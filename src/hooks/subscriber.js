@@ -23,13 +23,14 @@ function useSubscriber({ moderator, screen, camera, custom }){
       mSession.session.unsubscribe(subscriber);
     })
     setSubscribers([]);
-    setSubscribed([]);
+    // setSubscribed([]);
     mSession.clearSessions();
   }
 
   async function subscribe(streams, moderatorContainer){
     setSubscribed(streams);
     console.log("Streams", streams);
+    console.log("subsribed", subscribed);
 
     const streamIDs = streams.map((stream) => stream.id);
     const subscribedIDs = subscribed.map((stream) => stream.id);

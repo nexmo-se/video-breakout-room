@@ -53,28 +53,59 @@ function SessionProvider({ children }){
   }
 
   function handleStreamCreated(e){
-    setStreams((prevStreams) => [ ...prevStreams, e.stream]);
+    setPrevRoomStreams((prevStreams)=> {
+      const newStream = {...prevStreams};
+      const sessionId = e.target.sessionId;
+      if (newStream[sessionId]) newStream[sessionId] = [...newStream[sessionId], e.stream];
+      else newStream[sessionId] = [e.stream];
+      return newStream;
+    })
+    // setStreams((prevStreams) => [ ...prevStreams, e.stream]);
   }
 
   function handleStreamDestroyed(e){
     console.log("destoy from session id", e.target.sessionId);
-    setStreams((prevStreams) => {
-      console.log("prev stream", prevStreams);
-      return prevStreams.filter((prevStream) => {
-        return prevStream.id !== e.stream.id
-      })
+
+    setPrevRoomStreams((prevStreams)=> {
+      const newStream = {...prevStreams};
+      const sessionId = e.target.sessionId;
+      newStream[sessionId] = newStream[sessionId].filter((stream) => stream.id !== e.stream.id);
+      return newStream;
     })
+
+
+    // setStreams((prevStreams) => {
+    //   console.log("prev stream", prevStreams);
+    //   return prevStreams.filter((prevStream) => {
+    //     return prevStream.id !== e.stream.id
+    //   })
+    // })
   }
+
+  useEffect(() => {
+    if (session) {
+      // find based on session ID
+      const sessionId = session.sessionId;
+      const targetStreams = {...prevRoomStreams}[sessionId];
+      console.log("prevroom stream",prevRoomStreams );
+      console.log("session id", sessionId);
+      console.log("taget stream", targetStreams);
+      console.log("previous stream", streams);
+      if (targetStreams) {
+        console.log("im setting stream");
+        setStreams(targetStreams);
+      }
+    }
+
+  }, [prevRoomStreams, session])
+
+  useEffect(() => {
+    console.log("stream change", streams)
+  }, [streams])
 
   function clearSessions() {
-    setPrevRoomStreams(streams);
     setStreams([]);
     setIsConnected(false);
-  }
-
-  function resubscribe() {
-    console.log("prev room", prevRoomStreams)
-    setStreams(prevRoomStreams);
   }
 
   function handleSessionDisconnected(e) {
@@ -123,8 +154,7 @@ function SessionProvider({ children }){
       connections,
       participants,
       clearSessions,
-      userSessions,
-      resubscribe
+      userSessions
     }}>
       {children}
     </SessionContext.Provider>

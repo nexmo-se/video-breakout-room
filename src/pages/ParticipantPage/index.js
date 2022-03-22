@@ -92,7 +92,6 @@ export default function ParticipantPage(){
     mSession.session.unpublish(mPublisher.publisher);
     mSubscriber.unsubscribe();
     connect();
-    mSession.resubscribe();
     const newRooms = [...mMessage.breakoutRooms];
     // Find room based on room name
     const targetRoomIndex = newRooms.findIndex((room) => room.name === activeRoom);
@@ -115,6 +114,8 @@ export default function ParticipantPage(){
   }, [ mSession.session ]);
 
   React.useEffect(() => {
+    console.log("session", mSession.session)
+    console.log("msession stream", mSession.streams)
     if(mSession.session && mSession.isConnected) {
       mSubscriber.subscribe(mSession.streams);
     }
