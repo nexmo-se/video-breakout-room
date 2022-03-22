@@ -6,6 +6,7 @@ import useSession from "hooks/session";
 function useSubscriber({ moderator, screen, camera, custom }){
   const [ subscribed, setSubscribed ] = useState([]);
   const [ subscribers, setSubscribers ] = useState([]);
+
   const [ cameraLayout, setCameraLayout ] = useState(new LayoutManager(camera));
   const [ screenLayout, setScreenLayout ] = useState(new LayoutManager(screen));
   const mSession = useSession();
@@ -28,15 +29,10 @@ function useSubscriber({ moderator, screen, camera, custom }){
 
   async function subscribe(streams, moderatorContainer){
     setSubscribed(streams);
+    console.log("Streams", streams);
 
-    streams.forEach((stream) => {
-      console.log('my stream' , mSession.session.getSubscribersForStream (stream));
-    })
     const streamIDs = streams.map((stream) => stream.id);
     const subscribedIDs = subscribed.map((stream) => stream.id);
-
-    console.log("stream ids", streamIDs);
-    console.log("subscribed ids", subscribedIDs);
 
     const newStreams = streams.filter((stream) => !subscribedIDs.includes(stream.id))
     const removedStreams = subscribed.filter((stream) => !streamIDs.includes(stream.id));
@@ -49,9 +45,6 @@ function useSubscriber({ moderator, screen, camera, custom }){
       })
     })
 
-    console.log("new stream", newStreams);
-    console.log("current sesstion", mSession.session);
-
     await Promise.all(newStreams.map(async (stream) => {
       const { connection, videoType } = stream;
       const data = JSON.parse(connection.data);
@@ -60,8 +53,7 @@ function useSubscriber({ moderator, screen, camera, custom }){
       const finalOptions = Object.assign({}, extraData, { insertMode: "append" });
       const subscriber = await new Promise((resolve, reject) => {
         const subscriber = mSession.session.subscribe(stream, containerId, finalOptions, (err) => {
-          if(err) reject(err);
-          else resolve(subscriber);
+          if(!err) resolve(subscriber);
         })        
       });
       setSubscribers((prevSubscribers) => [ ...prevSubscribers, subscriber ]);

@@ -5,6 +5,7 @@ import OT, { Session, Stream, Connection } from "@opentok/client";
 
 import Credential from "entities/credential";
 import User from "entities/user";
+import { ConstructionOutlined } from "@mui/icons-material";
 
 
 export const SessionContext = createContext<any>({});
@@ -13,6 +14,7 @@ function SessionProvider({ children }){
   const [ session, setSession ] = useState<Session>();
   const [ changedStream, setChangedStream ] = useState<any>();
   const [ streams, setStreams ] = useState<Array<Stream>>([]);
+  const [ prevRoomStreams, setPrevRoomStreams ] = useState<Array<Stream>>([]);
 
   const [ connections, setConnections ] = useState<Array<Connection>>([]);
   const [ participants, setParticipants ] = useState([]);
@@ -51,21 +53,28 @@ function SessionProvider({ children }){
   }
 
   function handleStreamCreated(e){
-    
     setStreams((prevStreams) => [ ...prevStreams, e.stream]);
   }
 
-  function handleStreamDestroyed({ stream }){
+  function handleStreamDestroyed(e){
+    console.log("destoy from session id", e.target.sessionId);
     setStreams((prevStreams) => {
+      console.log("prev stream", prevStreams);
       return prevStreams.filter((prevStream) => {
-        return prevStream.id !== stream.id
+        return prevStream.id !== e.stream.id
       })
     })
   }
 
   function clearSessions() {
+    setPrevRoomStreams(streams);
     setStreams([]);
     setIsConnected(false);
+  }
+
+  function resubscribe() {
+    console.log("prev room", prevRoomStreams)
+    setStreams(prevRoomStreams);
   }
 
   function handleSessionDisconnected(e) {
@@ -81,7 +90,7 @@ function SessionProvider({ children }){
 
         session.on("streamPropertyChanged", handleStreamPropertyChanged);
         session.on("streamCreated", (e) => handleStreamCreated(e));
-        session.on("streamDestroyed", handleStreamDestroyed);
+        session.on("streamDestroyed", (e) => handleStreamDestroyed(e));
         session.on("sessionDisconnected", (e) => handleSessionDisconnected(e));
   
         session.on("connectionCreated", handleConnectionCreated);
@@ -114,7 +123,8 @@ function SessionProvider({ children }){
       connections,
       participants,
       clearSessions,
-      userSessions
+      userSessions,
+      resubscribe
     }}>
       {children}
     </SessionContext.Provider>

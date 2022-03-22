@@ -13,10 +13,6 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
   const [ nameDisplayMode, setNameDisplayMode ] = useState(displayName);
   const mSession = useSession();
 
-  useEffect(() => {
-    console.log("container id", containerId)
-  }, [containerId]);
-
   function handleDestroyed(){
     setPublisher(undefined);
   }
@@ -61,13 +57,10 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
       if (!publisher) {
 
         const initPublisher = OT.initPublisher(containerId, finalOptions);
-        console.log("publisher2", initPublisher);
-
         mSession.session.publish(initPublisher);
         setPublisher(initPublisher);
       }
       else {
-        console.log("publisher1", publisher);
         mSession.session.publish(publisher);
       }
     }catch(err){

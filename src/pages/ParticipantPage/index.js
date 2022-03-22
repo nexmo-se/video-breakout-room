@@ -62,9 +62,7 @@ export default function ParticipantPage(){
         data: user.toJSON()
       }
       if (roomName) credentialInfo["roomName"] = roomName;
-      console.log("credential info", credentialInfo);
       const credential = await CredentialAPI.generateCredential(credentialInfo);
-      console.log("create credential", credential);
       await mSession.connect(credential);
     }
   }
@@ -90,17 +88,11 @@ export default function ParticipantPage(){
     setActiveRoom(null);
   }
 
-  useEffect(() => {
-    if (mSession.session) {
-      console.log("session change", mSession.session)
-    }
-  }, [mSession.session])
-
   function handleBackMainRoom() {
-    console.log("unpublish session", mSession.session);
     mSession.session.unpublish(mPublisher.publisher);
     mSubscriber.unsubscribe();
     connect();
+    mSession.resubscribe();
     const newRooms = [...mMessage.breakoutRooms];
     // Find room based on room name
     const targetRoomIndex = newRooms.findIndex((room) => room.name === activeRoom);
@@ -118,16 +110,11 @@ export default function ParticipantPage(){
 
   React.useEffect(() => {
     if(mSession.session) {
-      console.log("publish now!!", mSession.session);
       mPublisher.publish(user);
     }
   }, [ mSession.session ]);
 
   React.useEffect(() => {
-    console.log("msession stream", mSession.streams);
-    console.log("msession session", mSession.session);
-    console.log("msession isConnected", mSession.isConnected);
-
     if(mSession.session && mSession.isConnected) {
       mSubscriber.subscribe(mSession.streams);
     }
