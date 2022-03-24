@@ -5,12 +5,6 @@ import useSession from "hooks/session";
 import useMessage from "hooks/message";
 import Person from "@material-ui/icons/Person"
 import useStyles from "./styles"
-import "@vonage/vwc-accordion";
-import "@vonage/vwc-expansion-panel";
-import "@vonage/vwc-list";
-import "@vonage/vwc-button";
-import "@vonage/vwc-formfield";
-import "@vonage/vwc-radio";
 import { Collapse } from 'antd';
 const { Panel } = Collapse;
 

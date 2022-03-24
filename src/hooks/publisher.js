@@ -82,7 +82,6 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
       if(autoLayout && stream && publisher) {
         const { videoType } = stream;
         const element = document.getElementById(publisher.id);
-        console.log("element", element);
         if(element && videoType === "screen") element.classList.add("OT_big");
       }
       layoutManager.layout();

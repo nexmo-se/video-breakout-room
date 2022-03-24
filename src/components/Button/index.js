@@ -2,12 +2,13 @@
 import clsx from "clsx";
 
 export default function Button(props){
-    const { text, style, hierarchy } = props;
+    const { text, style, hierarchy, value} = props;
   
     const handleClick = (e) => {
       e.preventDefault();
-      if(props.onClick) props.onClick();
+      e.stopPropagation();
+      if(props.onClick) props.onClick(e);
     }
     const buttonType =  hierarchy? hierarchy : "primary";
-    return <button className={clsx("Vlt-btn Vlt-btn--app" , "Vlt-btn--" + buttonType)} style={style} onClick={handleClick} type="submit">{text}</button>
+    return <button className={clsx("Vlt-btn Vlt-btn--app" , "Vlt-btn--" + buttonType)} value={value} style={style} onClick={handleClick} type="submit">{text}</button>
 }

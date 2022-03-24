@@ -29,8 +29,6 @@ function useSubscriber({ moderator, screen, camera, custom }){
 
   async function subscribe(streams, moderatorContainer){
     setSubscribed(streams);
-    console.log("Streams", streams);
-    console.log("subsribed", subscribed);
 
     const streamIDs = streams.map((stream) => stream.id);
     const subscribedIDs = subscribed.map((stream) => stream.id);

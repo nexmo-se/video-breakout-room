@@ -2,7 +2,6 @@
 import React, { useEffect } from "react";
 import clsx from "clsx";
 import config from "config";
-import CredentialAPI from "api/credential";
 import User from "entities/user";
 
 import useStyles from "./styles";
@@ -23,14 +22,16 @@ import AskNameDialog from "components/AskNameDialog";
 import LayoutContainer from "components/LayoutContainer";
 import PromptChooseRoom from "components/PromptChooseRoom";
 import Button from "components/Button";
+import RoomAPI from "api/room";
+
 
 
 export default function ParticipantPage(){
   const [ user, setUser ] = React.useState();
   const [ videoControlVisible, setVideoControlVisible ] = React.useState<boolean>(false);
-  const [ openPrompt, setOpenPrompt ] = React.useState(false);
+  const [ chooseRoomPrompt, setChooseRoomPrompt ] = React.useState(false);
+  const [ messagePrompt, setMessagePrompt ] = React.useState(false);
   const [ activeRoom, setActiveRoom ] = React.useState();
-  const [ inBreakoutRoom, setInBreakoutRoom ] = React.useState(false);
 
   const mSession = useSession();
   const mRoom = useRoom();
@@ -49,62 +50,38 @@ export default function ParticipantPage(){
   }
 
   React.useEffect(() => {
+      setChooseRoomPrompt(false);
+
       if (mMessage.breakoutRooms.length !== 0 && !activeRoom) {
-        setOpenPrompt(true);
+        // TODO: check if room already assigned, if yes, prompt to ask join room
+        setChooseRoomPrompt(true);
+      }
+      else if (mMessage.breakoutRooms.length === 0  && activeRoom) {        
+        handleBackMainRoom();
+      }
+      else if (mMessage.breakoutRooms.length !== 0  && activeRoom) {
+        // TODO: check if need change room.
+        // TODO: change if needed
       }
   }, [ mMessage.breakoutRooms ])
 
-
-  async function connect(roomName){
-    if(user){
-      const credentialInfo = {
-        role: "publisher",
-        data: user.toJSON()
-      }
-      if (roomName) credentialInfo["roomName"] = roomName;
-      const credential = await CredentialAPI.generateCredential(credentialInfo);
-      await mSession.connect(credential);
-    }
-  }
-
   function handleConfirm() {
-    mSession.session.unpublish(mPublisher.publisher);
-    mSubscriber.unsubscribe();
-    connect(activeRoom);
-    setOpenPrompt(false);
-    const newRooms = [...mMessage.breakoutRooms];
-    // Find room based on room name
-    const targetRoomIndex = newRooms.findIndex((room) => room.name === activeRoom);
-    newRooms[targetRoomIndex]["member"].push(user.name);
-    setInBreakoutRoom(true);
-    mSession.userSessions[0].signal({
-      type: "join-room",
-      data: JSON.stringify(newRooms)
-    }); 
+    mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, user, activeRoom);
+    setChooseRoomPrompt(false);
   }
 
   function handleCancel() {
-    setOpenPrompt(false);
+    setChooseRoomPrompt(false);
     setActiveRoom(null);
   }
 
   function handleBackMainRoom() {
-    mSession.session.unpublish(mPublisher.publisher);
-    mSubscriber.unsubscribe();
-    connect();
-    const newRooms = [...mMessage.breakoutRooms];
-    // Find room based on room name
-    const targetRoomIndex = newRooms.findIndex((room) => room.name === activeRoom);
-    newRooms[targetRoomIndex]["member"].splice(newRooms[targetRoomIndex]["member"].indexOf(user.name),1);
-    setInBreakoutRoom(false);
-    mSession.userSessions[0].signal({
-      type: "join-room",
-      data: JSON.stringify(newRooms)
-    }); 
+    mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, user);
+    setActiveRoom(null);
   }
 
   React.useEffect(() => {
-    if(user) connect()
+    if(user) mRoom.connect(user, "publisher")
   }, [ user ]);
 
   React.useEffect(() => {
@@ -114,8 +91,6 @@ export default function ParticipantPage(){
   }, [ mSession.session ]);
 
   React.useEffect(() => {
-    console.log("session", mSession.session)
-    console.log("msession stream", mSession.streams)
     if(mSession.session && mSession.isConnected) {
       mSubscriber.subscribe(mSession.streams);
     }
@@ -136,7 +111,7 @@ export default function ParticipantPage(){
     <React.Fragment>
       <div className={mStyles.container}>
       <div className={clsx(mStyles.leftContainer, mStyles.black)}>
-            { inBreakoutRoom ?
+            { mRoom.inBreakoutRoom ?
               (
               <div className={mStyles.header}>
                 <strong>{activeRoom}</strong>
@@ -177,7 +152,7 @@ export default function ParticipantPage(){
         </div>
       </div>
       <PromptChooseRoom
-        when={openPrompt}
+        when={chooseRoomPrompt}
         onOK={handleConfirm}
         onCancel={handleCancel}
         title="Join a breakout room"
@@ -186,6 +161,16 @@ export default function ParticipantPage(){
         activeRoom={activeRoom}
         setActiveRoom={setActiveRoom}
       ></PromptChooseRoom>
+      {/* <PromptMessage
+        when={messagePrompt}
+        onOK={handleConfirm}
+        onCancel={handleCancel}
+        title="Join a breakout room"
+        okText="Join"
+        CancelText="Cancel"
+        activeRoom={activeRoom}
+        setActiveRoom={setActiveRoom}
+      ></PromptMessage> */}
     </React.Fragment>
   )
 }

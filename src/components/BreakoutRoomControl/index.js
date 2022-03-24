@@ -7,14 +7,16 @@ import clsx from "clsx";
 import Person from "@material-ui/icons/Person"
 import { Collapse } from 'antd';
 import Button from 'components/Button'
+import RoomAPI from "api/room";
+
 const { Panel } = Collapse;
 
 export default function BreakoutRoomControl(props) {
-    const { when } = props
+    const { when, setIsBreakout, setActiveRoom } = props
     const mStyles = useStyles();
     const mSession = useSession();
     const mMessage = useMessage();
-
+    const mRoom = useRoom();
 
     const [roomGroup, setRoomGroup] = useState({
         "Main Room": []
@@ -72,10 +74,27 @@ export default function BreakoutRoomControl(props) {
         setPosition(newPosition);
     }
 
-    function handleJoinRoom() {
-        // TODO
+    function handleJoinRoom(e) {
+        if (mRoom.inBreakoutRoom === e.target.value) {
+            return setActiveRoom(null);
+        }
+         setActiveRoom(e.target.value);
     }
 
+    function handleAddNewRoom() {
+        let roomName = `Room ${mMessage.breakoutRooms.length + 1}`;
+        mRoom.handleRoomCreation(roomName).then((response) => {
+            response["member"] = [];
+            response["maxMember"] = mMessage.breakoutRooms[0]["maxMember"];
+
+            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], [...mMessage.breakoutRooms, response])
+        });
+    }
+
+    function handleCloseAllRoom() {
+        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], [])
+        setIsBreakout(false);
+    }
     return when ? (
         <>
         <div className={mStyles.root} style={position.styles} onMouseDown={dragStart} onMouseMove={dragging} onMouseUp={dragEnd}>
@@ -83,7 +102,7 @@ export default function BreakoutRoomControl(props) {
         <Collapse defaultActiveKey={['1']} accordion ghost>
         {roomGroup && Object.entries(roomGroup).map(([key,value],i) => {
           const genExtra = () => (
-            <Button value={key} text="Join" key={'joinroom-' + i} onClick={handleJoinRoom} style={{minHeight: "24px", padding: "0px 4px", margin: "0px 24px"}}></Button>
+            i !== 0 ? <Button value={key} text={mRoom.inBreakoutRoom === key ? "Leave" : "Join"} key={'joinroom-' + i} onClick={handleJoinRoom} style={{minHeight: "24px", padding: "0px 4px", margin: "0px 24px"}}></Button> : null
           ); 
           return(
             <Panel header={key + ' (' + value.length + ')'} key={"chooseroom-" + i} extra={genExtra()}>
@@ -95,7 +114,11 @@ export default function BreakoutRoomControl(props) {
             </Panel>
         )})
         }
-    </Collapse>
+        </Collapse>
+        <div>
+            <Button text="Add New Room" hierarchy="tertiary" onClick={handleAddNewRoom}></Button>
+            <Button text="Close All Rooms" hierarchy="destructive" onClick={handleCloseAllRoom}></Button>
+        </div>
         </div>
         </>
     ): null;

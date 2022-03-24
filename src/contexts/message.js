@@ -93,12 +93,6 @@ export default function MessageProvider({ children }){
           return jsonData;
         })
       })
-      mSession.session.on("signal:join-room", ({ data }) => {
-        setBreakoutRooms((prevBreakoutRooms) => {
-          const jsonData = JSON.parse(data);
-          return jsonData;
-        })
-      })
     }
   }, [ mSession.session ])
 

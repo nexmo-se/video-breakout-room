@@ -26,8 +26,9 @@ function SessionProvider({ children }){
       const user = User.fromJSON(data);
       user.connection = connection;
       user.id = connection.id;
-      return user;
-    }).sort((a, b) => {
+      return user
+    }).reduce((acc, curr) => acc.find((p) => p.name === curr.name) ? acc: [...acc, curr], [])
+    .sort((a, b) => {
       if(a.name.toLowerCase() < b.name.toLowerCase()) return -1
       else if(a.name.toLowerCase() > b.name.toLowerCase()) return 1;
       else return 0;
@@ -64,22 +65,12 @@ function SessionProvider({ children }){
   }
 
   function handleStreamDestroyed(e){
-    console.log("destoy from session id", e.target.sessionId);
-
     setPrevRoomStreams((prevStreams)=> {
       const newStream = {...prevStreams};
       const sessionId = e.target.sessionId;
       newStream[sessionId] = newStream[sessionId].filter((stream) => stream.id !== e.stream.id);
       return newStream;
     })
-
-
-    // setStreams((prevStreams) => {
-    //   console.log("prev stream", prevStreams);
-    //   return prevStreams.filter((prevStream) => {
-    //     return prevStream.id !== e.stream.id
-    //   })
-    // })
   }
 
   useEffect(() => {
@@ -87,21 +78,12 @@ function SessionProvider({ children }){
       // find based on session ID
       const sessionId = session.sessionId;
       const targetStreams = {...prevRoomStreams}[sessionId];
-      console.log("prevroom stream",prevRoomStreams );
-      console.log("session id", sessionId);
-      console.log("taget stream", targetStreams);
-      console.log("previous stream", streams);
       if (targetStreams) {
-        console.log("im setting stream");
         setStreams(targetStreams);
       }
     }
 
   }, [prevRoomStreams, session])
-
-  useEffect(() => {
-    console.log("stream change", streams)
-  }, [streams])
 
   function clearSessions() {
     setStreams([]);
@@ -134,7 +116,6 @@ function SessionProvider({ children }){
           })
         });
       }
-      console.log("set session id", session.id);
       setSession(session);
       setUserSessions([...userSessions, session]);
       setIsConnected(true);

@@ -13,4 +13,16 @@ export default class RoomAPI{
     const room = new Room(jsonResult.apiKey, jsonResult.name, jsonResult.sessionId);
     return room;
   }
+
+  static async sendBreakoutRoom(session, breakoutRoom){
+    await new Promise((resolve, reject) => {
+      session.signal({
+        type: "breakout-room",
+        data: JSON.stringify(breakoutRoom)
+      }, (err) => {
+        if(err) reject(err);
+        else resolve();
+      });
+    })
+  };
 }

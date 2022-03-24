@@ -3,11 +3,12 @@ import { Modal, Form, InputNumber, Radio } from "antd";
 import useRoom from "hooks/room";
 import useSession from "hooks/session";
 import Room from "entities/room";
+import RoomAPI from "api/room"
 
 
 export default function PromptCreateRooms(props) {
   const [form] = Form.useForm();
-  const mroom = useRoom();
+  const mRoom = useRoom();
   const mSession = useSession();
 
 
@@ -37,7 +38,7 @@ export default function PromptCreateRooms(props) {
       let p = [];
       for (let i = 0; i < numberOfRooms; i++) {
         let roomName = `Room ${i+1}`;
-        p.push(mroom.handleRoomCreation(roomName));
+        p.push(mRoom.handleRoomCreation(roomName));
       }
       Promise.all(p).then((response) => {
         // add maxmember and empty member list
@@ -45,10 +46,7 @@ export default function PromptCreateRooms(props) {
           data["member"] = [];
           data["maxMember"] = numberOfParticipants/numberOfRooms
         })
-        mSession.session.signal({
-          type: "breakout-room",
-          data: JSON.stringify(response)
-        }); 
+        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], response)
       });
     }
 

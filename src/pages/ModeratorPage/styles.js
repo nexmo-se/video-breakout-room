@@ -16,6 +16,17 @@ export default makeStyles(() => ({
     display: "flex",
     position: "relative" 
   },
+  header: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 2,
+    backgroundColor: "rgba(255, 249, 222,0.8)",
+    width: "100%",
+    height: "32px",
+    paddingLeft: "16px",
+    lineHeight: "32px",
+  },
   logoContainer: { 
     display: "flex", 
     flexDirection: "column", 

@@ -7,6 +7,7 @@ import clsx from "clsx";
 import useSession from "hooks/session";
 import useSubscriber from "hooks/subscriber";
 import usePublisher from "hooks/publisher";
+import useRoom from "hooks/room";
 
 import FullPageLoading from "components/FullPageLoading";
 import LayoutContainer from "components/LayoutContainer";
@@ -18,14 +19,18 @@ import ChatList from "components/ChatList";
 import ChatInput from "components/ChatInput";
 import BreakoutRoomButton from "components/BreakoutRoomButton";
 import BreakoutRoomControl from "components/BreakoutRoomControl";
+import Button from "components/Button";
 
 import useStyles from "./styles"
 
 export default function ModeratorPage() {
     const [isBreakout, setIsBreakout] = useState(false);
+    const [activeRoom, setActiveRoom] = useState();
+
     const [user, setUser] = useState();
     const mSession = useSession();
     const mStyles = useStyles();
+    const mRoom = useRoom();
     const mPublisher = usePublisher("cameraContainer", true, false);
     const mSubscriber = useSubscriber({ 
       moderator: "cameraContainer", 
@@ -40,20 +45,8 @@ export default function ModeratorPage() {
         return;
       }
 
-    async function connect(roomName){
-    if(user){
-        const credentialInfo = {
-          role: "moderator",
-          data: user.toJSON()
-        }
-        if (roomName) credentialInfo["roomName"] = roomName
-        const credential = await CredentialAPI.generateCredential(credentialInfo);
-        await mSession.connect(credential);
-    }
-    }
-
     useEffect(() => {
-    if(user) connect()
+    if(user) mRoom.connect(user, "moderator")
     }, [ user ]);
 
     useEffect(() => {
@@ -64,6 +57,15 @@ export default function ModeratorPage() {
       if(mSession.session) mSubscriber.subscribe(mSession.streams);
     }, [ mSession.streams, mSession.session ]);
 
+    useEffect(() => {
+        if (activeRoom || mRoom.inBreakoutRoom) {
+          mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, user, activeRoom ? activeRoom : '');
+        }
+    }, [activeRoom])
+
+    function handleBackMainRoom() {
+      setActiveRoom(null);
+    }
 
     if(!user && !mSession.session) {
     return (
@@ -79,6 +81,14 @@ export default function ModeratorPage() {
       <>
       <div className={mStyles.container}>
         <div className={clsx(mStyles.leftContainer, mStyles.black)}>
+        { mRoom.inBreakoutRoom ?
+              (
+              <div className={mStyles.header}>
+                <strong>{activeRoom}</strong>
+                <Button hierarchy="link" text="Return to main room" onClick={handleBackMainRoom} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
+              </div>
+              ) : null
+          }
           <LayoutContainer id="cameraContainer" size="big" />
           <WhiteLayer/>
           <div className={mStyles.logoContainer}>
@@ -114,6 +124,8 @@ export default function ModeratorPage() {
       </div>
         <BreakoutRoomControl
         when={isBreakout}
+        setIsBreakout={setIsBreakout}
+        setActiveRoom={setActiveRoom}
         ></BreakoutRoomControl>
     </>
     )
