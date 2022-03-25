@@ -20,18 +20,37 @@ export default function PromptChooseRooms(props) {
   const [ numberParticipants, setNumberOfParticipants] = useState(mSession.participants.length);
   const [roomGroup, setRoomGroup] = useState({})
   const [ buttonDisabled, setButtonDisabled] = useState(true);
+  const [ roomOccupied, setRoomOccupied ] = useState([]);
 
     useEffect(() => {
-        let newRoomGroup = {...roomGroup};
-        let participantAssigned = [];
+      console.log("room group", mMessage.breakoutRooms);
+        let newRoomGroup = {};
         mMessage.breakoutRooms.forEach((room) => {
-            newRoomGroup[room.name] = room.member;
-            participantAssigned.concat(room.member);
+          newRoomGroup[room.name] = room.member;
+          setRoomGroup(newRoomGroup);
+          if (room.member.length >= room.maxMember) {
+            console.log("im here1");
+            setRoomOccupied((prev) => {
+              return [...new Set([...prev, room.name])]
+            })
+          }
+         if (roomOccupied.includes(room.name)){
+          console.log("im here2");
+
+            setRoomOccupied((prev) => {
+              let newRoomOccupied = [...prev];
+              newRoomOccupied.splice(newRoomOccupied.indexOf(room.name), 1);
+              return newRoomOccupied;
+            })
+          }
         })
-        setRoomGroup(newRoomGroup);
     }, [mMessage.breakoutRooms])
 
 
+
+    useEffect(() => {
+      console.log("room occupied", roomOccupied)
+    }, [roomOccupied])
     useEffect(() => {
       if(activeRoom) {
         setButtonDisabled(false)
@@ -44,15 +63,11 @@ export default function PromptChooseRooms(props) {
      setActiveRoom(e.target.value);
     }
 
-    function handleJoinRoom() {
-      onOK();
-    }
-
     return (
     <Modal
       title={title}
       visible={when}
-      onOk={handleJoinRoom}
+      onOk={onOK}
       okText={okText}
       onCancel={onCancel}
       cancelText={cancelText}
@@ -62,7 +77,13 @@ export default function PromptChooseRooms(props) {
       <Collapse defaultActiveKey={['1']} accordion ghost>
         {roomGroup && Object.entries(roomGroup).map(([key,value],i) => {
           const genExtra = () => (
-            <Radio value={key} key={'radio-' + i} checked={activeRoom === key} onClick={handleRoomChange}></Radio>
+            <>
+            {
+              roomOccupied.includes(key) ?
+              <span>FULL</span>
+            : <Radio value={key} key={'radio-' + i} checked={activeRoom === key} disabled={roomOccupied.includes(key) ? true : false} onClick={handleRoomChange}></Radio>
+            }
+            </>
           ); 
           return(
             <Panel header={key + ' (' + value.length + ')'} key={"chooseroom-" +i} extra={genExtra()}>

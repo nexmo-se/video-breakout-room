@@ -80,6 +80,7 @@ export default function ModeratorPage() {
     else if(user && mSession.session) return (
       <>
       <div className={mStyles.container}>
+        {!mSession.isConnected ? <FullPageLoading/> : null}
         <div className={clsx(mStyles.leftContainer, mStyles.black)}>
         { mRoom.inBreakoutRoom ?
               (

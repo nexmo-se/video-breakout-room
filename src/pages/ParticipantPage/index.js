@@ -23,7 +23,7 @@ import LayoutContainer from "components/LayoutContainer";
 import PromptChooseRoom from "components/PromptChooseRoom";
 import Button from "components/Button";
 import RoomAPI from "api/room";
-
+import { notification } from 'antd';
 
 
 export default function ParticipantPage(){
@@ -31,6 +31,7 @@ export default function ParticipantPage(){
   const [ videoControlVisible, setVideoControlVisible ] = React.useState<boolean>(false);
   const [ chooseRoomPrompt, setChooseRoomPrompt ] = React.useState(false);
   const [ messagePrompt, setMessagePrompt ] = React.useState(false);
+
   const [ activeRoom, setActiveRoom ] = React.useState();
 
   const mSession = useSession();
@@ -52,16 +53,22 @@ export default function ParticipantPage(){
   React.useEffect(() => {
       setChooseRoomPrompt(false);
 
+      // TODO if active room not inside mMessage.breakout room , prompt return to main dialog
+
       if (mMessage.breakoutRooms.length !== 0 && !activeRoom) {
         // TODO: check if room already assigned, if yes, prompt to ask join room
         setChooseRoomPrompt(true);
       }
       else if (mMessage.breakoutRooms.length === 0  && activeRoom) {        
-        handleBackMainRoom();
+        openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.")
       }
       else if (mMessage.breakoutRooms.length !== 0  && activeRoom) {
         // TODO: check if need change room.
         // TODO: change if needed
+        if (!mMessage.breakoutRooms.find((room) => room.name === activeRoom)) {
+          openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.")
+
+        }
       }
   }, [ mMessage.breakoutRooms ])
 
@@ -76,9 +83,27 @@ export default function ParticipantPage(){
   }
 
   function handleBackMainRoom() {
+    console.log("inside close");
     mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, user);
     setActiveRoom(null);
   }
+
+  function openNotification(message, description) {
+    const key = `open${Date.now()}`;
+    const btn = (
+      <Button type="secondary" text="Confirm" size="small" onClick={() => {handleBackMainRoom(); notification.close(key);}}>
+        Confirm
+      </Button>
+    );
+    notification.open({
+      message,
+      description,
+      btn,
+      key,
+      duration: 5,
+      onClose: handleBackMainRoom,
+    });
+  };
 
   React.useEffect(() => {
     if(user) mRoom.connect(user, "publisher")
@@ -110,6 +135,7 @@ export default function ParticipantPage(){
   else if(user && mSession.session) return (
     <React.Fragment>
       <div className={mStyles.container}>
+        {!mSession.isConnected ? <FullPageLoading/> : null}
       <div className={clsx(mStyles.leftContainer, mStyles.black)}>
             { mRoom.inBreakoutRoom ?
               (
@@ -161,16 +187,6 @@ export default function ParticipantPage(){
         activeRoom={activeRoom}
         setActiveRoom={setActiveRoom}
       ></PromptChooseRoom>
-      {/* <PromptMessage
-        when={messagePrompt}
-        onOK={handleConfirm}
-        onCancel={handleCancel}
-        title="Join a breakout room"
-        okText="Join"
-        CancelText="Cancel"
-        activeRoom={activeRoom}
-        setActiveRoom={setActiveRoom}
-      ></PromptMessage> */}
     </React.Fragment>
   )
 }

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Modal, Form, InputNumber, Radio } from "antd";
+import { Modal, Form, InputNumber, Radio, Input } from "antd";
 import useRoom from "hooks/room";
 import useSession from "hooks/session";
 import Room from "entities/room";
@@ -20,15 +20,6 @@ export default function PromptCreateRooms(props) {
       setNumberOfParticipants(mSession.participants.length);
     }, [mSession.participants.length])
 
-    useEffect(() => {
-        if (when) {
-          form.setFieldsValue({
-            roomCount: numberOfRooms,
-            modifier: "automatic"
-         });
-        }
-    }, [when])
-
     function handleRoomChange(value) {
       setNumberOfRooms(value);
     }
@@ -36,15 +27,16 @@ export default function PromptCreateRooms(props) {
     function handleConfirm() {
       onOK();
       let p = [];
-      for (let i = 0; i < numberOfRooms; i++) {
-        let roomName = `Room ${i+1}`;
-        p.push(mRoom.handleRoomCreation(roomName));
+      const formValue = form.getFieldsValue();
+      for (let i = 0; i < formValue.roomCount; i++) {
+        let roomName = formValue[`roomName ${i + 1}`];
+        let maxMamber = formValue[`maxMember ${i + 1}`]
+        p.push(mRoom.handleRoomCreation(roomName, maxMamber));
       }
       Promise.all(p).then((response) => {
-        // add maxmember and empty member list
+        // add empty member list
         response.map((data) => {
           data["member"] = [];
-          data["maxMember"] = numberOfParticipants/numberOfRooms
         })
         RoomAPI.sendBreakoutRoom(mSession.userSessions[0], response)
       });
@@ -67,7 +59,7 @@ export default function PromptCreateRooms(props) {
         form={form}
         layout="vertical"
         name="form_in_modal"
-        initialValues={{ modifier: 'public' }}
+        initialValues={{ modifier: 'automatic', roomCount: numberOfRooms }}
       >
         <div>Assign {numberOfParticipants} participants into <Form.Item
           name="roomCount"
@@ -76,6 +68,27 @@ export default function PromptCreateRooms(props) {
         >
           <InputNumber min={1} onChange={handleRoomChange}/>
         </Form.Item> Breakout rooms. </div>
+        {[...Array(numberOfRooms)].map((x, i) =>
+              <Input.Group compact key={`room ${i+1}`}>
+              <Form.Item
+              label="Room Name"
+              name={`roomName ${i+1}`}
+              rules={[{ required: true, message: 'Please input a room name!' }]}
+              style={{marginRight: "24px"}}
+              initialValue={`Room ${i+1}`}
+            >
+              <Input/>
+            </Form.Item>
+              <Form.Item
+              label="Max Participants"
+              name={`maxMember ${i+1}`}
+              rules={[{ required: true, message: 'Please input max participants!' }]}
+              initialValue={1}
+            >
+              <InputNumber min={1} value={1}/>
+            </Form.Item>
+            </Input.Group>
+        )}
         <Form.Item name="modifier" className="collection-create-form_last-form-item">
           <Radio.Group>
             <Radio style={{display: 'block'}} value="automatic">Assign automatically</Radio>
@@ -83,7 +96,6 @@ export default function PromptCreateRooms(props) {
           </Radio.Group>
         </Form.Item>
       </Form>
-      <p>Maximum {Math.ceil(numberOfParticipants/numberOfRooms)} participants per room</p>
     </Modal>
   ) : null;
 }

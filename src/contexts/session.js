@@ -91,7 +91,6 @@ function SessionProvider({ children }){
   }
 
   function handleSessionDisconnected(e) {
-    e.preventDefault();
     setSession(null);
   }
 

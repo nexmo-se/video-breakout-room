@@ -12,29 +12,35 @@ export const RoomContext = createContext({});
 export default function RoomContextProvider({ children }){
   const [inBreakoutRoom, setInBreakoutRoom] = useState(null);
   const [role, setRole] = useState(false);
+  const [credential, setCredential] = useState(false);
+
 
   const mSession = useSession();
   const mPublisher = usePublisher();
   const mMessage = useMessage();
 
-  async function handleRoomCreation(roomName) {
+  async function handleRoomCreation(roomName, maxMember) {
     const generatedRoom = await RoomAPI.generateSession(roomName);
+    generatedRoom["maxMember"] = maxMember;
     return new Promise((resolve, reject) => {
       resolve(generatedRoom);
     })
   }
 
   async function connect(user, role, roomName){
-    if(user){
-      const credentialInfo = {
-        role,
-        data: user.toJSON()
+      if (credential) {
+        return await mSession.connect(credential);
       }
-      if (roomName) credentialInfo["roomName"] = roomName;
-      const credential = await CredentialAPI.generateCredential(credentialInfo);
-      await mSession.connect(credential);
-      setRole(role);
-    }
+      if(user) {
+        const credentialInfo = {
+          role,
+          data: user.toJSON()
+        }
+        if (roomName) credentialInfo["roomName"] = roomName;
+        const credential = await CredentialAPI.generateCredential(credentialInfo);
+        await mSession.connect(credential);
+        setRole(role);
+      }
   }
 
   function handleChangeRoom(publisher, subscriber, user, roomName) {
