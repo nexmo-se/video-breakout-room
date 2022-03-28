@@ -55,11 +55,11 @@ export default function ParticipantPage(){
 
       // TODO if active room not inside mMessage.breakout room , prompt return to main dialog
 
-      if (mMessage.breakoutRooms.length !== 0 && !activeRoom) {
+      if (mMessage.breakoutRoomsRequest && !activeRoom) {
         // TODO: check if room already assigned, if yes, prompt to ask join room
         setChooseRoomPrompt(true);
       }
-      else if (mMessage.breakoutRooms.length === 0  && activeRoom) {        
+      else if (mMessage.breakoutRooms.length === 0  && activeRoom) {  
         openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.")
       }
       else if (mMessage.breakoutRooms.length !== 0  && activeRoom) {
@@ -83,7 +83,6 @@ export default function ParticipantPage(){
   }
 
   function handleBackMainRoom() {
-    console.log("inside close");
     mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, user);
     setActiveRoom(null);
   }

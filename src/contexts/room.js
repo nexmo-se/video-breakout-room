@@ -48,7 +48,8 @@ export default function RoomContextProvider({ children }){
     subscriber.unsubscribe();
     connect(user, role,  roomName ? roomName : '');
 
-    if (mMessage.breakoutRooms.length === 0) { setInBreakoutRoom(null); return; }
+    setInBreakoutRoom(null);
+    if (mMessage.breakoutRooms.length === 0) { return }
 
     const newRooms = [...mMessage.breakoutRooms];
     newRooms.map((room) => {
@@ -57,7 +58,6 @@ export default function RoomContextProvider({ children }){
       }
     })
 
-    setInBreakoutRoom(null);
     const targetRoomIndex = newRooms.findIndex((room) => room.name === roomName);
     if (targetRoomIndex !== -1 ) {
       newRooms[targetRoomIndex]["member"].push(user.name);

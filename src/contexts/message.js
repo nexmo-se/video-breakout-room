@@ -17,6 +17,7 @@ export default function MessageProvider({ children }){
   const [ raisedHands, setRaisedHands ] = useState([]);
   const [ messages, setMessages ] = useState([]);
   const [ breakoutRooms, setBreakoutRooms ] = useState([]);
+  const [ breakoutRoomsRequest, setBreakoutRoomsRequest ] = useState(false);
 
   const mSession = useSession();
 
@@ -27,7 +28,7 @@ export default function MessageProvider({ children }){
   }
 
   useEffect(() => {
-    if(mSession.session){
+    if(mSession.session && !mSession.userSessions.find((session) => session.sessionId === mSession.session.sessionId)){
       mSession.session.on("signal:force-video", ({ data }) => {
         const jsonData = JSON.parse(data)
         const user = User.fromJSON(JSON.parse(data));
@@ -88,6 +89,10 @@ export default function MessageProvider({ children }){
       })
 
       mSession.session.on("signal:breakout-room", ({ data }) => {
+        setBreakoutRoomsRequest(false);
+        if (breakoutRooms.length === 0) {
+          setBreakoutRoomsRequest(true);
+        }
         setBreakoutRooms((prevBreakoutRooms) => {
           const jsonData = JSON.parse(data);
           return jsonData;
@@ -106,7 +111,8 @@ export default function MessageProvider({ children }){
       raisedHands,
       removeRaisedHand,
       messages,
-      breakoutRooms
+      breakoutRooms,
+      breakoutRoomsRequest
     }}>
       {children}
     </MessageContext.Provider>

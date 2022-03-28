@@ -23,20 +23,16 @@ export default function PromptChooseRooms(props) {
   const [ roomOccupied, setRoomOccupied ] = useState([]);
 
     useEffect(() => {
-      console.log("room group", mMessage.breakoutRooms);
         let newRoomGroup = {};
         mMessage.breakoutRooms.forEach((room) => {
           newRoomGroup[room.name] = room.member;
           setRoomGroup(newRoomGroup);
           if (room.member.length >= room.maxMember) {
-            console.log("im here1");
             setRoomOccupied((prev) => {
               return [...new Set([...prev, room.name])]
             })
           }
-         if (roomOccupied.includes(room.name)){
-          console.log("im here2");
-
+         else if (roomOccupied.includes(room.name)){
             setRoomOccupied((prev) => {
               let newRoomOccupied = [...prev];
               newRoomOccupied.splice(newRoomOccupied.indexOf(room.name), 1);
@@ -46,11 +42,6 @@ export default function PromptChooseRooms(props) {
         })
     }, [mMessage.breakoutRooms])
 
-
-
-    useEffect(() => {
-      console.log("room occupied", roomOccupied)
-    }, [roomOccupied])
     useEffect(() => {
       if(activeRoom) {
         setButtonDisabled(false)
