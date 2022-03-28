@@ -85,7 +85,7 @@ export default function PromptCreateRooms(props) {
               rules={[{ required: true, message: 'Please input max participants!' }]}
               initialValue={1}
             >
-              <InputNumber min={1} value={1}/>
+              <InputNumber min={1}/>
             </Form.Item>
             </Input.Group>
         )}

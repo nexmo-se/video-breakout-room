@@ -10,6 +10,7 @@ import usePublisher from "hooks/publisher";
 import useMessage from "hooks/message";
 import useSubscriber from "hooks/subscriber";
 import useRoom from "hooks/room";
+import useNotification from "hooks/notification"
 
 import LiveBadge from "components/LiveBadge";
 import VonageLogo from "components/VonageLogo"
@@ -23,7 +24,7 @@ import LayoutContainer from "components/LayoutContainer";
 import PromptChooseRoom from "components/PromptChooseRoom";
 import Button from "components/Button";
 import RoomAPI from "api/room";
-import { notification } from 'antd';
+ 
 
 
 export default function ParticipantPage(){
@@ -40,6 +41,7 @@ export default function ParticipantPage(){
   const mScreenPublisher = usePublisher("cameraContainer");
   const mStyles = useStyles();
   const mMessage = useMessage();
+  const mNotification = useNotification();
   const mSubscriber = useSubscriber({ 
     moderator: "moderatorContainer", 
     camera: "cameraContainer", 
@@ -51,26 +53,18 @@ export default function ParticipantPage(){
   }
 
   React.useEffect(() => {
-      setChooseRoomPrompt(false);
-
-      // TODO if active room not inside mMessage.breakout room , prompt return to main dialog
-
-      if (mMessage.breakoutRoomsRequest && !activeRoom) {
-        // TODO: check if room already assigned, if yes, prompt to ask join room
-        setChooseRoomPrompt(true);
-      }
-      else if (mMessage.breakoutRooms.length === 0  && activeRoom) {  
-        openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.")
-      }
-      else if (mMessage.breakoutRooms.length !== 0  && activeRoom) {
-        // TODO: check if need change room.
-        // TODO: change if needed
-        if (!mMessage.breakoutRooms.find((room) => room.name === activeRoom)) {
-          openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.")
-
-        }
-      }
-  }, [ mMessage.breakoutRooms ])
+    setChooseRoomPrompt(false);
+    console.log('m sig',mRoom.signal  );
+    if (mRoom.signal === 'breakoutRoomCreated') {
+      setChooseRoomPrompt(true);
+    }
+    else if (mRoom.signal === 'breakoutRoomRemoved') {  
+      mNotification.openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.", handleBackMainRoom)
+    }
+    else if (mRoom.signal === 'breakoutRoomRenamed') {  
+      mNotification.openNotification("Room renamed by Host", "Room rename by host, new Room Name: " + mRoom.inBreakoutRoom, ()=>{});
+    }
+  }, [ mRoom.signal ])
 
   function handleConfirm() {
     mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, user, activeRoom);
@@ -86,23 +80,6 @@ export default function ParticipantPage(){
     mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, user);
     setActiveRoom(null);
   }
-
-  function openNotification(message, description) {
-    const key = `open${Date.now()}`;
-    const btn = (
-      <Button type="secondary" text="Confirm" size="small" onClick={() => {handleBackMainRoom(); notification.close(key);}}>
-        Confirm
-      </Button>
-    );
-    notification.open({
-      message,
-      description,
-      btn,
-      key,
-      duration: 5,
-      onClose: handleBackMainRoom,
-    });
-  };
 
   React.useEffect(() => {
     if(user) mRoom.connect(user, "publisher")
@@ -120,6 +97,9 @@ export default function ParticipantPage(){
     }
   }, [ mSession.streams, mSession.session, mSession.isConnected ]);
 
+  useEffect(() =>{
+    console.log("m broom", mRoom.inBreakoutRoom);
+  }, [mRoom.inBreakoutRoom])
 
   if(!user && !mSession.session){
     return (
@@ -136,10 +116,11 @@ export default function ParticipantPage(){
       <div className={mStyles.container}>
         {!mSession.isConnected ? <FullPageLoading/> : null}
       <div className={clsx(mStyles.leftContainer, mStyles.black)}>
-            { mRoom.inBreakoutRoom ?
+            {
+            mRoom.inBreakoutRoom ?
               (
               <div className={mStyles.header}>
-                <strong>{activeRoom}</strong>
+                <strong>{mRoom.inBreakoutRoom}</strong>
                 <Button hierarchy="link" text="Return to main room" onClick={handleBackMainRoom} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
               </div>
               ) : null

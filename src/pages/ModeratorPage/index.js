@@ -8,6 +8,7 @@ import useSession from "hooks/session";
 import useSubscriber from "hooks/subscriber";
 import usePublisher from "hooks/publisher";
 import useRoom from "hooks/room";
+import useNotification from "hooks/notification";
 
 import FullPageLoading from "components/FullPageLoading";
 import LayoutContainer from "components/LayoutContainer";
@@ -31,6 +32,7 @@ export default function ModeratorPage() {
     const mSession = useSession();
     const mStyles = useStyles();
     const mRoom = useRoom();
+    const mNotification = useNotification();
     const mPublisher = usePublisher("cameraContainer", true, false);
     const mSubscriber = useSubscriber({ 
       moderator: "cameraContainer", 
@@ -39,6 +41,16 @@ export default function ModeratorPage() {
     });
 
     const [ videoControlVisible, setVideoControlVisible ] = useState(false);
+
+
+    useEffect(() => {
+      if (mRoom.signal === 'breakoutRoomRemoved') {  
+        mNotification.openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.", handleBackMainRoom)
+      }
+      if (mRoom.signal === 'breakoutRoomRenamed') {  
+        mNotification.openNotification("Room renamed by Host", "Room rename by host, new Room Name: " +  mRoom.inBreakoutRoom, ()=>{});
+      }
+    }, [ mRoom.signal ])
 
     function handleSubmit(user){
         setUser(user);
@@ -85,7 +97,7 @@ export default function ModeratorPage() {
         { mRoom.inBreakoutRoom ?
               (
               <div className={mStyles.header}>
-                <strong>{activeRoom}</strong>
+                <strong>{mRoom.inBreakoutRoom}</strong>
                 <Button hierarchy="link" text="Return to main room" onClick={handleBackMainRoom} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
               </div>
               ) : null

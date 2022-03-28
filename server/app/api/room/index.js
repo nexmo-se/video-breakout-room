@@ -19,10 +19,14 @@ class RoomAPI{
     });
   }
 
-  /**
-   * 
-   * @param {Room} room 
-   */
+  static async renameRoom(room, newRoomName){
+    await DatabaseAPI.query(async (client) => {
+      await client.query("UPDATE rooms SET id = $1 WHERE sessionId = $2 ", [ newRoomName, room.sessionId  ]);
+    });
+    const newRoom = new Room(newRoomName, room.sessionId);
+    return Promise.resolve(newRoom);
+  }
+
   static async generateSession(room){
     const isExists = await RoomAPI.isExistsById(room);
     if(!isExists){
@@ -42,10 +46,6 @@ class RoomAPI{
     }
   }
 
-  /**
-   * 
-   * @param {Room} room 
-   */
   static async getDetailById(room){
     return await DatabaseAPI.query(async (client) => {
       const queryResponse = await client.query("SELECT * FROM rooms WHERE id = $1", [ room.id ]);
@@ -54,10 +54,6 @@ class RoomAPI{
     })
   }
 
-  /**
-   * 
-   * @param {Room} room 
-   */
   static async isExistsById(room){
     try{
       await RoomAPI.getDetailById(room);

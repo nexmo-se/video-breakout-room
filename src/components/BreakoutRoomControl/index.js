@@ -8,7 +8,7 @@ import Person from "@material-ui/icons/Person"
 import Delete from "@material-ui/icons/Delete"
 import Edit from "@material-ui/icons/Edit"
 
-import { Collapse, Popconfirm, Popover, Input, InputNumber } from 'antd';
+import { Collapse, Popconfirm, Popover, Input, InputNumber, Form } from 'antd';
 import Button from 'components/Button'
 import RoomAPI from "api/room";
 
@@ -25,6 +25,10 @@ export default function BreakoutRoomControl(props) {
 
     const [roomGroup, setRoomGroup] = useState({})
     const [ showAddNewRoom, setShowAddNewRoom ] = useState(false);
+    const [ selectedRoom, setSelectedRoom ] = useState();
+
+
+    const [form] = Form.useForm();
 
     useEffect(() => {
         if (mMessage.breakoutRooms.length === 0) return setIsBreakout(false);
@@ -67,6 +71,37 @@ export default function BreakoutRoomControl(props) {
         <Button text="Create" onClick={handleAddNewRoom}></Button>
         </>
     );
+
+    const contentEditRoom = (roomName, maxParticipant) => {
+        return (
+        <>
+        <Form
+            form={form}
+            layout="vertical"
+            name="form_in_modal"
+        >
+        <Input.Group>
+            <Form.Item
+            label="Room Name"
+            name={roomName}
+            rules={[{ required: true, message: 'Please input a room name!' }]}
+            initialValue={roomName}
+        >
+            <Input/>
+        </Form.Item>
+            <Form.Item
+            label="Max Participants"
+            name={roomName + '-maxMember'}
+            rules={[{ required: true, message: 'Please input max participants!' }]}
+            initialValue={maxParticipant}
+        >
+            <InputNumber min={1}/>
+        </Form.Item>
+        </Input.Group>
+        <Button text="Edit" onClick={handleEditRoom}></Button>
+        </Form>
+        </>
+    )};
     
     const [ position, setPosition ] = useState({
         diffX: 0,
@@ -131,8 +166,18 @@ export default function BreakoutRoomControl(props) {
         RoomAPI.sendBreakoutRoom(mSession.userSessions[0], newRooms)
     }
 
-    function handleRenameRoom() {
-        // TODO
+    function handleEditRoom() {
+        const formRoomName = form.getFieldValue(selectedRoom);
+        const formMaxparticipant = form.getFieldValue(selectedRoom + '-maxMember');
+        const newRooms = mMessage.breakoutRooms.map(room => ({...room}));
+        let targetIndex = newRooms.findIndex((room) => room.name === selectedRoom);
+        newRooms[targetIndex]["name"] = formRoomName;
+        newRooms[targetIndex]["maxMember"] = formMaxparticipant; 
+        setSelectedRoom(null);  
+        if (selectedRoom !== formRoomName) {
+            RoomAPI.renameRoom(selectedRoom, formRoomName);
+        }
+        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], newRooms);
     }
     return when ? (
         <>
@@ -140,6 +185,7 @@ export default function BreakoutRoomControl(props) {
         <h4 className={mStyles.header}>Breakout Room Control</h4>
         <Collapse defaultActiveKey={['1']} accordion ghost>
         {roomGroup && Object.entries(roomGroup).map(([key,value],i) => {
+          const breakoutRoom = mMessage.breakoutRooms.find((room) => room.name === key);
           const genExtra = () => (
                 i !== 0 ? 
                 <>
@@ -153,7 +199,9 @@ export default function BreakoutRoomControl(props) {
                     >
                     <Button hierarchy="link" text={<Delete style={{fill:"black"}}/>} key={'delete-' + i} style={{minHeight: "24px", minWidth: "24px", padding: "0px", margin: "0px"}}></Button> 
                 </Popconfirm>
-                 <Button value={key} hierarchy="link" text={<Edit style={{fill:"black"}}/>} key={'rename-' + i} onClick={handleRenameRoom} style={{minHeight: "24px", minWidth: "24px", padding: "0px", margin: "0px"}}></Button>      
+                <Popover visible={selectedRoom === key? true: false} content={contentEditRoom(key, breakoutRoom ? breakoutRoom["maxMember"] : 1)} title="Edit Room" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedRoom(key) : setSelectedRoom(null)} overlayStyle={{width: "250px"}}>
+                    <Button value={key} hierarchy="link" text={<Edit style={{fill:"black"}}/>} key={'edit-' + i} onClick={() => setSelectedRoom(key)} style={{minHeight: "24px", minWidth: "24px", padding: "0px", margin: "0px"}}></Button>      
+                 </Popover>
                  <Button value={key} text={mRoom.inBreakoutRoom === key ? "Leave" : "Join"} key={'joinroom-' + i} onClick={handleJoinRoom} style={{minHeight: "24px", padding: "0px 4px", margin: "0px"}}></Button> 
                 </>
                 : null

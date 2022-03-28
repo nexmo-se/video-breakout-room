@@ -51,5 +51,20 @@ class RoomListener{
       res.status(500).end();
     }
   }
+
+  static async renameRoom(req, res){
+    try{
+      const { roomId } = req.params;
+      const newRoomName = req.body.data;
+      const room = new Room(roomId);
+      const [ selectedRoom ] = await RoomAPI.getDetailById(room);
+      const newRoom = await RoomAPI.renameRoom(selectedRoom, newRoomName);
+      res.json({apiKey: process.env.API_KEY, name: newRoom.name, sessionId: newRoom.sessionId });
+    }catch(err){
+      console.log(err.stack);
+      res.status(500).end();
+    }
+  }
+
 }
 module.exports = RoomListener;

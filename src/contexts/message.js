@@ -89,12 +89,8 @@ export default function MessageProvider({ children }){
       })
 
       mSession.session.on("signal:breakout-room", ({ data }) => {
-        setBreakoutRoomsRequest(false);
-        if (breakoutRooms.length === 0) {
-          setBreakoutRoomsRequest(true);
-        }
         setBreakoutRooms((prevBreakoutRooms) => {
-          const jsonData = JSON.parse(data);
+          const jsonData = JSON.parse(data);          
           return jsonData;
         })
       })

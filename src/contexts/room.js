@@ -11,13 +11,42 @@ import { RoomPreferences } from "@mui/icons-material";
 export const RoomContext = createContext({});
 export default function RoomContextProvider({ children }){
   const [inBreakoutRoom, setInBreakoutRoom] = useState(null);
+  const [newBreakoutRoom, setNewBreakoutRoom] = useState(true);
+
   const [role, setRole] = useState(false);
   const [credential, setCredential] = useState(false);
+  const [signal, setSignal] = useState();
 
 
   const mSession = useSession();
   const mPublisher = usePublisher();
   const mMessage = useMessage();
+
+
+  useEffect(() => {
+    if (mMessage.breakoutRooms.length !== 0  && !inBreakoutRoom && newBreakoutRoom) {
+      setSignal('breakoutRoomCreated');
+      setNewBreakoutRoom(false);
+    }
+    else if (mMessage.breakoutRooms.length === 0) {  
+      if (inBreakoutRoom) setSignal('breakoutRoomRemoved');
+      setNewBreakoutRoom(true);
+    }
+    else if (mMessage.breakoutRooms.length !== 0  && inBreakoutRoom) {
+      let roomNameFound = mMessage.breakoutRooms.find((room) => room.name === inBreakoutRoom);
+      let roomSessionIdFound = mMessage.breakoutRooms.find((room) => room.sessionId === mSession.session.sessionId);
+      if (!roomNameFound && !roomSessionIdFound) {
+        setSignal('breakoutRoomRemoved');
+      }
+      else if (!roomNameFound && roomSessionIdFound) {
+        setSignal('breakoutRoomRenamed');
+        setInBreakoutRoom(roomSessionIdFound.name)
+      }
+    }
+    else {
+      setSignal(null);
+    }
+  }, [ mMessage.breakoutRooms ])
 
   async function handleRoomCreation(roomName, maxMember) {
     const generatedRoom = await RoomAPI.generateSession(roomName);
@@ -70,6 +99,7 @@ export default function RoomContextProvider({ children }){
   return (
     <RoomContext.Provider value={{ 
       inBreakoutRoom,
+      signal,
       connect,
       handleRoomCreation,
       handleChangeRoom

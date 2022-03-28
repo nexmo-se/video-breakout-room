@@ -26,6 +26,7 @@ const RoomListener = require("@app/listeners/room");
 
   app.post("/room/:roomId/generateToken", RoomListener.generateToken);
 
+  app.post("/room/:roomId/renameRoom", RoomListener.renameRoom);
 
 //   app.get("*", (req, res) => {
 //     res.sendFile(path.join(__dirname, "../build/index.html"));
