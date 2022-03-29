@@ -17,7 +17,6 @@ export default function PromptChooseRooms(props) {
   const mStyles = useStyles();
 
   const { when, onOK, onCancel, title, okText, cancelText, activeRoom, setActiveRoom } = props;
-  const [ numberParticipants, setNumberOfParticipants] = useState(mSession.participants.length);
   const [roomGroup, setRoomGroup] = useState({})
   const [ buttonDisabled, setButtonDisabled] = useState(true);
   const [ roomOccupied, setRoomOccupied ] = useState([]);

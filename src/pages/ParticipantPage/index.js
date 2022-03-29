@@ -55,10 +55,16 @@ export default function ParticipantPage(){
   React.useEffect(() => {
     setChooseRoomPrompt(false);
     if (mRoom.signal === 'breakoutRoomCreated') {
-      setChooseRoomPrompt(true);
+      let roomAssinged = mMessage.breakoutRooms.find((room) => room["member"].includes(user.name))
+      if (roomAssinged) {
+       return  mNotification.openNotification("Room assigned by Host", `You have been assigned to Room: ${roomAssinged.name}. Click confirm to Return to join the room OR you will be directed to main session automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged.name))
+      }
+      else if (mMessage.breakoutRooms[0]["member"].length === 0) {
+        setChooseRoomPrompt(true);
+      }
     }
     else if (mRoom.signal === 'breakoutRoomRemoved') {  
-      mNotification.openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.", handleBackMainRoom)
+      mNotification.openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.", handleChangeRoom)
     }
     else if (mRoom.signal === 'breakoutRoomRenamed') {  
       mNotification.openNotification("Room renamed by Host", "Room rename by host, new Room Name: " + mRoom.inBreakoutRoom, ()=>{});
@@ -66,7 +72,7 @@ export default function ParticipantPage(){
   }, [ mRoom.signal ])
 
   function handleConfirm() {
-    mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, user, activeRoom);
+    handleChangeRoom(activeRoom);
     setChooseRoomPrompt(false);
   }
 
@@ -75,9 +81,9 @@ export default function ParticipantPage(){
     setActiveRoom(null);
   }
 
-  function handleBackMainRoom() {
-    mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, user);
-    setActiveRoom(null);
+  function handleChangeRoom(roomName = '') {
+    mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, user, roomName);
+    setActiveRoom(roomName? roomName : null);
   }
 
   React.useEffect(() => {
@@ -116,7 +122,7 @@ export default function ParticipantPage(){
               (
               <div className={mStyles.header}>
                 <strong>{mRoom.inBreakoutRoom}</strong>
-                <Button hierarchy="link" text="Return to main room" onClick={handleBackMainRoom} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
+                <Button hierarchy="link" text="Return to main room" onClick={handleChangeRoom} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
               </div>
               ) : null
             }

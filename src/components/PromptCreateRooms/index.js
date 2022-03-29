@@ -34,10 +34,20 @@ export default function PromptCreateRooms(props) {
         p.push(mRoom.handleRoomCreation(roomName, maxMamber));
       }
       Promise.all(p).then((response) => {
-        // add empty member list
-        response.map((data) => {
-          data["member"] = [];
-        })
+        // if assign automatically
+        const participants = mSession.participants.filter((p) => p.role !== "moderator").map((p) => p.name);
+        if (formValue.modifier === "automatic" && participants.length !== 0) {
+          participants.sort(()=> { return 0.5 - Math.random()});
+          let i = 0;
+          response.map((data) => {
+              data["member"] = participants.splice(0, data["maxMember"]);
+          })
+        }
+        else {
+          response.map((data) => {
+            data["member"] = [];
+          })
+        }
         RoomAPI.sendBreakoutRoom(mSession.userSessions[0], response)
       });
     }

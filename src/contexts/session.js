@@ -16,6 +16,7 @@ function SessionProvider({ children }){
   const [ streams, setStreams ] = useState<Array<Stream>>([]);
   const [ prevRoomStreams, setPrevRoomStreams ] = useState<Array<Stream>>([]);
 
+  const [ prevRoomConnections, setPrevRoomConnections ] = useState<Array<Connection>>([]);
   const [ connections, setConnections ] = useState<Array<Connection>>([]);
   const [ participants, setParticipants ] = useState([]);
   const [ userSessions, setUserSessions ] = useState([]);
@@ -40,17 +41,32 @@ function SessionProvider({ children }){
     setChangedStream({ stream, changedProperty, newValue, oldValue, token: uuid() });
   }
 
-  function handleConnectionCreated({ connection }){
-    setConnections((prevConnections) => [ ...prevConnections, connection ]);
+  function handleConnectionCreated(e){
+    setPrevRoomConnections((prevConnection)=> {
+      const newConnection = {...prevConnection};
+      const sessionId = e.target.sessionId;
+      if (newConnection[sessionId]) newConnection[sessionId] = [...newConnection[sessionId], e.connection];
+      else newConnection[sessionId] = [e.connection];
+      return newConnection;
+    })
+      // setConnections((prevConnections) => [ ...prevConnections, e.connection ]);
   }
 
 
-  function handleConnectionDestroyed({ connection }){
-    setConnections((prevConnections) => {
-      return prevConnections.filter((prevConnection) => {
-        return prevConnection.id !== connection.id;
-      })
-    })
+  function handleConnectionDestroyed(e){
+    setPrevRoomConnections((prevConnection)=> {
+      const newConnection = {...prevConnection};
+      const sessionId = e.target.sessionId;
+      newConnection[sessionId] = newConnection[sessionId].filter((connection) => connection.id !== e.connection.id);
+      return newConnection;
+    });
+    
+    // setConnections((prevConnections) => {
+    //   return prevConnections.filter((prevConnection) => {
+    //     return prevConnection.id !== e.connection.id;
+    //   })
+    // })    
+
   }
 
   function handleStreamCreated(e){
@@ -76,17 +92,20 @@ function SessionProvider({ children }){
   useEffect(() => {
     if (session) {
       // find based on session ID
+      // Check if prevRoomStreams changes come from current session
+
       const sessionId = session.sessionId;
       const targetStreams = {...prevRoomStreams}[sessionId];
-      if (targetStreams) {
-        setStreams(targetStreams);
-      }
+      const mainSessionId = userSessions[0].sessionId;
+      const targetConnections = {...prevRoomConnections}[mainSessionId];
+
+      targetStreams && targetStreams !== streams ? setStreams(targetStreams) : setStreams([]);
+      targetConnections ? setConnections(targetConnections) : setConnections([]);
     }
 
   }, [prevRoomStreams, session])
 
   function clearSessions() {
-    setStreams([]);
     setIsConnected(false);
   }
 
@@ -105,8 +124,8 @@ function SessionProvider({ children }){
         session.on("streamDestroyed", (e) => handleStreamDestroyed(e));
         session.on("sessionDisconnected", (e) => handleSessionDisconnected(e));
   
-        session.on("connectionCreated", handleConnectionCreated);
-        session.on("connectionDestroyed", handleConnectionDestroyed);
+        session.on("connectionCreated", (e) => handleConnectionCreated(e));
+        session.on("connectionDestroyed", (e) => handleConnectionDestroyed(e));
         
         await new Promise((resolve, reject) => {
           session.connect(credential.token, (err) => {
@@ -118,6 +137,7 @@ function SessionProvider({ children }){
       }
       setSession(session);
       setIsConnected(true);
+      setStreams([]); // Clear old streams
     }catch(err){
       console.log(err);
       setIsConnected(false);
