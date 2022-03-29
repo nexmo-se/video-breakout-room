@@ -49,6 +49,7 @@ export default function BreakoutRoomControl(props) {
         })
         newRoomGroup["Main Room"] = participantUnAssigned;
         setRoomGroup(newRoomGroup);
+
     }, [mMessage.breakoutRooms, mSession.participants])
 
     const content = (

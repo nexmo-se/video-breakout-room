@@ -27,8 +27,7 @@ function SessionProvider({ children }){
       user.connection = connection;
       user.id = connection.id;
       return user
-    }).reduce((acc, curr) => acc.find((p) => p.name === curr.name) ? acc: [...acc, curr], [])
-    .sort((a, b) => {
+    }).sort((a, b) => {
       if(a.name.toLowerCase() < b.name.toLowerCase()) return -1
       else if(a.name.toLowerCase() > b.name.toLowerCase()) return 1;
       else return 0;
@@ -44,6 +43,7 @@ function SessionProvider({ children }){
   function handleConnectionCreated({ connection }){
     setConnections((prevConnections) => [ ...prevConnections, connection ]);
   }
+
 
   function handleConnectionDestroyed({ connection }){
     setConnections((prevConnections) => {
@@ -114,9 +114,9 @@ function SessionProvider({ children }){
             else resolve();
           })
         });
+        setUserSessions([...userSessions, session]);
       }
       setSession(session);
-      setUserSessions([...userSessions, session]);
       setIsConnected(true);
     }catch(err){
       console.log(err);

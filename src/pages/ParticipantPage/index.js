@@ -54,7 +54,6 @@ export default function ParticipantPage(){
 
   React.useEffect(() => {
     setChooseRoomPrompt(false);
-    console.log('m sig',mRoom.signal  );
     if (mRoom.signal === 'breakoutRoomCreated') {
       setChooseRoomPrompt(true);
     }
@@ -96,10 +95,6 @@ export default function ParticipantPage(){
       mSubscriber.subscribe(mSession.streams);
     }
   }, [ mSession.streams, mSession.session, mSession.isConnected ]);
-
-  useEffect(() =>{
-    console.log("m broom", mRoom.inBreakoutRoom);
-  }, [mRoom.inBreakoutRoom])
 
   if(!user && !mSession.session){
     return (

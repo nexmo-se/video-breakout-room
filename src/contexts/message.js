@@ -18,6 +18,8 @@ export default function MessageProvider({ children }){
   const [ messages, setMessages ] = useState([]);
   const [ breakoutRooms, setBreakoutRooms ] = useState([]);
   const [ breakoutRoomsRequest, setBreakoutRoomsRequest ] = useState(false);
+  const [ roomSessionListeners, setSessionListeners ] = useState([]);
+
 
   const mSession = useSession();
 
@@ -28,7 +30,7 @@ export default function MessageProvider({ children }){
   }
 
   useEffect(() => {
-    if(mSession.session && !mSession.userSessions.find((session) => session.sessionId === mSession.session.sessionId)){
+    if(mSession.session && !roomSessionListeners.find((session) => session.sessionId === mSession.session.sessionId)){
       mSession.session.on("signal:force-video", ({ data }) => {
         const jsonData = JSON.parse(data)
         const user = User.fromJSON(JSON.parse(data));
@@ -94,6 +96,7 @@ export default function MessageProvider({ children }){
           return jsonData;
         })
       })
+      setSessionListeners([...roomSessionListeners, mSession.session])
     }
   }, [ mSession.session ])
 

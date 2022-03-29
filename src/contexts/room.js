@@ -26,13 +26,13 @@ export default function RoomContextProvider({ children }){
   useEffect(() => {
     if (mMessage.breakoutRooms.length !== 0  && !inBreakoutRoom && newBreakoutRoom) {
       setSignal('breakoutRoomCreated');
-      setNewBreakoutRoom(false);
     }
     else if (mMessage.breakoutRooms.length === 0) {  
       if (inBreakoutRoom) setSignal('breakoutRoomRemoved');
       setNewBreakoutRoom(true);
     }
     else if (mMessage.breakoutRooms.length !== 0  && inBreakoutRoom) {
+      setNewBreakoutRoom(false);
       let roomNameFound = mMessage.breakoutRooms.find((room) => room.name === inBreakoutRoom);
       let roomSessionIdFound = mMessage.breakoutRooms.find((room) => room.sessionId === mSession.session.sessionId);
       if (!roomNameFound && !roomSessionIdFound) {
@@ -66,6 +66,7 @@ export default function RoomContextProvider({ children }){
           data: user.toJSON()
         }
         if (roomName) credentialInfo["roomName"] = roomName;
+
         const credential = await CredentialAPI.generateCredential(credentialInfo);
         await mSession.connect(credential);
         setRole(role);
