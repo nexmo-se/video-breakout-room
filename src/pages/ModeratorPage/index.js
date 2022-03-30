@@ -66,7 +66,7 @@ export default function ModeratorPage() {
     }, [ mSession.session ]);
 
     useEffect(() => {
-      if(mSession.session && mSession.streams.length !== 0  && mSession.isConnected ) {
+      if(mSession.session && mSession.isConnected ) {
         mSubscriber.subscribe(mSession.streams);
       }
     }, [ mSession.streams, mSession.session, mSession.isConnected  ]);

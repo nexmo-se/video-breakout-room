@@ -90,7 +90,7 @@ function SessionProvider({ children }){
   }
 
   useEffect(() => {
-    if (session) {
+    if (session && isConnected) {
       // find based on session ID
       // Check if prevRoomStreams changes come from current session
 
@@ -99,11 +99,13 @@ function SessionProvider({ children }){
       const mainSessionId = userSessions[0].sessionId;
       const targetConnections = {...prevRoomConnections}[mainSessionId];
 
-      targetStreams && targetStreams !== streams ? setStreams(targetStreams) : setStreams([]);
+      if (targetStreams && targetStreams !== streams) {
+        setStreams(targetStreams)
+      }
       targetConnections ? setConnections(targetConnections) : setConnections([]);
     }
 
-  }, [prevRoomStreams, session])
+  }, [prevRoomStreams, session, isConnected])
 
   function clearSessions() {
     setIsConnected(false);

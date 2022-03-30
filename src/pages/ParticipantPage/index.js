@@ -97,7 +97,7 @@ export default function ParticipantPage(){
   }, [ mSession.session ]);
 
   React.useEffect(() => {
-    if(mSession.session && mSession.isConnected && mSession.streams.length !== 0) {
+    if(mSession.session && mSession.isConnected) {
       mSubscriber.subscribe(mSession.streams);
     }
   }, [ mSession.streams, mSession.session, mSession.isConnected ]);
