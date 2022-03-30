@@ -64,7 +64,7 @@ export default function ParticipantPage(){
       }
     }
     else if (mRoom.signal === 'breakoutRoomRemoved') {  
-      mNotification.openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.", handleChangeRoom)
+      mNotification.openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.",  () => handleChangeRoom())
     }
     else if (mRoom.signal === 'breakoutRoomRenamed') {  
       mNotification.openNotification("Room renamed by Host", "Room rename by host, new Room Name: " + mRoom.inBreakoutRoom, ()=>{});
@@ -97,7 +97,7 @@ export default function ParticipantPage(){
   }, [ mSession.session ]);
 
   React.useEffect(() => {
-    if(mSession.session && mSession.isConnected) {
+    if(mSession.session && mSession.isConnected && mSession.streams.length !== 0) {
       mSubscriber.subscribe(mSession.streams);
     }
   }, [ mSession.streams, mSession.session, mSession.isConnected ]);
@@ -122,7 +122,7 @@ export default function ParticipantPage(){
               (
               <div className={mStyles.header}>
                 <strong>{mRoom.inBreakoutRoom}</strong>
-                <Button hierarchy="link" text="Return to main room" onClick={handleChangeRoom} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
+                <Button hierarchy="link" text="Return to main room" onClick={() => handleChangeRoom()} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
               </div>
               ) : null
             }

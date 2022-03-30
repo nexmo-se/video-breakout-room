@@ -66,8 +66,10 @@ export default function ModeratorPage() {
     }, [ mSession.session ]);
 
     useEffect(() => {
-      if(mSession.session) mSubscriber.subscribe(mSession.streams);
-    }, [ mSession.streams, mSession.session ]);
+      if(mSession.session && mSession.streams.length !== 0  && mSession.isConnected ) {
+        mSubscriber.subscribe(mSession.streams);
+      }
+    }, [ mSession.streams, mSession.session, mSession.isConnected  ]);
 
     useEffect(() => {
         if (activeRoom || mRoom.inBreakoutRoom) {
