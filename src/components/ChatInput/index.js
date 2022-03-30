@@ -8,14 +8,14 @@ import Message from "entities/message";
 import TextInput from "components/TextInput";
 import Button from "components/Button";
 
-function ChatInput({ user, byPass }){
+function ChatInput({ byPass }){
   const [ text, setText ] = React.useState("");
   const mSession = useSession();
 
   function handleClick(e){
     if(e) e.preventDefault();
     const isApproved = (byPass)? true: false;
-    const message = new Message(user, text, isApproved);
+    const message = new Message(mSession.user, text, isApproved);
     MessageAPI.sendMessage(mSession.session, message);
     setText("");
   }

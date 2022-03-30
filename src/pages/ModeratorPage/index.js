@@ -9,6 +9,7 @@ import useSubscriber from "hooks/subscriber";
 import usePublisher from "hooks/publisher";
 import useRoom from "hooks/room";
 import useNotification from "hooks/notification";
+import useMessage from "hooks/message";
 
 import FullPageLoading from "components/FullPageLoading";
 import LayoutContainer from "components/LayoutContainer";
@@ -28,12 +29,12 @@ export default function ModeratorPage() {
     const [isBreakout, setIsBreakout] = useState(false);
     const [activeRoom, setActiveRoom] = useState();
 
-    const [user, setUser] = useState();
     const mSession = useSession();
     const mStyles = useStyles();
     const mRoom = useRoom();
     const mNotification = useNotification();
     const mPublisher = usePublisher("cameraContainer", true, false);
+    const mMessage = useMessage();
     const mSubscriber = useSubscriber({ 
       moderator: "cameraContainer", 
       camera: "cameraContainer", 
@@ -45,24 +46,23 @@ export default function ModeratorPage() {
 
     useEffect(() => {
       if (mRoom.signal === 'breakoutRoomRemoved') {  
-        mNotification.openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.", handleBackMainRoom)
+        mNotification.openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.", () => handleChangeRoom())
       }
       if (mRoom.signal === 'breakoutRoomRenamed') {  
         mNotification.openNotification("Room renamed by Host", "Room rename by host, new Room Name: " +  mRoom.inBreakoutRoom, ()=>{});
       }
+      if (mRoom.signal === 'breakoutRoomChanged') {
+        let roomAssinged = mMessage.breakoutRooms.find((room) => room["member"].includes(mSession.user.name))
+          mNotification.openNotification("Room changed by Host", `You have been reassigned to Room: ${roomAssinged ? roomAssinged.name : "Main Room"}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged ? roomAssinged.name : ''))
+      }
     }, [ mRoom.signal ])
 
-    function handleSubmit(user){
-        setUser(user);
-        return;
-      }
+    useEffect(() => {
+    if(mSession.user) mRoom.connect(mSession.user, "moderator")
+    }, [ mSession.user ]);
 
     useEffect(() => {
-    if(user) mRoom.connect(user, "moderator")
-    }, [ user ]);
-
-    useEffect(() => {
-      if(mSession.session) mPublisher.publish(user);
+      if(mSession.session) mPublisher.publish(mSession.user);
     }, [ mSession.session ]);
 
     useEffect(() => {
@@ -71,27 +71,21 @@ export default function ModeratorPage() {
       }
     }, [ mSession.streams, mSession.session, mSession.isConnected  ]);
 
-    useEffect(() => {
-        if (activeRoom || mRoom.inBreakoutRoom) {
-          mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, user, activeRoom ? activeRoom : '');
-        }
-    }, [activeRoom])
-
-    function handleBackMainRoom() {
-      setActiveRoom(null);
+    function handleChangeRoom(roomName = '') {
+      mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, mSession.user, roomName);
     }
 
-    if(!user && !mSession.session) {
+    if(!mSession.user && !mSession.session) {
     return (
         <AskNameDialog 
           pin={config.moderatorPin}
           role="moderator"
-          onSubmit={handleSubmit}
+          onSubmit={(user) => mSession.createUser(user)}
         />
       )
     }
-    else if(user && !mSession.session) return <FullPageLoading />
-    else if(user && mSession.session) return (
+    else if(mSession.user && !mSession.session) return <FullPageLoading />
+    else if(mSession.user && mSession.session) return (
       <>
       <div className={mStyles.container}>
         {!mSession.isConnected ? <FullPageLoading/> : null}
@@ -100,7 +94,7 @@ export default function ModeratorPage() {
               (
               <div className={mStyles.header}>
                 <strong>{mRoom.inBreakoutRoom}</strong>
-                <Button hierarchy="link" text="Return to main room" onClick={handleBackMainRoom} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
+                <Button hierarchy="link" text="Return to main room" onClick={() => handleChangeRoom()} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
               </div>
               ) : null
           }
@@ -133,14 +127,14 @@ export default function ModeratorPage() {
           </div>
           <div className={mStyles.chatContainer}>
             <ChatList/>
-            <ChatInput user={user} byPass={true}/>
+            <ChatInput byPass={true}/>
           </div>
         </div>
       </div>
         <BreakoutRoomControl
         when={isBreakout}
         setIsBreakout={setIsBreakout}
-        setActiveRoom={setActiveRoom}
+        handleChangeRoom={handleChangeRoom}
         ></BreakoutRoomControl>
     </>
     )

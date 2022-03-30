@@ -20,6 +20,8 @@ function SessionProvider({ children }){
   const [ connections, setConnections ] = useState<Array<Connection>>([]);
   const [ participants, setParticipants ] = useState([]);
   const [ userSessions, setUserSessions ] = useState([]);
+  const [ user, setUser ] = useState();
+
 
   useEffect(() => {
     const participants = connections.map((connection) => {
@@ -51,7 +53,6 @@ function SessionProvider({ children }){
     })
       // setConnections((prevConnections) => [ ...prevConnections, e.connection ]);
   }
-
 
   function handleConnectionDestroyed(e){
     setPrevRoomConnections((prevConnection)=> {
@@ -115,6 +116,10 @@ function SessionProvider({ children }){
     setSession(null);
   }
 
+  function createUser(user) {
+    setUser(user)
+  }
+
   async function connect(credential){
     try{
       let session =  userSessions.find((tSession) => tSession.id === credential.sessionId);
@@ -156,7 +161,9 @@ function SessionProvider({ children }){
       connections,
       participants,
       clearSessions,
-      userSessions
+      userSessions,
+      user,
+      createUser
     }}>
       {children}
     </SessionContext.Provider>

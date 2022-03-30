@@ -7,15 +7,17 @@ import clsx from "clsx";
 import Person from "@material-ui/icons/Person"
 import Delete from "@material-ui/icons/Delete"
 import Edit from "@material-ui/icons/Edit"
+import SwapVert from "@material-ui/icons/SwapVert"
 
-import { Collapse, Popconfirm, Popover, Input, InputNumber, Form } from 'antd';
+
+import { Collapse, Popconfirm, Popover, Input, InputNumber, Form, Select } from 'antd';
 import Button from 'components/Button'
 import RoomAPI from "api/room";
-
+const { Option } = Select
 const { Panel } = Collapse;
 
 export default function BreakoutRoomControl(props) {
-    const { when, setIsBreakout, setActiveRoom } = props
+    const { when, setIsBreakout, handleChangeRoom } = props
     const mStyles = useStyles();
     const mSession = useSession();
     const mMessage = useMessage();
@@ -26,6 +28,8 @@ export default function BreakoutRoomControl(props) {
     const [roomGroup, setRoomGroup] = useState({})
     const [ showAddNewRoom, setShowAddNewRoom ] = useState(false);
     const [ selectedRoom, setSelectedRoom ] = useState();
+    const [ selectedParticipant, setSelectedParticipant ] = useState();
+    const [ selectedParticipantRoom, setSelectedParticipantRoom ] = useState();
 
 
     const [form] = Form.useForm();
@@ -57,7 +61,7 @@ export default function BreakoutRoomControl(props) {
         <Input.Group>
               <Input 
               addonBefore="Room name:"
-              defaultValue={`Room ${mMessage.breakoutRooms.length + 1}`}
+              defaultValue={`Room ${mMessage.breakoutRooms.length +1}`}
               ref={inputRoomName}
               required
               />
@@ -103,6 +107,23 @@ export default function BreakoutRoomControl(props) {
         </Form>
         </>
     )};
+
+    const contentMoveParticipant = (participant, defaultRoom) => {    
+        return (
+        <>
+        <p>Move <strong>{participant}</strong> to Room:</p>
+        <Select defaultValue={defaultRoom} style={{ width: 200 }} onChange={(value) => setSelectedParticipantRoom(value)}>
+        {
+            roomGroup && Object.entries(roomGroup).map(([key,value],i) => {
+                return (
+                    <Option key={`Option-${participant}-${i}`} value={key}>{key}</Option>
+                )
+            })
+        }
+         </Select>
+         <Button text="Move" onClick={handleMoveRoom} style={{marginTop: "24px"}}></Button>
+        </>
+    )};
     
     const [ position, setPosition ] = useState({
         diffX: 0,
@@ -140,9 +161,9 @@ export default function BreakoutRoomControl(props) {
 
     function handleJoinRoom(e) {
         if (mRoom.inBreakoutRoom === e.target.value) {
-            return setActiveRoom(null);
+            return handleChangeRoom();
         }
-         setActiveRoom(e.target.value);
+        handleChangeRoom(e.target.value);
     }
 
     function handleAddNewRoom() {
@@ -180,6 +201,26 @@ export default function BreakoutRoomControl(props) {
         }
         RoomAPI.sendBreakoutRoom(mSession.userSessions[0], newRooms);
     }
+
+    function handleMoveRoom() {
+        const newRooms = mMessage.breakoutRooms.map(room => ({...room}));
+        let targetRoomIndex = newRooms.findIndex((room) => room.name === selectedParticipantRoom);
+        let prevRoomIndex = newRooms.findIndex((room) => room["member"].includes(selectedParticipant));
+
+        if (targetRoomIndex === prevRoomIndex || !selectedParticipantRoom) {
+            return;
+        }
+        
+        if (targetRoomIndex !==  -1)  {
+            newRooms[targetRoomIndex]["member"] = [...newRooms[targetRoomIndex]["member"], selectedParticipant];
+        }
+        if (prevRoomIndex !==  -1) {
+            newRooms[prevRoomIndex]["member"] = [...newRooms[prevRoomIndex]["member"]].filter((a) => a !== selectedParticipant);
+        }
+
+        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], newRooms);
+    }
+
     return when ? (
         <>
         <div className={mStyles.root} style={position.styles} onMouseDown={dragStart} onMouseMove={dragging} onMouseUp={dragEnd}>
@@ -208,13 +249,17 @@ export default function BreakoutRoomControl(props) {
                 : null
           ); 
           return(
-
             <Panel header={key + ' (' + value.length + ')'} key={"chooseroom-" + i} extra={genExtra()}>
-            {
-                value.map((participant, i) => (
-                    <p key={"participant-" + i}><Person style={{marginRight: "12px", marginLeft:"24px", verticalAlign:"bottom", fontSize: "18px"}}></Person>{participant}</p>
+             {
+                value.map((participant, i) => (                     
+                    <div key={`participant-${i}`} style={{position: "relative"}}>
+                    <p ><Person style={{marginRight: "12px", marginLeft:"24px", verticalAlign:"bottom", fontSize: "18px"}}></Person>{participant}</p> 
+                     <Popover visible={selectedParticipant === participant? true: false} content={contentMoveParticipant(participant, key)} title="Move Participant" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedParticipant(participant) : setSelectedParticipant(null)} overlayStyle={{width: "250px"}}>
+                        <Button value={participant} hierarchy="link" text={<SwapVert style={{fill:"black", position:"absolute", right: 0, top: 0}}/>} onClick={() => setSelectedParticipant(participant)} style={{minHeight: "24px", minWidth: "24px", padding: "0px", margin: "0px"}}></Button>      
+                    </Popover>
+                    </div>
                 ))
-                }
+            }
             </Panel>
         )})
         }

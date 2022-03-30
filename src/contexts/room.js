@@ -24,8 +24,13 @@ export default function RoomContextProvider({ children }){
 
 
   useEffect(() => {
-    if (mMessage.breakoutRooms.length !== 0  && !inBreakoutRoom && newBreakoutRoom) {
-      setSignal('breakoutRoomCreated');
+    if (mMessage.breakoutRooms.length !== 0  && !inBreakoutRoom ) {
+      let roomNameFound = mMessage.breakoutRooms.find((room) => room["member"].includes(mSession.user.name));
+      if (roomNameFound) {
+        setSignal('breakoutRoomChanged');
+      }
+      else if (newBreakoutRoom && mSession.user.role === "participant") setSignal('breakoutRoomCreated');
+
     }
     else if (mMessage.breakoutRooms.length === 0) {  
       if (inBreakoutRoom) setSignal('breakoutRoomRemoved');
@@ -35,6 +40,7 @@ export default function RoomContextProvider({ children }){
       setNewBreakoutRoom(false);
       let roomNameFound = mMessage.breakoutRooms.find((room) => room.name === inBreakoutRoom);
       let roomSessionIdFound = mMessage.breakoutRooms.find((room) => room.sessionId === mSession.session.sessionId);
+      
       if (!roomNameFound && !roomSessionIdFound) {
         setSignal('breakoutRoomRemoved');
       }
@@ -42,6 +48,11 @@ export default function RoomContextProvider({ children }){
         setSignal('breakoutRoomRenamed');
         setInBreakoutRoom(roomSessionIdFound.name)
       }
+      else if (!roomNameFound["member"].includes(mSession.user.name)) {
+        setSignal('breakoutRoomChanged');
+      }
+      // check if inBreakoutRoom includes user name
+
     }
     else {
       setSignal(null);
@@ -57,9 +68,6 @@ export default function RoomContextProvider({ children }){
   }
 
   async function connect(user, role, roomName){
-      if (credential) {
-        return await mSession.connect(credential);
-      }
       if(user) {
         const credentialInfo = {
           role,
@@ -74,6 +82,7 @@ export default function RoomContextProvider({ children }){
   }
 
   function handleChangeRoom(publisher, subscriber, user, roomName) {
+    setSignal(null);
     mSession.session.unpublish(publisher);
     subscriber.unsubscribe();
     connect(user, role,  roomName ? roomName : '');

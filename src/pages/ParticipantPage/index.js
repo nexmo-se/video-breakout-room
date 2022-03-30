@@ -1,5 +1,5 @@
 // @flow
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import config from "config";
 import User from "entities/user";
@@ -24,11 +24,11 @@ import LayoutContainer from "components/LayoutContainer";
 import PromptChooseRoom from "components/PromptChooseRoom";
 import Button from "components/Button";
 import RoomAPI from "api/room";
+import { SettingsInputAntennaTwoTone } from "@mui/icons-material";
  
 
 
 export default function ParticipantPage(){
-  const [ user, setUser ] = React.useState();
   const [ videoControlVisible, setVideoControlVisible ] = React.useState<boolean>(false);
   const [ chooseRoomPrompt, setChooseRoomPrompt ] = React.useState(false);
   const [ messagePrompt, setMessagePrompt ] = React.useState(false);
@@ -48,26 +48,26 @@ export default function ParticipantPage(){
     screen: "cameraContainer" 
   });
 
-  function handleSubmit(user){
-    setUser(user);
-  }
-
   React.useEffect(() => {
     setChooseRoomPrompt(false);
     if (mRoom.signal === 'breakoutRoomCreated') {
-      let roomAssinged = mMessage.breakoutRooms.find((room) => room["member"].includes(user.name))
+      let roomAssinged = mMessage.breakoutRooms.find((room) => room["member"].includes(mSession.user.name))
       if (roomAssinged) {
-       return  mNotification.openNotification("Room assigned by Host", `You have been assigned to Room: ${roomAssinged.name}. Click confirm to Return to join the room OR you will be directed to main session automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged.name))
+         mNotification.openNotification("Room assigned by Host", `You have been assigned to Room: ${roomAssinged.name}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged.name))
       }
       else if (mMessage.breakoutRooms[0]["member"].length === 0) {
         setChooseRoomPrompt(true);
       }
     }
-    else if (mRoom.signal === 'breakoutRoomRemoved') {  
+    if (mRoom.signal === 'breakoutRoomRemoved') {  
       mNotification.openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.",  () => handleChangeRoom())
     }
-    else if (mRoom.signal === 'breakoutRoomRenamed') {  
+    if (mRoom.signal === 'breakoutRoomRenamed') {  
       mNotification.openNotification("Room renamed by Host", "Room rename by host, new Room Name: " + mRoom.inBreakoutRoom, ()=>{});
+    }
+    if (mRoom.signal === 'breakoutRoomChanged') {
+      let roomAssinged = mMessage.breakoutRooms.find((room) => room["member"].includes(mSession.user.name))
+        mNotification.openNotification("Room changed by Host", `You have been reassigned to Room: ${roomAssinged ? roomAssinged.name : "Main Room"}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged ? roomAssinged.name : ''))
     }
   }, [ mRoom.signal ])
 
@@ -82,17 +82,17 @@ export default function ParticipantPage(){
   }
 
   function handleChangeRoom(roomName = '') {
-    mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, user, roomName);
+    mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, mSession.user, roomName);
     setActiveRoom(roomName? roomName : null);
   }
 
   React.useEffect(() => {
-    if(user) mRoom.connect(user, "publisher")
-  }, [ user ]);
+    if(mSession.user) mRoom.connect(mSession.user, "publisher")
+  }, [ mSession.user ]);
 
   React.useEffect(() => {
     if(mSession.session) {
-      mPublisher.publish(user);
+      mPublisher.publish(mSession.user);
     }
   }, [ mSession.session ]);
 
@@ -102,17 +102,17 @@ export default function ParticipantPage(){
     }
   }, [ mSession.streams, mSession.session, mSession.isConnected ]);
 
-  if(!user && !mSession.session){
+  if(!mSession.user && !mSession.session){
     return (
       <AskNameDialog 
         pin={config.participantPin}
         role="participant"
-        onSubmit={handleSubmit}
+        onSubmit={(user) => mSession.createUser(user)}
       />
     )
   }
-  else if(user && !mSession.session) return <FullPageLoading />
-  else if(user && mSession.session) return (
+  else if(mSession.user && !mSession.session) return <FullPageLoading />
+  else if(mSession.user && mSession.session) return (
     <React.Fragment>
       <div className={mStyles.container}>
         {!mSession.isConnected ? <FullPageLoading/> : null}
@@ -154,7 +154,7 @@ export default function ParticipantPage(){
           </div>
           <div className={mStyles.chatContainer}>
             <ChatList/>
-            <ChatInput user={user} byPass={true}/>
+            <ChatInput byPass={true}/>
           </div>
         </div>
       </div>
