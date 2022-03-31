@@ -21,7 +21,10 @@ class DatabaseAPI{
       await client.query(`
         CREATE TABLE IF NOT EXISTS rooms(
           id VARCHAR(255) PRIMARY KEY,
-          sessionId VARCHAR(255)
+          name VARCHAR(255) DEFAULT NULL,
+          session_id VARCHAR(255) DEFAULT NULL,
+          main_room_id VARCHAR(255) DEFAULT NULL,
+          max_participants SMALLINT DEFAULT 0
         )
       `);
     });

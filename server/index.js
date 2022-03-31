@@ -28,6 +28,10 @@ const RoomListener = require("@app/listeners/room");
 
   app.post("/room/:roomId/renameRoom", RoomListener.renameRoom);
 
+  app.delete("/room/:roomId/breakoutrooms", RoomListener.delBreakoutRooms);
+
+  app.post("/rooms", RoomListener.getAllMainRooms);
+
 //   app.get("*", (req, res) => {
 //     res.sendFile(path.join(__dirname, "../build/index.html"));
 //   });
