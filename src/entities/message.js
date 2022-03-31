@@ -8,12 +8,15 @@ export default class Message{
    * @param {User} sender 
    * @param {string} text 
    * @param {boolean} isApproved 
+   * @param {string} roomName 
+
    */
-  constructor(sender, text, isApproved, id){
+  constructor(roomName, sender, text, isApproved, id){
     this.id = !id? uuid(): id;
     this.sender = sender;
     this.text = text;
     this.isApproved = text;
+    this.roomName = roomName
   }
 
   set isApproved(value){
@@ -31,14 +34,15 @@ export default class Message{
       id: this.id,
       sender: this.sender.toJSON(),
       text: this.text,
-      isApproved: this.isApproved
+      isApproved: this.isApproved,
+      roomName: this.roomName
     }
     return JSON.parse(JSON.stringify(jsonData));
   }
 
   static fromJSON(data){
     const sender = User.fromJSON(data.sender);
-    const message = new Message(sender, data.text, data.isApproved, data.id);
+    const message = new Message(data.roomName, sender, data.text, data.isApproved, data.id);
     return message;
   }
 

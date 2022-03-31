@@ -48,6 +48,8 @@ export default function ParticipantPage(){
     screen: "cameraContainer" 
   });
 
+  const subscriberRef = React.useRef(null);
+
   React.useEffect(() => {
     setChooseRoomPrompt(false);
     if (mRoom.signal === 'breakoutRoomCreated') {
@@ -71,6 +73,10 @@ export default function ParticipantPage(){
     }
   }, [ mRoom.signal ])
 
+  React.useEffect(() => {
+    if (mSubscriber.subscribers) subscriberRef.current = mSubscriber;
+  }, [mSubscriber.subscribers] )
+
   function handleConfirm() {
     handleChangeRoom(activeRoom);
     setChooseRoomPrompt(false);
@@ -82,7 +88,7 @@ export default function ParticipantPage(){
   }
 
   function handleChangeRoom(roomName = '') {
-    mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, mSession.user, roomName);
+    mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, mSession.user, roomName);
     setActiveRoom(roomName? roomName : null);
   }
 

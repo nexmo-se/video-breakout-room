@@ -1,6 +1,6 @@
 import AskNameDialog from "components/AskNameDialog"
 import config from "config";
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import CredentialAPI from "api/credential";
 import clsx from "clsx";
 
@@ -42,7 +42,7 @@ export default function ModeratorPage() {
     });
 
     const [ videoControlVisible, setVideoControlVisible ] = useState(false);
-
+    const subscriberRef = useRef(null);
 
     useEffect(() => {
       if (mRoom.signal === 'breakoutRoomRemoved') {  
@@ -71,8 +71,12 @@ export default function ModeratorPage() {
       }
     }, [ mSession.streams, mSession.session, mSession.isConnected  ]);
 
+    useEffect(() => {
+      if (mSubscriber.subscribers) subscriberRef.current = mSubscriber;
+    }, [mSubscriber.subscribers] )
+
     function handleChangeRoom(roomName = '') {
-      mRoom.handleChangeRoom(mPublisher.publisher, mSubscriber, mSession.user, roomName);
+      mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, mSession.user, roomName);
     }
 
     if(!mSession.user && !mSession.session) {

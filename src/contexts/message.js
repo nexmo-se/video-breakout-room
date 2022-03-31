@@ -1,7 +1,8 @@
 // @flow
-import { useState, useEffect, createContext } from "react";
+import { useState, useEffect, createContext, useRef } from "react";
 import { v4 as uuid } from "uuid"
 import useSession from "hooks/session";
+import useRoom from "hooks/room"
 
 import User from "entities/user";
 import Message from "entities/message";
@@ -22,6 +23,7 @@ export default function MessageProvider({ children }){
 
 
   const mSession = useSession();
+  const sessionRef = useRef(null);
 
   function removeRaisedHand(user){
     setRaisedHands((prevRaisedHands) => prevRaisedHands.filter((prevRaisedHand) => {
@@ -30,6 +32,7 @@ export default function MessageProvider({ children }){
   }
 
   useEffect(() => {
+    sessionRef.current = mSession.session;
     if(mSession.session && !roomSessionListeners.find((session) => session.sessionId === mSession.session.sessionId)){
       mSession.session.on("signal:force-video", ({ data }) => {
         const jsonData = JSON.parse(data)
@@ -82,9 +85,10 @@ export default function MessageProvider({ children }){
         })
       });
 
-      mSession.session.on("signal:message", ({ data }) => {
+      mSession.session.on("signal:message", (e) => {
+        if (e.target.sessionId !== sessionRef.current.sessionId) return;
         setMessages((prevMessages) => {
-          const jsonData = JSON.parse(data);
+          const jsonData = JSON.parse(e.data)
           const message = Message.fromJSON(jsonData);
           return [ ...prevMessages, message ]
         })
