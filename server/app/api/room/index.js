@@ -6,7 +6,7 @@ const DatabaseAPI = require("@app/api/database");
 class RoomAPI{
 
   static parseQueryResponse(queryResponse){
-    return queryResponse.rows.map((response) => new Room().fromDatabase(response))
+    return queryResponse.rows.map((response) => Room.fromDatabase(response))
   }
 
   /**
@@ -15,16 +15,26 @@ class RoomAPI{
    */
   static async createRoom(room){
     await DatabaseAPI.query(async (client) => {
-      await client.query("INSERT INTO rooms(id, sessionId) VALUES($1, $2)", [ room.id, room.sessionId ]);
+      var { id, name, sessionId, mainRoomId, maxParticipants } = room;
+      await client.query("INSERT INTO rooms(id, name, session_id, main_room_id, max_participants) " 
+                                  + "VALUES($1, $2, $3, $4, $5)", 
+                                           [ id, name, sessionId, mainRoomId, maxParticipants ]);
     });
   }
 
+  /**
+   * Update first, then Select again
+   */
   static async renameRoom(room, newRoomName){
-    await DatabaseAPI.query(async (client) => {
-      await client.query("UPDATE rooms SET id = $1 WHERE sessionId = $2 ", [ newRoomName, room.sessionId  ]);
-    });
-    const newRoom = new Room(newRoomName, room.sessionId);
-    return Promise.resolve(newRoom);
+    try {
+      await DatabaseAPI.query(async (client) => {
+        await client.query("UPDATE rooms SET name = $1 WHERE id = $2 ", [ newRoomName, room.id ]);
+      });
+      const [ selectedRoom ] = await RoomAPI.getDetailById(room);
+      return Promise.resolve(selectedRoom);
+    } catch(err) {
+      throw err;
+    }
   }
 
   static async generateSession(room){
@@ -34,7 +44,9 @@ class RoomAPI{
         OT.opentok.createSession({ mediaMode: "routed" }, async (err, session) => {
           if(err) reject(new CustomError("room/err", err.message));
           else {
-            const newRoom = new Room(room.id, session.sessionId);
+            room.name = room.name ?? room.id;
+            room.sessionId = session.sessionId;
+            const newRoom = new Room(room);
             await RoomAPI.createRoom(newRoom);
             resolve(newRoom);
           }
@@ -63,5 +75,36 @@ class RoomAPI{
       else throw err;
     }
   }
+
+  static async getBreakoutRooms(room) {
+    return await DatabaseAPI.query(async (client) => {
+      const queryResponse = await client.query("SELECT * FROM rooms WHERE main_room_id = $1", [ room.id ]);
+      if (queryResponse.rowCount === 0) return null;
+      else return Promise.resolve(RoomAPI.parseQueryResponse(queryResponse));
+    })
+  }
+
+  static async delBreakoutRooms(room) {
+    try {
+      await DatabaseAPI.query(async (client) => {
+        await client.query("DELETE FROM rooms WHERE main_room_id = $1 ", [ room.id ]);
+      });
+      const [ selectedRoom ] = await RoomAPI.getDetailById(room);
+      selectedRoom.breakoutRooms = await RoomAPI.getBreakoutRooms(room);
+      return Promise.resolve(selectedRoom);
+    } catch(err) {
+      throw err;
+    }
+  }
+
+  static async getAllMainRooms() {
+    return await DatabaseAPI.query(async (client) => {
+      const queryResponse = await client.query("SELECT * FROM rooms WHERE main_room_id ISNULL");
+      if (queryResponse.rowCount === 0) return null;
+      else return Promise.resolve(RoomAPI.parseQueryResponse(queryResponse));
+    })
+  }
+
 }
+
 module.exports = RoomAPI;
