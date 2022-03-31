@@ -2,14 +2,13 @@ const RoomAPI = require("@app/api/room");
 const UserAPI = require("@app/api/user");
 const User = require("@app/entities/user");
 const Room = require("@app/entities/room");
-const { resolve } = require("path");
 
 class RoomListener{
   static async info(req, res){
     try{
       const { roomId } = req.params;
-      const { role } = req.body?? "publisher";
-      const data = (req.body.data)? req.body.data: {};
+      const { role } = req.body ?? "publisher";
+      const { data } = req.body ?? {};
 
       const user = new User(role);
       const room = new Room(roomId);
@@ -67,8 +66,8 @@ class RoomListener{
   static async generateToken(req, res){
     try{
       const { roomId } = req.params;
-      const { role } = req.body?? "publisher";
-      const { data } = req.body?? {};
+      const { role } = req.body ?? "publisher";
+      const { data } = req.body ?? {};
 
       const user = new User(role);
       const room = new Room(roomId);
