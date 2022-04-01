@@ -20,7 +20,7 @@ const RoomListener = require("@app/listeners/room");
   app.use(cors());
 
 //   app.use(express.static(path.join(__dirname, "../build")));
-  app.post("/room/:roomId/info", RoomListener.info);
+  app.get("/room/:roomId/info", RoomListener.info);
 
   app.post("/room/:roomId/createSession", RoomListener.createSession);
 
@@ -30,7 +30,7 @@ const RoomListener = require("@app/listeners/room");
 
   app.delete("/room/:roomId/breakoutrooms", RoomListener.delBreakoutRooms);
 
-  app.post("/rooms", RoomListener.getAllMainRooms);
+  app.get("/rooms", RoomListener.getAllMainRooms);
 
 //   app.get("*", (req, res) => {
 //     res.sendFile(path.join(__dirname, "../build/index.html"));

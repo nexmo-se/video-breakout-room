@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 class Room {
   constructor(id = null, sessionId = null, name = null, mainRoomId = null, maxParticipants = 0) {
     if (typeof arguments[0] === 'object') {
-      id = arguments[0].id ?? uuidv4();
+      id = arguments[0].id ?? null;
       name = arguments[0].name ?? null;
       sessionId = arguments[0].sessionId ?? null;
       mainRoomId = arguments[0].mainRoomId ?? null;

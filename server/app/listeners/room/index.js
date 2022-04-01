@@ -10,20 +10,20 @@ class RoomListener{
       const { role } = req.body ?? "publisher";
       const { data } = req.body ?? {};
 
-      const user = new User(role);
+      //const user = new User(role);
       const room = new Room(roomId);
       
       const generatedRoom = await RoomAPI.generateSession(room);
-      const generatedUser = await UserAPI.generateToken(generatedRoom, user, data);
-      const breakoutRooms = await RoomAPI.getBreakoutRooms(room);
+      //const generatedUser = await UserAPI.generateToken(generatedRoom, user, data);
+      generatedRoom.breakoutRooms = await RoomAPI.getBreakoutRooms(room);
 
       res.json({ 
         apiKey: process.env.API_KEY, 
-        token: generatedUser.token, 
+        //token: generatedUser.token, 
+        id: generatedRoom.id,
+        name: generatedRoom.name,
         sessionId: generatedRoom.sessionId,
-        id: room.id,
-        name: room.name,
-        breakoutRooms: breakoutRooms
+        breakoutRooms: generatedRoom.breakoutRooms
       });
     }catch(err){
       console.error(err.stack);
@@ -40,22 +40,18 @@ class RoomListener{
       const { roomName } = req.body ?? roomId;
       const { breakoutRooms } = req.body ?? [];
       
-      const roomMain = new Room({ id: roomId, name: roomName });
-      const sessionMain = await RoomAPI.generateSession(roomMain);
-
-      for (var i = 0; i < breakoutRooms.length; i++) {
-        let _roomSub = new Room({ name: breakoutRooms[i].name, mainRoomId: roomMain.id });
-        await RoomAPI.generateSession(_roomSub);
-      }
-      
-      const newBreakoutRooms = await RoomAPI.getBreakoutRooms(roomMain);
+      const room = new Room({ id: roomId, name: roomName });
+      const generatedRoom = await RoomAPI.generateSession(room);
+      // ---
+      await RoomAPI.generateSessionBreakoutRoom(breakoutRooms, generatedRoom);
+      generatedRoom.breakoutRooms = await RoomAPI.getBreakoutRooms(generatedRoom);
 
       return res.json({ 
         apiKey: process.env.API_KEY, 
-        id: roomMain.id, 
-        name: roomMain.name, 
-        sessionId: sessionMain.sessionId,
-        breakoutRooms: newBreakoutRooms
+        id: generatedRoom.id, 
+        name: generatedRoom.name, 
+        sessionId: generatedRoom.sessionId,
+        breakoutRooms: generatedRoom.breakoutRooms
       });
     } catch(err) {
       console.error(err.stack);
@@ -98,13 +94,13 @@ class RoomListener{
 
       const room = new Room(roomId);
 
-      const newRoom = await RoomAPI.renameRoom(room, newRoomName);
+      const updatedRoom = await RoomAPI.renameRoom(room, newRoomName);
 
       res.json({
         apiKey: process.env.API_KEY, 
-        id: newRoom.name,
-        name: newRoom.id,
-        sessionId: newRoom.sessionId
+        id: updatedRoom.id,
+        name: updatedRoom.name,
+        sessionId: updatedRoom.sessionId
       });
     } catch(err) {
       console.error(err.stack);
@@ -118,13 +114,13 @@ class RoomListener{
 
       const room = new Room(roomId);
 
-      const newRoom = await RoomAPI.delBreakoutRooms(room);
+      const updatedRoom = await RoomAPI.delBreakoutRooms(room);
       
       res.json({
         apiKey: process.env.API_KEY, 
-        id: newRoom.id,
-        name: newRoom.name,
-        breakoutRooms: newRoom.breakoutRooms
+        id: updatedRoom.id,
+        name: updatedRoom.name,
+        breakoutRooms: updatedRoom.breakoutRooms
       });
     } catch(err) {
       console.error(err.stack);
@@ -145,7 +141,6 @@ class RoomListener{
       res.status(500).end(err.message);
     }
   }
-  
 
 }
 module.exports = RoomListener;

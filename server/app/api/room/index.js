@@ -46,8 +46,8 @@ class RoomAPI{
           else {
             room.name = room.name ?? room.id;
             room.sessionId = session.sessionId;
-            const newRoom = new Room(room);
-            await RoomAPI.createRoom(newRoom);
+            await RoomAPI.createRoom(room);
+            const [ newRoom ] = await RoomAPI.getDetailById(room);
             resolve(newRoom);
           }
         });
@@ -103,6 +103,22 @@ class RoomAPI{
       if (queryResponse.rowCount === 0) return null;
       else return Promise.resolve(RoomAPI.parseQueryResponse(queryResponse));
     })
+  }
+
+  static async generateSessionBreakoutRoom(breakoutRooms, mainRoom) {
+    try {
+      for (var i = 0; i < breakoutRooms.length; i++) {
+        let _id = breakoutRooms[i].id ?? breakoutRooms[i].name.replace(/[^a-zA-Z0-9]/g, '');
+        _id = mainRoom.id + "-" + _id.slice(0, 1).toLowerCase().concat(_id.slice(1));
+        let _roomSub = new Room({id: _id, name: breakoutRooms[i].name, mainRoomId: mainRoom.id });
+        await RoomAPI.generateSession(_roomSub);
+      }
+      return Promise.resolve(true);
+    }
+    catch(err) {
+      console.error(err);
+      return Promise.resolve(false);
+    }
   }
 
 }
