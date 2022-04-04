@@ -27,6 +27,10 @@ const RoomListener = require("@app/listeners/room");
   app.post("/room/:roomId/generateToken", RoomListener.generateToken);
 
   app.post("/room/:roomId/renameRoom", RoomListener.renameRoom);
+  
+  app.post("/room/:roomId/update", RoomListener.updateRoom);
+
+  app.delete("/room/:roomId", RoomListener.deleteRoom);
 
   app.delete("/room/:roomId/breakoutrooms", RoomListener.delBreakoutRooms);
 

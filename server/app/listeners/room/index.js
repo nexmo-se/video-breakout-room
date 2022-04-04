@@ -7,8 +7,8 @@ class RoomListener{
   static async info(req, res){
     try{
       const { roomId } = req.params;
-      const { role } = req.body ?? "publisher";
-      const { data } = req.body ?? {};
+      // const { role } = req.body ?? "publisher";
+      // const { data } = req.body ?? {};
 
       //const user = new User(role);
       const room = new Room(roomId);
@@ -20,10 +20,7 @@ class RoomListener{
       res.json({ 
         apiKey: process.env.API_KEY, 
         //token: generatedUser.token, 
-        id: generatedRoom.id,
-        name: generatedRoom.name,
-        sessionId: generatedRoom.sessionId,
-        breakoutRooms: generatedRoom.breakoutRooms
+        ...generatedRoom
       });
     }catch(err){
       console.error(err.stack);
@@ -47,11 +44,7 @@ class RoomListener{
       generatedRoom.breakoutRooms = await RoomAPI.getBreakoutRooms(generatedRoom);
 
       return res.json({ 
-        apiKey: process.env.API_KEY, 
-        id: generatedRoom.id, 
-        name: generatedRoom.name, 
-        sessionId: generatedRoom.sessionId,
-        breakoutRooms: generatedRoom.breakoutRooms
+        apiKey: process.env.API_KEY, ...generatedRoom
       });
     } catch(err) {
       console.error(err.stack);
@@ -73,10 +66,7 @@ class RoomListener{
 
       res.json({ 
         token: generatedUser.token,
-        apiKey: process.env.API_KEY, 
-        roomId: selectedRoom.id,
-        roomName: selectedRoom.name,
-        sessionId: selectedRoom.sessionId
+        apiKey: process.env.API_KEY, ...selectedRoom
       });
     }catch(err){
       console.error(err.stack);
@@ -97,11 +87,43 @@ class RoomListener{
       const updatedRoom = await RoomAPI.renameRoom(room, newRoomName);
 
       res.json({
-        apiKey: process.env.API_KEY, 
-        id: updatedRoom.id,
-        name: updatedRoom.name,
-        sessionId: updatedRoom.sessionId
+        apiKey: process.env.API_KEY, ...updatedRoom
       });
+    } catch(err) {
+      console.error(err.stack);
+      res.status(500).end(err.message);
+    }
+  }
+
+  static async updateRoom(req, res) {
+    try {
+      const { roomId } = req.params;
+      const { data } = req.body;
+      const { maxParticipants:newMaxParticipants } = data;
+
+      const room = new Room(roomId);
+
+      const updatedRoom = await RoomAPI.updateRoom(room, newMaxParticipants);
+
+      res.json({
+        apiKey: process.env.API_KEY, ...updatedRoom
+      });
+    } catch(err) {
+      console.error(err.stack);
+      res.status(500).end(err.message);
+    }
+  }
+
+
+  static async deleteRoom(req, res, next) { 
+    try {
+      const { roomId } = req.params;
+
+      const room = new Room(roomId);
+
+      await RoomAPI.deleteRoom(room);
+      
+      res.json(["Room is deleted"]);
     } catch(err) {
       console.error(err.stack);
       res.status(500).end(err.message);
@@ -117,10 +139,7 @@ class RoomListener{
       const updatedRoom = await RoomAPI.delBreakoutRooms(room);
       
       res.json({
-        apiKey: process.env.API_KEY, 
-        id: updatedRoom.id,
-        name: updatedRoom.name,
-        breakoutRooms: updatedRoom.breakoutRooms
+        apiKey: process.env.API_KEY, ...updatedRoom
       });
     } catch(err) {
       console.error(err.stack);

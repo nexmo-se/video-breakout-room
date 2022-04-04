@@ -37,6 +37,18 @@ class RoomAPI{
     }
   }
 
+   static async updateRoom(room, newMaxParticipants){
+    try {
+      await DatabaseAPI.query(async (client) => {
+        await client.query("UPDATE rooms SET max_participants = $1 WHERE id = $2 ", [ newMaxParticipants, room.id ]);
+      });
+      const [ selectedRoom ] = await RoomAPI.getDetailById(room);
+      return Promise.resolve(selectedRoom);
+    } catch(err) {
+      throw err;
+    }
+  }
+
   static async generateSession(room){
     const isExists = await RoomAPI.isExistsById(room);
     if(!isExists){
@@ -82,6 +94,17 @@ class RoomAPI{
       if (queryResponse.rowCount === 0) return null;
       else return Promise.resolve(RoomAPI.parseQueryResponse(queryResponse));
     })
+  }
+
+  static async deleteRoom(room) {
+    try {
+      await DatabaseAPI.query(async (client) => {
+        await client.query("DELETE FROM rooms WHERE id = $1 ", [ room.id ]);
+      });
+      return Promise.resolve(true);
+    } catch(err) {
+      throw err;
+    }
   }
 
   static async delBreakoutRooms(room) {
