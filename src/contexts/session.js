@@ -6,6 +6,7 @@ import OT, { Session, Stream, Connection } from "@opentok/client";
 import Credential from "entities/credential";
 import User from "entities/user";
 import { ConstructionOutlined } from "@mui/icons-material";
+import { useIsomorphicLayoutEffect } from "framer-motion";
 
 
 export const SessionContext = createContext<any>({});
@@ -92,13 +93,6 @@ function SessionProvider({ children }){
 
   useEffect(() => {
     if (session && isConnected) {
-      if (session.sessionId === userSessions[0].sessionId) {
-        setUserSessions((prevUserSessions) => {
-          return prevUserSessions.slice(0, 1);
-        })
-      }
-      // find based on session ID
-      // Check if prevRoomStreams changes come from current session
       const sessionId = session.sessionId;
       const targetStreams = {...prevRoomStreams}[sessionId];
       const mainSessionId = userSessions[0].sessionId;

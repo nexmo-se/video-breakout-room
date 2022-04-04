@@ -13,6 +13,7 @@ import SwapVert from "@material-ui/icons/SwapVert"
 import { Collapse, Popconfirm, Popover, Input, InputNumber, Form, Select } from 'antd';
 import Button from 'components/Button'
 import RoomAPI from "api/room";
+import { ConstructionOutlined } from "@mui/icons-material";
 const { Option } = Select
 const { Panel } = Collapse;
 
@@ -30,12 +31,17 @@ export default function BreakoutRoomControl(props) {
     const [ selectedRoom, setSelectedRoom ] = useState();
     const [ selectedParticipant, setSelectedParticipant ] = useState();
     const [ selectedParticipantRoom, setSelectedParticipantRoom ] = useState();
-
+    const [ isLoading, setIsLoading ] = useState(true);
 
     const [form] = Form.useForm();
 
     useEffect(() => {
-        if (mMessage.breakoutRooms.length === 0) return setIsBreakout(false);
+        setIsLoading(true);
+
+        if (mMessage.breakoutRooms.length === 0) {
+            setRoomGroup({});
+            return setIsBreakout(false);
+        }
 
         let newRoomGroup = {
             "Main Room": []
@@ -53,7 +59,7 @@ export default function BreakoutRoomControl(props) {
         })
         newRoomGroup["Main Room"] = participantUnAssigned;
         setRoomGroup(newRoomGroup);
-
+        setIsLoading(false);
     }, [mMessage.breakoutRooms, mSession.participants])
 
     const content = (
@@ -167,6 +173,7 @@ export default function BreakoutRoomControl(props) {
     }
 
     function handleAddNewRoom() {
+        setIsLoading(true);
         let roomName = inputRoomName.current.input.value;
         let maxParticipants = inputMaxParticipant.current.value;
         setShowAddNewRoom(false);
@@ -179,29 +186,28 @@ export default function BreakoutRoomControl(props) {
         mRoom.handleRoomCreate(data).then((response) => {
             let newRoom = response.find((room) => room.name === roomName);
             newRoom["member"] = [];
-            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], [...mMessage.breakoutRooms, newRoom]);
+            setIsLoading(false);
+            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], {"breakoutRooms": [...mMessage.breakoutRooms, newRoom]});
         });
     }
 
-    function handleCloseAllRoom() {
-        let p = [];
-        mMessage.breakoutRooms.forEach((room) => {
-            p.push(mRoom.handleRoomRemove(room.id));
-        })
-        
-        Promise.all(p).then((response) => {
-            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], [])
+    function handleCloseAllRoom() {    
+        setIsLoading(true); 
+        return mRoom.handleRoomRemove(mRoom.mainRoom).then((response) => {
+            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], {"breakoutRooms":[]})
             setIsBreakout(false);
         })
     }
 
     function handleDeleteRoom(roomName) {
+        setIsLoading(true);
         const newRooms = [...mMessage.breakoutRooms];
         let targetIndex = newRooms.findIndex((room) => room.name === roomName);
         
         mRoom.handleRoomRemove(newRooms[targetIndex].id).then((response) => {
             newRooms.splice(targetIndex, 1);
-            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], newRooms)
+            setIsLoading(false);
+            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], {"breakoutRooms": newRooms})
         })
     }
 
@@ -212,11 +218,25 @@ export default function BreakoutRoomControl(props) {
         let targetIndex = newRooms.findIndex((room) => room.name === selectedRoom);
         newRooms[targetIndex]["name"] = formRoomName;
         newRooms[targetIndex]["maxParticipants"] = formMaxparticipant; 
-        setSelectedRoom(null);  
-        if (selectedRoom !== formRoomName) {
-            RoomAPI.renameRoom(selectedRoom, formRoomName);
+        setSelectedRoom(null); 
+        const targetRoom = mMessage.breakoutRooms.find((room) => room.name === selectedRoom); 
+        
+        if (!targetRoom || (targetRoom.name === formRoomName && targetRoom.maxParticipants === formMaxparticipant)) return;
+
+        setIsLoading(true);
+        let p = [];
+        if (targetRoom.name !== formRoomName) {
+            p.push(RoomAPI.renameRoom(targetRoom.id, formRoomName));
         }
-        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], newRooms);
+        if (targetRoom.maxParticipants !== formMaxparticipant) {
+            p.push(RoomAPI.updateRoom(targetRoom.id, formMaxparticipant));
+        }
+
+        Promise.all(p).then((response) => {
+            setIsLoading(false);
+            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], {"breakoutRooms": newRooms});
+        })
+
     }
 
     function handleMoveRoom() {
@@ -227,6 +247,10 @@ export default function BreakoutRoomControl(props) {
         if (targetRoomIndex === prevRoomIndex || !selectedParticipantRoom) {
             return;
         }
+
+        if (targetRoomIndex !==  -1 && newRooms[targetRoomIndex].member.length >= newRooms[targetRoomIndex].maxParticipants) {
+            return alert(`Room: ${newRooms[targetRoomIndex].name} is full`);
+        }
         
         if (targetRoomIndex !==  -1)  {
             newRooms[targetRoomIndex]["member"] = [...newRooms[targetRoomIndex]["member"], selectedParticipant];
@@ -235,13 +259,14 @@ export default function BreakoutRoomControl(props) {
             newRooms[prevRoomIndex]["member"] = [...newRooms[prevRoomIndex]["member"]].filter((a) => a !== selectedParticipant);
         }
 
-        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], newRooms);
+        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], {"breakoutRooms": newRooms});
     }
 
     return when ? (
         <>
         <div className={mStyles.root} style={position.styles} onMouseDown={dragStart} onMouseMove={dragging} onMouseUp={dragEnd}>
         <h4 className={mStyles.header}>Breakout Room Control</h4>
+         {isLoading? <div className={clsx("Vlt-spinner", mStyles.spinner)} /> : null}
         <Collapse defaultActiveKey={['1']} accordion ghost>
         {roomGroup && Object.entries(roomGroup).map(([key,value],i) => {
           const breakoutRoom = mMessage.breakoutRooms.find((room) => room.name === key);

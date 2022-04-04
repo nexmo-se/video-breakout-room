@@ -15,7 +15,23 @@ class RoomListener{
       
       const generatedRoom = await RoomAPI.generateSession(room);
       //const generatedUser = await UserAPI.generateToken(generatedRoom, user, data);
+      
       generatedRoom.breakoutRooms = await RoomAPI.getBreakoutRooms(room);
+
+      if (generatedRoom.breakoutRooms) {
+        generatedRoom.breakoutRooms.sort((a,b) =>  {
+        let fa = a.name.toLowerCase(),
+        fb = b.name.toLowerCase();
+
+        if (fa < fb) {
+            return -1;
+        }
+        if (fa > fb) {
+            return 1;
+        }
+        return 0;
+      });
+    }
 
       res.json({ 
         apiKey: process.env.API_KEY, 

@@ -18,6 +18,8 @@ export default function MessageProvider({ children }){
   const [ raisedHands, setRaisedHands ] = useState([]);
   const [ messages, setMessages ] = useState([]);
   const [ breakoutRooms, setBreakoutRooms ] = useState([]);
+  const [ breakoutRoomsType, setBreakoutRoomsType ] = useState("automatic");
+
   const [ breakoutRoomsRequest, setBreakoutRoomsRequest ] = useState(false);
   const [ roomSessionListeners, setSessionListeners ] = useState([]);
 
@@ -95,9 +97,13 @@ export default function MessageProvider({ children }){
       })
 
       mSession.session.on("signal:breakout-room", ({ data }) => {
+        const jsonData = JSON.parse(data);          
+
+        setBreakoutRoomsType((prevBreakoutRoomsType) => {
+          return jsonData.type ?? "automatic"
+        })
         setBreakoutRooms((prevBreakoutRooms) => {
-          const jsonData = JSON.parse(data);          
-          return jsonData;
+          return jsonData.breakoutRooms;
         })
       })
       setSessionListeners([...roomSessionListeners, mSession.session])
@@ -114,6 +120,7 @@ export default function MessageProvider({ children }){
       raisedHands,
       removeRaisedHand,
       messages,
+      breakoutRoomsType,
       breakoutRooms,
       setBreakoutRooms
     }}>

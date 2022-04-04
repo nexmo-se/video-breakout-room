@@ -29,8 +29,7 @@ export default function RoomContextProvider({ children }){
       if (roomNameFound) {
         setSignal('breakoutRoomChanged');
       }
-      else if (newBreakoutRoom && mSession.user.role === "participant") setSignal('breakoutRoomCreated');
-
+      else if (newBreakoutRoom && mSession.user.role === "participant" && mMessage.breakoutRoomsType !== "automatic") setSignal('breakoutRoomCreated');
     }
     else if (mMessage.breakoutRooms.length === 0) {  
       if (inBreakoutRoom) setSignal('breakoutRoomRemoved');
@@ -67,10 +66,17 @@ export default function RoomContextProvider({ children }){
   }
 
   async function handleRoomRemove(roomId) {
-    const removedRoom = await RoomAPI.removeSession(roomId);
-    return new Promise((resolve, reject) => {
-      resolve(removedRoom);
-    })
+    if (roomId === mainRoom) {
+      const removedRoom = await RoomAPI.removeAllBreakoutRooms(roomId);
+      return new Promise((resolve, reject) => {
+        resolve(removedRoom);
+      })
+    }
+    const removedRoom = await RoomAPI.removeBreakoutRoom(roomId);
+      return new Promise((resolve, reject) => {
+        resolve(removedRoom);
+      })
+
   }
 
   async function connect(user, role, roomId){
@@ -99,34 +105,35 @@ export default function RoomContextProvider({ children }){
   }
 
   function handleChangeRoom(publisher, subscriber, user, roomName) {
-    setSignal(null);
-    mSession.session.unpublish(publisher);
-    subscriber.unsubscribe();
-    connect(user, role,  roomName ? roomName : '');
-
-    setInBreakoutRoom(null);
-    if (mMessage.breakoutRooms.length === 0) { return }
-
     const newRooms = [...mMessage.breakoutRooms];
+    const targetRoomIndex = newRooms.findIndex((room) => room.name === roomName);
     newRooms.map((room) => {
       if (room["member"].includes(user.name)) {
         room["member"].splice(room["member"].indexOf(user.name),1);
       }
     })
 
-    const targetRoomIndex = newRooms.findIndex((room) => room.name === roomName);
+    setSignal(null);
+    mSession.session.unpublish(publisher);
+    subscriber.unsubscribe();
+    connect(user, role,  targetRoomIndex!== -1  ? newRooms[targetRoomIndex].id : '');
+
     if (targetRoomIndex !== -1 ) {
       newRooms[targetRoomIndex]["member"].push(user.name);
       setInBreakoutRoom(roomName);
     }
+    else {
+      setInBreakoutRoom(null);
+    }
 
-    RoomAPI.sendBreakoutRoom(mSession.userSessions[0], newRooms)
+    RoomAPI.sendBreakoutRoom(mSession.userSessions[0], { "breakoutRooms": newRooms})
   }
 
   return (
     <RoomContext.Provider value={{ 
       inBreakoutRoom,
       signal,
+      mainRoom,
       connect,
       createMainRoom,
       handleRoomCreate,

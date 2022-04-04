@@ -12,6 +12,11 @@ export default makeStyles(() => ({
         zIndex: 5,
         boxShadow: "4px 4px rgba(0,0,0,0.1)"
     },
+    spinner: {
+        position: "absolute",
+        top: "25%",
+        left: "25%",
+    },
     header: {
         textAlign: "center"
     }

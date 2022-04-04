@@ -48,7 +48,12 @@ export default function PromptCreateRooms(props) {
             data["member"] = [];
           })
         }
-        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], response)
+
+        const message = {
+          "type": formValue.modifier,
+          "breakoutRooms": response
+        }
+        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], message)
       });
 
     }

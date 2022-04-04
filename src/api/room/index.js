@@ -33,7 +33,7 @@ export default class RoomAPI{
     return breakoutRoomList;
   }
 
-  static async removeSession(roomId){
+  static async removeAllBreakoutRooms(roomId){
     const url = new URL(window.location.href);
     // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
     const apiURL = `http://localhost:3002/room/${roomId}/breakoutrooms`;
@@ -44,16 +44,38 @@ export default class RoomAPI{
     return removedRoom;
   }
 
-  static async renameRoom(oldRoomName, newRoomName){
+  static async removeBreakoutRoom(roomId){
     const url = new URL(window.location.href);
     // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
-    const apiURL = `http://localhost:3002/room/${oldRoomName}/renameRoom`;
+    const apiURL = `http://localhost:3002/room/${roomId}`;
+    const jsonResult = await (await fetch(apiURL, {
+      method: "DELETE", headers: { "Content-Type": "application/JSON" },
+    })).json();
+    return jsonResult;
+  }
+
+  static async renameRoom(roomId, newRoomName){
+    const url = new URL(window.location.href);
+    // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
+    const apiURL = `http://localhost:3002/room/${roomId}/renameRoom`;
     const jsonResult = await (await fetch(apiURL, {
       method: "POST", headers: { "Content-Type": "application/JSON" },
-      body: JSON.stringify({ data: newRoomName })
+      body: JSON.stringify({ data: {name: newRoomName} })
     })).json();
     const room = new Room(jsonResult.apiKey, jsonResult.id, jsonResult.name, jsonResult.sessionId, jsonResult.maxParticipants);
-    return room;
+    return Promise.resolve(room);
+  }
+
+  static async updateRoom(roomId, maxParticipants){
+    const url = new URL(window.location.href);
+    // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
+    const apiURL = `http://localhost:3002/room/${roomId}/update`;
+    const jsonResult = await (await fetch(apiURL, {
+      method: "POST", headers: { "Content-Type": "application/JSON" },
+      body: JSON.stringify({ data: {maxParticipants} })
+    })).json();
+    const room = new Room(jsonResult.apiKey, jsonResult.id, jsonResult.name, jsonResult.sessionId, jsonResult.maxParticipants);
+    return Promise.resolve(room);
   }
 
   static async sendBreakoutRoom(session, breakoutRoom){

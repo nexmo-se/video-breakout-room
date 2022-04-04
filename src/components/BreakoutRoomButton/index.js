@@ -12,11 +12,11 @@ export default function BreakoutRoomButton({...props }){
 
   function onBreakoutRoomClicked() {
     if (isBreakout) return;  
-      setIsBreakout(true);
       setOpenPrompt(true);
     }
 
   function handleConfirm() {
+    setIsBreakout(true);
     setOpenPrompt(false);
     return;
   }

@@ -75,8 +75,8 @@ export default function ModeratorPage() {
       if (mSubscriber.subscribers) subscriberRef.current = mSubscriber;
     }, [mSubscriber.subscribers] )
 
-    function handleChangeRoom(roomName = '') {
-      mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, mSession.user, roomName);
+    function handleChangeRoom(roomId = '') {
+      mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, mSession.user, roomId);
     }
 
     useEffect(() => {
