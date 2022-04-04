@@ -1,27 +1,29 @@
 // @flow
 class Room{
   
-    constructor(apiKey = '', name = '', sessionId = '', member=[], maxMember=''){
+    constructor(apiKey = '', id= '', name = '', sessionId = '',  maxParticipants='', member=[]){
       this.apiKey = apiKey;
+      this.id = id;
       this.name = name;
       this.sessionId = sessionId;
       this.member = member;
-      this.maxMember = maxMember;
+      this.maxParticipants = maxParticipants;
     }
 
     toJSON() {
       const jsonData = {
         apiKey: this.apiKey,
+        id: this.id,
         name: this.name,
         sessionId: this.sessionId,
         member: this.member,
-        maxMember: this.maxMember
+        maxParticipants: this.maxParticipants
       }
       return JSON.parse(JSON.stringify(jsonData));
     }
   
     static fromJSON(data){
-      const breakoutRoom = new Room(data.apiKey, data.name, data.sessionId, data.member, data.maxMember);
+      const breakoutRoom = new Room(data.apiKey, data.id, data.name, data.sessionId, data.maxParticipants, data.member);
       return breakoutRoom;
     }
   }

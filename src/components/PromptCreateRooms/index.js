@@ -26,21 +26,21 @@ export default function PromptCreateRooms(props) {
 
     function handleConfirm() {
       onOK();
-      let p = [];
       const formValue = form.getFieldsValue();
+      let data =  [];
       for (let i = 0; i < formValue.roomCount; i++) {
         let roomName = formValue[`roomName ${i + 1}`];
-        let maxMamber = formValue[`maxMember ${i + 1}`]
-        p.push(mRoom.handleRoomCreation(roomName, maxMamber));
+        let maxParticipants = formValue[`maxParticipants ${i + 1}`]
+        data.push({name: roomName, maxParticipants: maxParticipants})
       }
-      Promise.all(p).then((response) => {
-        // if assign automatically
+
+
+      return mRoom.handleRoomCreate(data).then((response) => {
         const participants = mSession.participants.filter((p) => p.role !== "moderator").map((p) => p.name);
         if (formValue.modifier === "automatic" && participants.length !== 0) {
           participants.sort(()=> { return 0.5 - Math.random()});
-          let i = 0;
           response.map((data) => {
-              data["member"] = participants.splice(0, data["maxMember"]);
+              data["member"] = participants.splice(0, data["maxParticipants"]);
           })
         }
         else {
@@ -50,6 +50,7 @@ export default function PromptCreateRooms(props) {
         }
         RoomAPI.sendBreakoutRoom(mSession.userSessions[0], response)
       });
+
     }
 
 
@@ -91,7 +92,7 @@ export default function PromptCreateRooms(props) {
             </Form.Item>
               <Form.Item
               label="Max Participants"
-              name={`maxMember ${i+1}`}
+              name={`maxParticipants ${i+1}`}
               rules={[{ required: true, message: 'Please input max participants!' }]}
               initialValue={1}
             >

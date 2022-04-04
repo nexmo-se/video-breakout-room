@@ -5,7 +5,8 @@ import User from "entities/user";
 
 export default function AskNameDialog(props) {
   const { role, pin, onSubmit } = props;
-  const [text, setText] = useState('');
+  const [name, setName] = useState('');
+  const [room, setRoom] = useState('');
   const [inputPin, setInputPin] = useState('');
 
   const styles = {
@@ -17,10 +18,10 @@ export default function AskNameDialog(props) {
 
   function handleSubmit(e) {
       e.preventDefault();
-      if(!text) alert("Please enter your name");
+      if(!name || !room) alert("Please fill in all fields");
       else if(onSubmit && inputPin === pin) {
-        const user = new User(text, role);
-        onSubmit(user);
+        const user = new User(name, role);
+        onSubmit(user, room);
       }else if(inputPin !== pin) alert("Wrong PIN");
   }
 
@@ -28,11 +29,12 @@ export default function AskNameDialog(props) {
     <form style={styles.container}>
       <div className="Vlt-card Vlt-bg-white" style={{ maxWidth: 500 }}>
         <div className="Vlt-card__header">
-          <h3>Tell Me Your Name</h3>
+          <h3>Join Main Room</h3>
         </div>
         <div className="Vlt-card__content">
-          <TextInput text={text} onChange={setText} placeholder="Please enter your name"/>
-          <TextInput type="password" text={inputPin} onChange={setInputPin} placeholder="PIN"/>
+          <TextInput label="Room Name*" text={room} onChange={setRoom} placeholder="Please enter a room name"/>
+          <TextInput label="Name*" text={name} onChange={setName} placeholder="Please enter your name"/>
+          <TextInput label="Password*" type="password" text={inputPin} onChange={setInputPin} placeholder="PIN"/>
         </div>
         <div className="Vlt-card__footer Vlt-card__footer--noborder">
           <button type="submit" className="Vlt-btn Vlt-btn--primary Vlt-btn--app" onClick={handleSubmit}>Join</button>

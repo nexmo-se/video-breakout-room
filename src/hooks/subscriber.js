@@ -24,7 +24,7 @@ function useSubscriber({ moderator, screen, camera, custom }){
     })
     setSubscribers([]);
     // setSubscribed([]);
-    mSession.clearSessions();
+    mSession.disconnectSession();
   }
 
   async function subscribe(streams, moderatorContainer){

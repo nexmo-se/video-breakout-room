@@ -79,12 +79,16 @@ export default function ModeratorPage() {
       mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, mSession.user, roomName);
     }
 
+    useEffect(() => {
+      if (mMessage.breakoutRooms.length !== 0 ) setIsBreakout(true);
+    }, [mMessage.breakoutRooms])
+
     if(!mSession.user && !mSession.session) {
     return (
         <AskNameDialog 
           pin={config.moderatorPin}
           role="moderator"
-          onSubmit={(user) => mSession.createUser(user)}
+          onSubmit={(user, room) => { mRoom.createMainRoom(user, room);}}
         />
       )
     }

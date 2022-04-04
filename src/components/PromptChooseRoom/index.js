@@ -26,7 +26,7 @@ export default function PromptChooseRooms(props) {
         mMessage.breakoutRooms.forEach((room) => {
           newRoomGroup[room.name] = room.member;
           setRoomGroup(newRoomGroup);
-          if (room.member.length >= room.maxMember) {
+          if (room.member.length >= room.maxParticipants) {
             setRoomOccupied((prev) => {
               return [...new Set([...prev, room.name])]
             })

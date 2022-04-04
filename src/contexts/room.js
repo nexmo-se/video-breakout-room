@@ -5,18 +5,18 @@ import RoomAPI from "api/room";
 import usePublisher from "hooks/publisher";
 import useMessage from "hooks/message";
 import CredentialAPI from "api/credential";
-import { RoomPreferences } from "@mui/icons-material";
+import { RoomPreferences, VolunteerActivismOutlined } from "@mui/icons-material";
 
 
 export const RoomContext = createContext({});
 export default function RoomContextProvider({ children }){
   const [inBreakoutRoom, setInBreakoutRoom] = useState(null);
   const [newBreakoutRoom, setNewBreakoutRoom] = useState(true);
+  const [mainRoom, setMainRoom] = useState();
 
   const [role, setRole] = useState(false);
   const [credential, setCredential] = useState(false);
   const [signal, setSignal] = useState();
-
 
   const mSession = useSession();
   const mPublisher = usePublisher();
@@ -59,26 +59,43 @@ export default function RoomContextProvider({ children }){
     }
   }, [ mMessage.breakoutRooms ])
 
-  async function handleRoomCreation(roomName, maxMember) {
-    const generatedRoom = await RoomAPI.generateSession(roomName);
-    generatedRoom["maxMember"] = maxMember;
+  async function handleRoomCreate(breakoutRooms) {
+    const generatedRoom = await RoomAPI.generateSession(mainRoom, {breakoutRooms});
     return new Promise((resolve, reject) => {
       resolve(generatedRoom);
     })
   }
 
-  async function connect(user, role, roomName){
+  async function handleRoomRemove(roomId) {
+    const removedRoom = await RoomAPI.removeSession(roomId);
+    return new Promise((resolve, reject) => {
+      resolve(removedRoom);
+    })
+  }
+
+  async function connect(user, role, roomId){
       if(user) {
         const credentialInfo = {
           role,
           data: user.toJSON()
         }
-        if (roomName) credentialInfo["roomName"] = roomName;
 
+        credentialInfo["roomId"] = mainRoom;
+        
+        if (roomId) {
+          credentialInfo["roomId"] = roomId;
+        }
         const credential = await CredentialAPI.generateCredential(credentialInfo);
         await mSession.connect(credential);
         setRole(role);
       }
+  }
+
+  async function createMainRoom(user, roomName) {
+    const roomInfo = await RoomAPI.getRoomInfo(roomName);
+    setMainRoom(roomName)
+    mSession.createUser(user);
+    mMessage.setBreakoutRooms(roomInfo.breakoutRooms ?? [])
   }
 
   function handleChangeRoom(publisher, subscriber, user, roomName) {
@@ -111,7 +128,9 @@ export default function RoomContextProvider({ children }){
       inBreakoutRoom,
       signal,
       connect,
-      handleRoomCreation,
+      createMainRoom,
+      handleRoomCreate,
+      handleRoomRemove,
       handleChangeRoom
     }}>
       {children}

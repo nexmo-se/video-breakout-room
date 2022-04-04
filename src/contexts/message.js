@@ -33,7 +33,7 @@ export default function MessageProvider({ children }){
 
   useEffect(() => {
     sessionRef.current = mSession.session;
-    if(mSession.session && !roomSessionListeners.find((session) => session.sessionId === mSession.session.sessionId)){
+    if(mSession.session && !roomSessionListeners.find((session) => session.sessionId === mSession.session.sessionId)){    
       mSession.session.on("signal:force-video", ({ data }) => {
         const jsonData = JSON.parse(data)
         const user = User.fromJSON(JSON.parse(data));
@@ -115,7 +115,7 @@ export default function MessageProvider({ children }){
       removeRaisedHand,
       messages,
       breakoutRooms,
-      breakoutRoomsRequest
+      setBreakoutRooms
     }}>
       {children}
     </MessageContext.Provider>

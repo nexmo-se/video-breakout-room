@@ -2,16 +2,46 @@
 import Room from "entities/room";
 
 export default class RoomAPI{
-  static async generateSession(roomName="room", data={}){
+
+  static async getRoomInfo(roomId, data={}){
     const url = new URL(window.location.href);
     // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
-    const apiURL = `http://localhost:3002/room/${roomName}/createSession`;
+    const apiURL = `http://localhost:3002/room/${roomId}/info`;
+    const jsonResult = await (await fetch(apiURL, {
+      method: "GET", headers: { "Content-Type": "application/JSON" },
+    })).json();
+    const mainRoom = new Room(jsonResult.apiKey, jsonResult.id, jsonResult.name, jsonResult.sessionId)
+    let breakoutRooms = [];
+    if ( jsonResult.breakoutRooms) jsonResult.breakoutRooms.forEach((room) => {
+      breakoutRooms.push(new Room(jsonResult.apiKey, room.id, room.name, room.sessionId, room.maxParticipants))
+    });
+    return {mainRoom, breakoutRooms};
+  }
+
+  static async generateSession(mainRoom, breakoutRooms=[]){
+    const url = new URL(window.location.href);
+    // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
+    const apiURL = `http://localhost:3002/room/${mainRoom}/createSession`;
     const jsonResult = await (await fetch(apiURL, {
       method: "POST", headers: { "Content-Type": "application/JSON" },
-      body: JSON.stringify({ data })
+      body: JSON.stringify(breakoutRooms)
     })).json();
-    const room = new Room(jsonResult.apiKey, jsonResult.name, jsonResult.sessionId);
-    return room;
+    let breakoutRoomList = [];
+    jsonResult.breakoutRooms.forEach((room) => {
+      breakoutRoomList.push(new Room(jsonResult.apiKey, room.id, room.name, room.sessionId, room.maxParticipants))
+    });
+    return breakoutRoomList;
+  }
+
+  static async removeSession(roomId){
+    const url = new URL(window.location.href);
+    // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
+    const apiURL = `http://localhost:3002/room/${roomId}/breakoutrooms`;
+    const jsonResult = await (await fetch(apiURL, {
+      method: "DELETE", headers: { "Content-Type": "application/JSON" },
+    })).json();
+    const removedRoom = new Room(jsonResult.apiKey, jsonResult.id, jsonResult.name, jsonResult.sessionId)
+    return removedRoom;
   }
 
   static async renameRoom(oldRoomName, newRoomName){
@@ -22,7 +52,7 @@ export default class RoomAPI{
       method: "POST", headers: { "Content-Type": "application/JSON" },
       body: JSON.stringify({ data: newRoomName })
     })).json();
-    const room = new Room(jsonResult.apiKey, jsonResult.name, jsonResult.sessionId);
+    const room = new Room(jsonResult.apiKey, jsonResult.id, jsonResult.name, jsonResult.sessionId, jsonResult.maxParticipants);
     return room;
   }
 

@@ -96,7 +96,7 @@ export default function BreakoutRoomControl(props) {
         </Form.Item>
             <Form.Item
             label="Max Participants"
-            name={roomName + '-maxMember'}
+            name={roomName + '-maxParticipants'}
             rules={[{ required: true, message: 'Please input max participants!' }]}
             initialValue={maxParticipant}
         >
@@ -168,33 +168,50 @@ export default function BreakoutRoomControl(props) {
 
     function handleAddNewRoom() {
         let roomName = inputRoomName.current.input.value;
-        let maxMember = inputMaxParticipant.current.value;
+        let maxParticipants = inputMaxParticipant.current.value;
         setShowAddNewRoom(false);
-        mRoom.handleRoomCreation(roomName, maxMember).then((response) => {
-            response["member"] = [];
-            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], [...mMessage.breakoutRooms, response])
+        let data =  [
+                {
+                    "name": roomName,
+                    "maxParticipants": maxParticipants
+                }
+            ];
+        mRoom.handleRoomCreate(data).then((response) => {
+            let newRoom = response.find((room) => room.name === roomName);
+            newRoom["member"] = [];
+            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], [...mMessage.breakoutRooms, newRoom]);
         });
     }
 
     function handleCloseAllRoom() {
-        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], [])
-        setIsBreakout(false);
+        let p = [];
+        mMessage.breakoutRooms.forEach((room) => {
+            p.push(mRoom.handleRoomRemove(room.id));
+        })
+        
+        Promise.all(p).then((response) => {
+            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], [])
+            setIsBreakout(false);
+        })
     }
 
     function handleDeleteRoom(roomName) {
         const newRooms = [...mMessage.breakoutRooms];
         let targetIndex = newRooms.findIndex((room) => room.name === roomName);
-        newRooms.splice(targetIndex, 1);
-        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], newRooms)
+        
+        mRoom.handleRoomRemove(newRooms[targetIndex].id).then((response) => {
+            newRooms.splice(targetIndex, 1);
+            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], newRooms)
+        })
     }
 
     function handleEditRoom() {
         const formRoomName = form.getFieldValue(selectedRoom);
-        const formMaxparticipant = form.getFieldValue(selectedRoom + '-maxMember');
+        const formMaxparticipant = form.getFieldValue(selectedRoom + '-maxParticipants');
         const newRooms = mMessage.breakoutRooms.map(room => ({...room}));
         let targetIndex = newRooms.findIndex((room) => room.name === selectedRoom);
         newRooms[targetIndex]["name"] = formRoomName;
-        newRooms[targetIndex]["maxMember"] = formMaxparticipant; 
+        newRooms[targetIndex]["maxParticipants"] = formMaxparticipant; 
         setSelectedRoom(null);  
         if (selectedRoom !== formRoomName) {
             RoomAPI.renameRoom(selectedRoom, formRoomName);
@@ -241,7 +258,7 @@ export default function BreakoutRoomControl(props) {
                     >
                     <Button hierarchy="link" text={<Delete style={{fill:"black"}}/>} key={'delete-' + i} style={{minHeight: "24px", minWidth: "24px", padding: "0px", margin: "0px"}}></Button> 
                 </Popconfirm>
-                <Popover visible={selectedRoom === key? true: false} content={contentEditRoom(key, breakoutRoom ? breakoutRoom["maxMember"] : 1)} title="Edit Room" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedRoom(key) : setSelectedRoom(null)} overlayStyle={{width: "250px"}}>
+                <Popover visible={selectedRoom === key? true: false} content={contentEditRoom(key, breakoutRoom ? breakoutRoom["maxParticipants"] : 1)} title="Edit Room" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedRoom(key) : setSelectedRoom(null)} overlayStyle={{width: "250px"}}>
                     <Button value={key} hierarchy="link" text={<Edit style={{fill:"black"}}/>} key={'edit-' + i} onClick={() => setSelectedRoom(key)} style={{minHeight: "24px", minWidth: "24px", padding: "0px", margin: "0px"}}></Button>      
                  </Popover>
                  <Button value={key} text={mRoom.inBreakoutRoom === key ? "Leave" : "Join"} key={'joinroom-' + i} onClick={handleJoinRoom} style={{minHeight: "24px", padding: "0px 4px", margin: "0px"}}></Button> 

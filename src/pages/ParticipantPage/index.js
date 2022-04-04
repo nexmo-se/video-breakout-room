@@ -113,7 +113,7 @@ export default function ParticipantPage(){
       <AskNameDialog 
         pin={config.participantPin}
         role="participant"
-        onSubmit={(user) => mSession.createUser(user)}
+        onSubmit={(user, room) => { mRoom.createMainRoom(user, room);}}
       />
     )
   }
