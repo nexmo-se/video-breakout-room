@@ -110,7 +110,7 @@ class RoomAPI{
       for (var i = 0; i < breakoutRooms.length; i++) {
         let _id = breakoutRooms[i].id ?? breakoutRooms[i].name.replace(/[^a-zA-Z0-9]/g, '');
         _id = mainRoom.id + "-" + _id.slice(0, 1).toLowerCase().concat(_id.slice(1));
-        let _roomSub = new Room({id: _id, name: breakoutRooms[i].name, mainRoomId: mainRoom.id });
+        let _roomSub = new Room({id: _id, name: breakoutRooms[i].name, mainRoomId: mainRoom.id, maxParticipants: breakoutRooms[i].maxParticipants });
         await RoomAPI.generateSession(_roomSub);
       }
       return Promise.resolve(true);
