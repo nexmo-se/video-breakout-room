@@ -114,6 +114,7 @@ function SessionProvider({ children }){
   async function connect(credential){
     try{
       let session =  userSessions.find((tSession) => tSession.id === credential.sessionId);
+      setStreams([]); // Clear old streams
       if (!session) {
         session = OT.initSession(credential.apiKey, credential.sessionId); 
 
@@ -134,7 +135,6 @@ function SessionProvider({ children }){
         setUserSessions([...userSessions, session]);
       }
       setSession(session);
-      setStreams([]); // Clear old streams
       setIsConnected(true);
     }catch(err){
       console.log(err);
