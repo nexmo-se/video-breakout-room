@@ -17,6 +17,9 @@ export default function MessageProvider({ children }){
 
   const mSession = useSession();
   const sessionRef = useRef(null);
+  const breakoutRoomsRef= useRef(null);
+  sessionRef.current = mSession.session;
+  breakoutRoomsRef.current = breakoutRooms;
 
   function removeRaisedHand(user){
     setRaisedHands((prevRaisedHands) => prevRaisedHands.filter((prevRaisedHand) => {
@@ -25,7 +28,14 @@ export default function MessageProvider({ children }){
   }
 
   useEffect(() => {
-    sessionRef.current = mSession.session;
+    if (!mSession.participants.find((user) => user.role === "moderator")) {
+      const newRooms = [...breakoutRooms];
+      newRooms.forEach((room) => room["member"] = []);
+      setBreakoutRooms(newRooms);
+    }
+  }, [mSession.participants])
+
+  useEffect(() => {
     if(mSession.session && !roomSessionListeners.find((session) => session.sessionId === mSession.session.sessionId)){    
 
       mSession.session.on("signal:raise-hand", ({ data }) => {
@@ -39,10 +49,17 @@ export default function MessageProvider({ children }){
       });
 
       mSession.session.on("signal:message", (e) => {
-        if (e.target.sessionId !== sessionRef.current.sessionId) return;
+        const jsonData = JSON.parse(e.data)
+        const message = Message.fromJSON(jsonData);
+
+        if (!message.toBreakoutRoom && e.target.sessionId !== sessionRef.current.sessionId) return;
+
+        if (message.toBreakoutRoom) {
+          const userRoom = breakoutRoomsRef.current.find((room) => room["member"].includes(mSession.user.name));
+          if (!userRoom || userRoom.name !== message.toBreakoutRoom) return;
+        }
+
         setMessages((prevMessages) => {
-          const jsonData = JSON.parse(e.data)
-          const message = Message.fromJSON(jsonData);
           return [ ...prevMessages, message ]
         })
       })

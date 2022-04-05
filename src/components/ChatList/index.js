@@ -30,9 +30,9 @@ function ChatList(){
   return(
     <div ref={list} style={styles.container}>
       {mMessage.messages.map((message, i) => {
-        const color = getBackgroundColor(message.roomName);
+        const color = getBackgroundColor(message.fromRoomName);
         if(message.isApproved){
-          return <ChatBubble color={color} key={`chatbubble-${i}`} roomName = {message.roomName} name={message.sender.name} message={message.text} />
+          return <ChatBubble color={color} key={`chatbubble-${i}`} roomName = {message.fromRoomName} name={message.sender.name} message={message.text} />
         }else return null;
       })}
     </div>

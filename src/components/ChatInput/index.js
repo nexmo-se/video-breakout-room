@@ -10,7 +10,7 @@ import TextInput from "components/TextInput";
 import Button from "components/Button";
 
 
-function ChatInput({ byPass }){
+function ChatInput({ byPass, toBreakoutRoom, resetSelectedRoom }){
   const [ text, setText ] = useState("");
   const mSession = useSession();
   const mRoom = useRoom();
@@ -18,9 +18,12 @@ function ChatInput({ byPass }){
   function handleClick(e){
     if(e) e.preventDefault();
     const isApproved = (byPass)? true: false;
-    const message = new Message(mRoom.inBreakoutRoom ? mRoom.inBreakoutRoom : 'Main Room', mSession.user, text, isApproved);
-    MessageAPI.sendMessage(mSession.session, message);
+    const fromRoomName = mRoom.inBreakoutRoom ? mRoom.inBreakoutRoom : 'Main Room';
+    const message = new Message(fromRoomName, toBreakoutRoom ?? null, mSession.user, text, isApproved);
+        
+    MessageAPI.sendMessage(toBreakoutRoom ? mSession.userSessions[0]: mSession.session, message);
     setText("");
+    if( resetSelectedRoom) resetSelectedRoom();
   }
 
   return (

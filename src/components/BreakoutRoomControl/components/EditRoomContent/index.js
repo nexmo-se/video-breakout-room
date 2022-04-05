@@ -40,7 +40,6 @@ export default function EditRoomContent(props) {
 }
 
     return (
-    <>
     <Form
         form={form}
         layout="vertical"
@@ -66,5 +65,4 @@ export default function EditRoomContent(props) {
     </Input.Group>
     <Button text="Edit" onClick={handleEditRoom}></Button>
     </Form>
-    </>
 )};

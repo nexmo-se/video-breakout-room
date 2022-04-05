@@ -4,6 +4,7 @@ import { v4 as uuid } from "uuid";
 import OT from "@opentok/client";
 
 import User from "entities/user";
+import useRoom from "hooks/room";
 
 
 export const SessionContext = createContext({});
@@ -19,7 +20,6 @@ function SessionProvider({ children }){
   const [ participants, setParticipants ] = useState([]);
   const [ userSessions, setUserSessions ] = useState([]);
   const [ user, setUser ] = useState();
-
 
   useEffect(() => {
     const participants = connections.map((connection) => {
@@ -72,6 +72,9 @@ function SessionProvider({ children }){
   }
 
   function handleStreamDestroyed(e){
+    // if (JSON.parse(e.stream.connection.data).role === "moderator") {
+    //   mRoom.handleExitRoom();
+    // }
     setPrevRoomStreams((prevStreams)=> {
       const newStream = {...prevStreams};
       const sessionId = e.target.sessionId;
@@ -94,6 +97,7 @@ function SessionProvider({ children }){
     }
   // eslint-disable-next-line
   }, [prevRoomStreams, prevRoomConnections,  session, isConnected])
+
 
   function disconnectSession() {
     setIsConnected(false);
@@ -130,8 +134,8 @@ function SessionProvider({ children }){
         setUserSessions([...userSessions, session]);
       }
       setSession(session);
-      setIsConnected(true);
       setStreams([]); // Clear old streams
+      setIsConnected(true);
     }catch(err){
       console.log(err);
       setIsConnected(false);

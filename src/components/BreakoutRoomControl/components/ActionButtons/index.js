@@ -1,8 +1,10 @@
 import { useState } from "react";
 import Delete from "@material-ui/icons/Delete"
 import Edit from "@material-ui/icons/Edit"
+import Chat from "@material-ui/icons/Chat"
 import Button from 'components/Button'
 import EditRoomContent from '../EditRoomContent'
+import MessageRoomContent from '../MessageRoomContent'
 
 import useMessage from 'hooks/message'
 import useRoom from 'hooks/room'
@@ -13,7 +15,9 @@ import useSession from "hooks/session";
 export default function ActionButtons(props) {
     const {index, roomName, setIsLoading, handleChangeRoom, styles} = props;
     
-    const [ selectedRoom, setSelectedRoom ] = useState();
+    const [ selectedEditRoom, setSelectedEditRoom ] = useState();
+    const [ selectedMessageRoom, setSelectedMessageRoom ] = useState();
+
     const mMessage = useMessage();
     const mRoom = useRoom();
     const mSession = useSession();
@@ -24,10 +28,21 @@ export default function ActionButtons(props) {
             <EditRoomContent
                 roomName={roomName}
                 maxParticipant={maxParticipants}
-                selectedRoom={selectedRoom}
-                setSelectedRoom={setSelectedRoom}
+                selectedRoom={selectedEditRoom}
+                setSelectedRoom={setSelectedEditRoom}
                 setIsLoading={setIsLoading}
             ></EditRoomContent>
+        )
+    }
+
+    const messageRoomContent = (roomName) => {
+        return (
+            <MessageRoomContent
+                roomName= {roomName}
+                selectedRoom={selectedMessageRoom}
+                setSelectedRoom={setSelectedMessageRoom}
+            >
+            </MessageRoomContent>
         )
     }
 
@@ -54,6 +69,12 @@ export default function ActionButtons(props) {
     return (
             index !== 0? 
             <>
+            <Popover visible={selectedMessageRoom === roomName? true: false} content={messageRoomContent(roomName)} title="Message Room" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedMessageRoom(roomName) : setSelectedMessageRoom(null)} overlayStyle={styles.popover}>
+                <Button value={roomName} hierarchy="link" text={<Chat style={styles.icon}/>} key={'message-' + index} onClick={() => setSelectedMessageRoom(roomName)} style={styles.button}></Button>      
+             </Popover>
+            <Popover visible={selectedEditRoom === roomName? true: false} content={editRoomContent(roomName, breakoutRoom ? breakoutRoom["maxParticipants"] : 1)} title="Edit Room" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedEditRoom(roomName) : setSelectedEditRoom(null)} overlayStyle={styles.popover}>
+                <Button value={roomName} hierarchy="link" text={<Edit style={styles.icon}/>} key={'edit-' + index} onClick={() => setSelectedEditRoom(roomName)} style={styles.button}></Button>      
+            </Popover>
             <Popconfirm
                     title="Are you sure to delete this room?"
                     onConfirm={() => handleDeleteRoom(roomName)}
@@ -64,10 +85,7 @@ export default function ActionButtons(props) {
                 >
                 <Button hierarchy="link" text={<Delete style={styles.icon}/>} key={'delete-' + index} style={styles.button}></Button> 
             </Popconfirm>
-            <Popover visible={selectedRoom === roomName? true: false} content={editRoomContent(roomName, breakoutRoom ? breakoutRoom["maxParticipants"] : 1)} title="Edit Room" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedRoom(roomName) : setSelectedRoom(null)} overlayStyle={styles.popover}>
-                <Button value={roomName} hierarchy="link" text={<Edit style={styles.icon}/>} key={'edit-' + index} onClick={() => setSelectedRoom(roomName)} style={styles.button}></Button>      
-             </Popover>
-             <Button value={roomName} text={mRoom.inBreakoutRoom === roomName ? "Leave" : "Join"} key={'joinroom-' + index} onClick={handleJoinRoom} style={{...styles.button,  padding: "0px 4px"}}></Button> 
+            <Button value={roomName} text={mRoom.inBreakoutRoom === roomName ? "Leave" : "Join"} key={'joinroom-' + index} onClick={handleJoinRoom} style={{...styles.button,  padding: "0px 4px"}}></Button> 
             </>
             : null
       ); 
