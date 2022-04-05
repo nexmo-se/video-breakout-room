@@ -54,7 +54,7 @@ export default function MessageProvider({ children }){
 
         if (!message.toBreakoutRoom && e.target.sessionId !== sessionRef.current.sessionId) return;
 
-        if (message.toBreakoutRoom) {
+        if (message.toBreakoutRoom && message.toBreakoutRoom !== 'all') {
           const userRoom = breakoutRoomsRef.current.find((room) => room["member"].includes(mSession.user.name));
           if (!userRoom || userRoom.name !== message.toBreakoutRoom) return;
         }

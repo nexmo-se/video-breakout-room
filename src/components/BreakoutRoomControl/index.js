@@ -12,6 +12,9 @@ import { Collapse, Popconfirm, Popover } from 'antd';
 import Button from 'components/Button'
 import RoomAPI from "api/room";
 import ParticipantList from "./components/ParticipantList";
+import Chat from "@material-ui/icons/Chat";
+
+import MessageRoomContent from "./components/MessageRoomContent";
 const { Panel } = Collapse;
 
 export default function BreakoutRoomControl(props) {
@@ -23,6 +26,7 @@ export default function BreakoutRoomControl(props) {
 
     const [ roomGroup, setRoomGroup] = useState({})
     const [ showAddNewRoom, setShowAddNewRoom ] = useState(false);
+    const [ showBroadCastMessage, setShowBroadCastMessage ] = useState(false);
     const [ isLoading, setIsLoading ] = useState(true);
 
 
@@ -103,6 +107,16 @@ export default function BreakoutRoomControl(props) {
         )
     }
 
+    const broadCastMessagecontent = () => {
+        return (
+            <MessageRoomContent
+                roomName= "All Rooms"
+                selectedRoom="all"
+                setSelectedRoom={setShowBroadCastMessage}
+            ></MessageRoomContent>
+        )
+    }
+
     return when ? (
         <>
         <div className={mStyles.root} style={position.styles} onMouseDown={dragStart} onMouseMove={dragging} onMouseUp={dragEnd}>
@@ -128,6 +142,9 @@ export default function BreakoutRoomControl(props) {
         }
         </Collapse>
         <div>
+        <Popover visible={showBroadCastMessage} content={broadCastMessagecontent} title="BroadCast Message" trigger="click"  onVisibleChange={(visible) => setShowBroadCastMessage(visible)} overlayStyle={{width: "250px"}}>
+            <Button text={<Chat style={{margin: 0}}></Chat>} hierarchy="white"></Button>
+        </Popover>
         <Popover visible={showAddNewRoom} content={addRoomcontent} title="Add New Room" trigger="click"  onVisibleChange={(visible) => setShowAddNewRoom(visible)} overlayStyle={{width: "250px"}}>
             <Button text="Add New Room" hierarchy="tertiary"></Button>
         </Popover>
