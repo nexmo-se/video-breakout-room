@@ -1,20 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Modal, Form, InputNumber, Radio } from "antd";
-import useRoom from "hooks/room";
-import useSession from "hooks/session";
+import React, { useEffect, useState } from "react";
+import { Modal, Radio } from "antd";
 import useMessage from "hooks/message";
 import Person from "@material-ui/icons/Person"
-import useStyles from "./styles"
 import { Collapse } from 'antd';
 const { Panel } = Collapse;
 
 
 
 export default function PromptChooseRooms(props) {
-  const mroom = useRoom();
-  const mSession = useSession();
   const mMessage = useMessage();
-  const mStyles = useStyles();
 
   const { when, onOK, onCancel, title, okText, cancelText, activeRoom, setActiveRoom } = props;
   const [roomGroup, setRoomGroup] = useState({})
@@ -39,6 +33,7 @@ export default function PromptChooseRooms(props) {
             })
           }
         })
+      // eslint-disable-next-line
     }, [mMessage.breakoutRooms])
 
     useEffect(() => {

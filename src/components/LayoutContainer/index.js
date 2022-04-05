@@ -1,15 +1,15 @@
 // @flow
-import React from "react";
+import { useState, useEffect } from "react";
 
 import clsx from "clsx";
 import useStyles from "./styles";
 
 
 function LayoutContainer({ id, size, hidden, screen }){
-  const [ isBig, setIsBig ] = React.useState<boolean>(true);
+  const [ isBig, setIsBig ] = useState<boolean>(true);
   const mStyles = useStyles();
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsBig(size === "big");
   }, [ size ]);
 

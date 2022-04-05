@@ -8,9 +8,8 @@ import OT from "@opentok/client";
 function usePublisher(containerId, autoLayout=true, displayName=true){
   const [ publisher, setPublisher ] = useState();
   const [ stream, setStream ] = useState();
-  const [ layoutManager, setLayoutManager ] = useState(new LayoutManager(containerId));
+  const [ layoutManager, setLayoutManager ] = useState();
   const [ onAccessDenied, setOnAccessDenied ] = useState();
-  const [ nameDisplayMode, setNameDisplayMode ] = useState(displayName);
   const mSession = useSession();
 
   function handleDestroyed(){
@@ -75,6 +74,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
       publisher.on("streamDestroyed", handleStreamDestroyed);
       publisher.on("accessDenied", handleAccessDenied)
     }
+    // eslint-disable-next-line
   }, [publisher])
 
   useEffect(() => {
@@ -84,11 +84,15 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
         const element = document.getElementById(publisher.id);
         if(element && videoType === "screen") element.classList.add("OT_big");
       }
-      layoutManager.layout();
+      if (document.getElementById(containerId)) layoutManager.layout();
     }catch(err){
       console.log(err.stack);
     }
-  }, [ publisher, stream ])
+  }, [ publisher, stream, layoutManager, autoLayout, containerId ])
+
+  useEffect(() => {
+    if (containerId) setLayoutManager(new LayoutManager(containerId))
+  }, [containerId])
 
   return { 
     unpublish, 

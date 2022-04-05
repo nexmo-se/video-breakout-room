@@ -1,8 +1,7 @@
 // @flow
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import clsx from "clsx";
 import config from "config";
-import User from "entities/user";
 
 import useStyles from "./styles";
 import useSession from "hooks/session";
@@ -23,22 +22,15 @@ import AskNameDialog from "components/AskNameDialog";
 import LayoutContainer from "components/LayoutContainer";
 import PromptChooseRoom from "components/PromptChooseRoom";
 import Button from "components/Button";
-import RoomAPI from "api/room";
-import { SettingsInputAntennaTwoTone } from "@mui/icons-material";
  
-
-
 export default function ParticipantPage(){
-  const [ videoControlVisible, setVideoControlVisible ] = React.useState<boolean>(false);
-  const [ chooseRoomPrompt, setChooseRoomPrompt ] = React.useState(false);
-  const [ messagePrompt, setMessagePrompt ] = React.useState(false);
+  const [ chooseRoomPrompt, setChooseRoomPrompt ] = useState(false);
 
-  const [ activeRoom, setActiveRoom ] = React.useState();
+  const [ activeRoom, setActiveRoom ] = useState();
 
   const mSession = useSession();
   const mRoom = useRoom();
   const mPublisher = usePublisher("cameraContainer", true, false);
-  const mScreenPublisher = usePublisher("cameraContainer");
   const mStyles = useStyles();
   const mMessage = useMessage();
   const mNotification = useNotification();
@@ -48,9 +40,9 @@ export default function ParticipantPage(){
     screen: "cameraContainer" 
   });
 
-  const subscriberRef = React.useRef(null);
+  const subscriberRef = useRef(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setChooseRoomPrompt(false);
     if (mRoom.signal === 'breakoutRoomCreated') {
       let roomAssinged = mMessage.breakoutRooms.find((room) => room["member"].includes(mSession.user.name))
@@ -71,11 +63,12 @@ export default function ParticipantPage(){
       let roomAssinged = mMessage.breakoutRooms.find((room) => room["member"].includes(mSession.user.name))
         mNotification.openNotification("Room changed by Host", `You have been reassigned to Room: ${roomAssinged ? roomAssinged.name : "Main Room"}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged ? roomAssinged.name : ''))
     }
+  // eslint-disable-next-line
   }, [ mRoom.signal ])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (mSubscriber.subscribers) subscriberRef.current = mSubscriber;
-  }, [mSubscriber.subscribers] )
+  }, [mSubscriber.subscribers, mSubscriber] )
 
   function handleConfirm() {
     handleChangeRoom(activeRoom);
@@ -88,25 +81,27 @@ export default function ParticipantPage(){
   }
 
   function handleChangeRoom(roomName = '') {
-    mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, mSession.user, roomName);
+    mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, roomName);
     setActiveRoom(roomName? roomName : null);
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if(mSession.user) mRoom.connect(mSession.user, "publisher")
+    // eslint-disable-next-line
   }, [ mSession.user ]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if(mSession.session) {
       mPublisher.publish(mSession.user);
     }
+    // eslint-disable-next-line
   }, [ mSession.session ]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if(mSession.session && mSession.isConnected) {
       mSubscriber.subscribe(mSession.streams);
     }
-  }, [ mSession.streams, mSession.session, mSession.isConnected ]);
+  }, [ mSession.streams, mSession.session, mSession.isConnected, mSubscriber ]);
 
   if(!mSession.user && !mSession.session){
     return (
@@ -119,7 +114,7 @@ export default function ParticipantPage(){
   }
   else if(mSession.user && !mSession.session) return <FullPageLoading />
   else if(mSession.user && mSession.session) return (
-    <React.Fragment>
+    <>
       <div className={mStyles.container}>
         {!mSession.isConnected ? <FullPageLoading/> : null}
       <div className={clsx(mStyles.leftContainer, mStyles.black)}>
@@ -154,7 +149,6 @@ export default function ParticipantPage(){
             <h4 className="Vlt-center">My Controls</h4>
             <VideoControl 
               publisher={mPublisher.publisher} 
-              hidden={!videoControlVisible}
             >
             </VideoControl>
           </div>
@@ -174,6 +168,6 @@ export default function ParticipantPage(){
         activeRoom={activeRoom}
         setActiveRoom={setActiveRoom}
       ></PromptChooseRoom>
-    </React.Fragment>
+    </>
   )
 }

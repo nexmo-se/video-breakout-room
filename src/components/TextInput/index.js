@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function TextInput(props){
-  const { text, placeholder, style, type="text", label } = props;
+  const { text, placeholder, style, type="text", label, autocomplete } = props;
 
   const handleChange = (e) => {
     if(props.onChange) props.onChange(e.target.value);
@@ -13,7 +13,7 @@ export default function TextInput(props){
         {label? 
         <label>{label}</label>
         : null}
-        <input value={text} onChange={handleChange} type={type} placeholder={placeholder} id="ex-input"/>
+        <input value={text} onChange={handleChange} type={type} placeholder={placeholder} autoComplete={autocomplete ?? "off"}/>
       </div>
     </div>  
   )

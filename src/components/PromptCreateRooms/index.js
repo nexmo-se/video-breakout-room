@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Form, InputNumber, Radio, Input } from "antd";
 import useRoom from "hooks/room";
 import useSession from "hooks/session";
-import Room from "entities/room";
 import RoomAPI from "api/room"
 
 
@@ -39,12 +38,12 @@ export default function PromptCreateRooms(props) {
         const participants = mSession.participants.filter((p) => p.role !== "moderator").map((p) => p.name);
         if (formValue.modifier === "automatic" && participants.length !== 0) {
           participants.sort(()=> { return 0.5 - Math.random()});
-          response.map((data) => {
+          response.forEach((data) => {
               data["member"] = participants.splice(0, data["maxParticipants"]);
           })
         }
         else {
-          response.map((data) => {
+          response.forEach((data) => {
             data["member"] = [];
           })
         }
@@ -71,7 +70,7 @@ export default function PromptCreateRooms(props) {
       getContainer={false}
       forceRender
     >
-     <Form
+      <Form
         form={form}
         layout="vertical"
         name="form_in_modal"

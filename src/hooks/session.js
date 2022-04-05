@@ -1,7 +1,7 @@
 // @flow
-import React from "react";
+import { useContext } from "react";
 import { SessionContext } from "contexts/session";
 
 export default function useSession(){
-  return React.useContext(SessionContext);
+  return useContext(SessionContext);
 }

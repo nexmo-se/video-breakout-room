@@ -1,5 +1,5 @@
 // @flow
-import React from "react";
+import { useState } from "react";
 import MessageAPI from "api/message";
 import useSession from "hooks/session";
 import useRoom from "hooks/room"
@@ -11,7 +11,7 @@ import Button from "components/Button";
 
 
 function ChatInput({ byPass }){
-  const [ text, setText ] = React.useState("");
+  const [ text, setText ] = useState("");
   const mSession = useSession();
   const mRoom = useRoom();
 

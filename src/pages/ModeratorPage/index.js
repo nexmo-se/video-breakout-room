@@ -1,7 +1,6 @@
 import AskNameDialog from "components/AskNameDialog"
 import config from "config";
 import { useState, useEffect, useRef } from "react"
-import CredentialAPI from "api/credential";
 import clsx from "clsx";
 
 import useSession from "hooks/session";
@@ -27,7 +26,6 @@ import useStyles from "./styles"
 
 export default function ModeratorPage() {
     const [isBreakout, setIsBreakout] = useState(false);
-    const [activeRoom, setActiveRoom] = useState();
 
     const mSession = useSession();
     const mStyles = useStyles();
@@ -41,7 +39,6 @@ export default function ModeratorPage() {
       screen: "cameraContainer" 
     });
 
-    const [ videoControlVisible, setVideoControlVisible ] = useState(false);
     const subscriberRef = useRef(null);
 
     useEffect(() => {
@@ -55,28 +52,31 @@ export default function ModeratorPage() {
         let roomAssinged = mMessage.breakoutRooms.find((room) => room["member"].includes(mSession.user.name))
           mNotification.openNotification("Room changed by Host", `You have been reassigned to Room: ${roomAssinged ? roomAssinged.name : "Main Room"}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged ? roomAssinged.name : ''))
       }
+    // eslint-disable-next-line
     }, [ mRoom.signal ])
 
     useEffect(() => {
-    if(mSession.user) mRoom.connect(mSession.user, "moderator")
+    if(mSession.user) mRoom.connect(mSession.user, "moderator");
+      // eslint-disable-next-line
     }, [ mSession.user ]);
 
     useEffect(() => {
       if(mSession.session) mPublisher.publish(mSession.user);
+      // eslint-disable-next-line
     }, [ mSession.session ]);
 
     useEffect(() => {
       if(mSession.session && mSession.isConnected ) {
         mSubscriber.subscribe(mSession.streams);
       }
-    }, [ mSession.streams, mSession.session, mSession.isConnected  ]);
+    }, [ mSession.streams, mSession.session, mSession.isConnected, mSubscriber  ]);
 
     useEffect(() => {
       if (mSubscriber.subscribers) subscriberRef.current = mSubscriber;
-    }, [mSubscriber.subscribers] )
+    }, [mSubscriber.subscribers, mSubscriber] )
 
-    function handleChangeRoom(roomId = '') {
-      mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, mSession.user, roomId);
+    function handleChangeRoom(roomName = '') {
+      mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, roomName);
     }
 
     useEffect(() => {
@@ -125,7 +125,6 @@ export default function ModeratorPage() {
             <h4 className="Vlt-center">My Controls</h4>
             <VideoControl 
               publisher={mPublisher.publisher} 
-              hidden={!videoControlVisible}
             >
             <BreakoutRoomButton
               isBreakout={isBreakout}

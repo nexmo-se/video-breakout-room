@@ -4,7 +4,7 @@ import Room from "entities/room";
 export default class RoomAPI{
 
   static async getRoomInfo(roomId, data={}){
-    const url = new URL(window.location.href);
+    // const url = new URL(window.location.href);
     // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
     const apiURL = `http://localhost:3002/room/${roomId}/info`;
     const jsonResult = await (await fetch(apiURL, {
@@ -19,7 +19,7 @@ export default class RoomAPI{
   }
 
   static async generateSession(mainRoom, breakoutRooms=[]){
-    const url = new URL(window.location.href);
+    // const url = new URL(window.location.href);
     // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
     const apiURL = `http://localhost:3002/room/${mainRoom}/createSession`;
     const jsonResult = await (await fetch(apiURL, {
@@ -34,7 +34,7 @@ export default class RoomAPI{
   }
 
   static async removeAllBreakoutRooms(roomId){
-    const url = new URL(window.location.href);
+    // const url = new URL(window.location.href);
     // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
     const apiURL = `http://localhost:3002/room/${roomId}/breakoutrooms`;
     const jsonResult = await (await fetch(apiURL, {
@@ -45,7 +45,7 @@ export default class RoomAPI{
   }
 
   static async removeBreakoutRoom(roomId){
-    const url = new URL(window.location.href);
+    // const url = new URL(window.location.href);
     // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
     const apiURL = `http://localhost:3002/room/${roomId}`;
     const jsonResult = await (await fetch(apiURL, {
@@ -55,7 +55,7 @@ export default class RoomAPI{
   }
 
   static async renameRoom(roomId, newRoomName){
-    const url = new URL(window.location.href);
+    // const url = new URL(window.location.href);
     // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
     const apiURL = `http://localhost:3002/room/${roomId}/renameRoom`;
     const jsonResult = await (await fetch(apiURL, {
@@ -67,7 +67,7 @@ export default class RoomAPI{
   }
 
   static async updateRoom(roomId, maxParticipants){
-    const url = new URL(window.location.href);
+    // const url = new URL(window.location.href);
     // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${config.roomName}/info`; // TODO:!
     const apiURL = `http://localhost:3002/room/${roomId}/update`;
     const jsonResult = await (await fetch(apiURL, {

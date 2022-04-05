@@ -7,7 +7,7 @@ import "@vonagevolta/volta2/dist/css/volta.min.css";
 import 'antd/dist/antd.css';
 
 ReactDOM.render(
-  // <React.StrictMode>  // TODO
+  // <React.StrictMode> 
     <App />,
   // </React.StrictMode>, 
   document.getElementById('root')

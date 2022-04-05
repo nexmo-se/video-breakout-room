@@ -1,24 +1,21 @@
 // @flow
 import { useState, createContext, useEffect } from "react";
 import { v4 as uuid } from "uuid";
-import OT, { Session, Stream, Connection } from "@opentok/client";
+import OT from "@opentok/client";
 
-import Credential from "entities/credential";
 import User from "entities/user";
-import { ConstructionOutlined } from "@mui/icons-material";
-import { useIsomorphicLayoutEffect } from "framer-motion";
 
 
-export const SessionContext = createContext<any>({});
+export const SessionContext = createContext({});
 function SessionProvider({ children }){
-  const [ isConnected, setIsConnected ] = useState<boolean>(false);
-  const [ session, setSession ] = useState<Session>();
-  const [ changedStream, setChangedStream ] = useState<any>();
-  const [ streams, setStreams ] = useState<Array<Stream>>([]);
-  const [ prevRoomStreams, setPrevRoomStreams ] = useState<Array<Stream>>([]);
+  const [ isConnected, setIsConnected ] = useState(false);
+  const [ session, setSession ] = useState();
+  const [ changedStream, setChangedStream ] = useState();
+  const [ streams, setStreams ] = useState([]);
+  const [ prevRoomStreams, setPrevRoomStreams ] = useState([]);
 
-  const [ prevRoomConnections, setPrevRoomConnections ] = useState<Array<Connection>>([]);
-  const [ connections, setConnections ] = useState<Array<Connection>>([]);
+  const [ prevRoomConnections, setPrevRoomConnections ] = useState([]);
+  const [ connections, setConnections ] = useState([]);
   const [ participants, setParticipants ] = useState([]);
   const [ userSessions, setUserSessions ] = useState([]);
   const [ user, setUser ] = useState();
@@ -62,13 +59,6 @@ function SessionProvider({ children }){
       newConnection[sessionId] = newConnection[sessionId].filter((connection) => connection.id !== e.connection.id);
       return newConnection;
     });
-    
-    // setConnections((prevConnections) => {
-    //   return prevConnections.filter((prevConnection) => {
-    //     return prevConnection.id !== e.connection.id;
-    //   })
-    // })    
-
   }
 
   function handleStreamCreated(e){
@@ -79,7 +69,6 @@ function SessionProvider({ children }){
       else newStream[sessionId] = [e.stream];
       return newStream;
     })
-    // setStreams((prevStreams) => [ ...prevStreams, e.stream]);
   }
 
   function handleStreamDestroyed(e){
@@ -103,8 +92,8 @@ function SessionProvider({ children }){
       }
       targetConnections ? setConnections(targetConnections) : setConnections([]);
     }
-
-  }, [prevRoomStreams, session, isConnected])
+  // eslint-disable-next-line
+  }, [prevRoomStreams, prevRoomConnections,  session, isConnected])
 
   function disconnectSession() {
     setIsConnected(false);

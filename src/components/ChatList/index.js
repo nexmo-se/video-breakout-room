@@ -1,5 +1,5 @@
 // @flow
-import { useRef, useEffect, useState } from "react"
+import { useRef, useEffect } from "react"
 import useMessage from "hooks/message";
 
 import ChatBubble from "components/ChatBubble";
@@ -7,7 +7,6 @@ import ChatBubble from "components/ChatBubble";
 function ChatList(){
   const mMessage = useMessage();
   const list = useRef<any>(null);
-  const [ existingRoom, setExistingRoom] = useState([])
 
   const styles = {
     container: {

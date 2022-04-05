@@ -7,12 +7,14 @@ import useSession from "hooks/session";
 import HangupButton from "components/HangupButton";
 import MuteButton from "components/MuteButton";
 import VideoButton from "components/VideoButton";
+import useRoom from "hooks/room";
 
 function VideoControl({ publisher, children }){
   const [ hasAudio, setHasAudio ] = useState(true);
   const [ hasVideo, setHasVideo ] = useState(true);
   const mSession = useSession();
   const mStyles = useStyles();
+  const mRoom = useRoom();
 
   function handleVideoClick(){
     setHasVideo((prevVideo) => !prevVideo);
@@ -23,7 +25,9 @@ function VideoControl({ publisher, children }){
   }
 
   function handleHangupClick(){
-    mSession.session.unpublish(publisher);
+    mRoom.handleExitRoom();
+    mSession.session.disconnect();
+    window.location.replace("/thank-you");
   }
 
   useEffect(() => {
@@ -39,15 +43,16 @@ function VideoControl({ publisher, children }){
         }
       }
     }
+  // eslint-disable-next-line 
   }, [ mSession.changedStream ]);
 
   useEffect(() => {
     if(publisher) publisher.publishAudio(hasAudio);
-  }, [ hasAudio ])
+  }, [ hasAudio, publisher ])
 
   useEffect(() => {
     if(publisher) publisher.publishVideo(hasVideo);
-  }, [ hasVideo ]);
+  }, [ hasVideo, publisher ]);
 
   if(!publisher) return null;
   return(
