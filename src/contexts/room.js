@@ -18,7 +18,6 @@ export default function RoomContextProvider({ children }){
   const mSession = useSession();
   const mMessage = useMessage();
 
-
   useEffect(() => {
     if (mMessage.breakoutRooms.length !== 0  && !inBreakoutRoom ) {
       let roomNameFound = mMessage.breakoutRooms.find((room) => room["member"].includes(mSession.user.name));
@@ -51,7 +50,7 @@ export default function RoomContextProvider({ children }){
       setSignal(null);
     }
   // eslint-disable-next-line
-  }, [ mMessage.breakoutRooms ])
+  }, [ mMessage.breakoutRooms ]) 
 
   async function handleRoomCreate(breakoutRooms) {
     const generatedRoom = await RoomAPI.generateSession(mainRoom, {breakoutRooms});

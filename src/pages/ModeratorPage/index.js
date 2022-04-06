@@ -23,6 +23,7 @@ import BreakoutRoomControl from "components/BreakoutRoomControl";
 import Button from "components/Button";
 
 import useStyles from "./styles"
+import CountDownTimer from "components/CountdownTimer";
 
 export default function ModeratorPage() {
     const [isBreakout, setIsBreakout] = useState(false);
@@ -83,6 +84,12 @@ export default function ModeratorPage() {
       if (mMessage.breakoutRooms.length !== 0 ) setIsBreakout(true);
     }, [mMessage.breakoutRooms])
 
+    useEffect(() => {
+      if (mMessage.timer) {
+        mNotification.openNotification(`Room Countdown Timer Triggered`, `Room will be closed in ${mMessage.timer.period} minutes`, () => {})
+      }
+    }, [mMessage.timer])
+
     if(!mSession.user && !mSession.session) {
     return (
         <AskNameDialog 
@@ -137,6 +144,9 @@ export default function ModeratorPage() {
             <ChatInput byPass={true}/>
           </div>
         </div>
+        <CountDownTimer
+        handleChangeRoom={handleChangeRoom}>  
+        </CountDownTimer>
       </div>
         <BreakoutRoomControl
         when={isBreakout}

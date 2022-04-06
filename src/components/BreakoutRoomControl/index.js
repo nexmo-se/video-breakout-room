@@ -6,6 +6,7 @@ import useMessage from "hooks/message"
 import clsx from "clsx";
 import ActionButtons from "./components/ActionButtons";
 import AddRoomContent from "./components/AddRoomContent"
+import SetTimerContent from "./components/SetTimerContent"
 
 
 import { Collapse, Popconfirm, Popover } from 'antd';
@@ -13,6 +14,8 @@ import Button from 'components/Button'
 import RoomAPI from "api/room";
 import ParticipantList from "./components/ParticipantList";
 import Chat from "@material-ui/icons/Chat";
+import HourglassEmpty from "@material-ui/icons/HourglassEmpty";
+
 
 import MessageRoomContent from "./components/MessageRoomContent";
 const { Panel } = Collapse;
@@ -26,6 +29,7 @@ export default function BreakoutRoomControl(props) {
 
     const [ roomGroup, setRoomGroup] = useState({})
     const [ showAddNewRoom, setShowAddNewRoom ] = useState(false);
+    const [ showSetTimer, setShowSetTimer ] = useState(false);
     const [ showBroadCastMessage, setShowBroadCastMessage ] = useState(false);
     const [ isLoading, setIsLoading ] = useState(true);
 
@@ -37,7 +41,6 @@ export default function BreakoutRoomControl(props) {
             setRoomGroup({});
             return setIsBreakout(false);
         }
-
         let newRoomGroup = {
             "Main Room": []
         };
@@ -53,6 +56,11 @@ export default function BreakoutRoomControl(props) {
             }
         })
         newRoomGroup["Main Room"] = participantUnAssigned;
+
+        if (participantAssigned.length === 0 && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
+            handleCloseAllRoom();
+            RoomAPI.sendCountDownTimer(mSession.userSessions[0], {});
+        }
         setRoomGroup(newRoomGroup);
         setIsLoading(false);
     }, [mMessage.breakoutRooms, mSession.participants, setIsBreakout])
@@ -117,6 +125,15 @@ export default function BreakoutRoomControl(props) {
         )
     }
 
+    const setTimerContent = () => {
+        return (
+            <SetTimerContent
+                setShowSetTimer={setShowSetTimer}
+            >
+            </SetTimerContent>
+        )
+    }
+
     return when ? (
         <>
         <div className={mStyles.root} style={position.styles} onMouseDown={dragStart} onMouseMove={dragging} onMouseUp={dragEnd}>
@@ -142,11 +159,14 @@ export default function BreakoutRoomControl(props) {
         }
         </Collapse>
         <div>
-        <Popover visible={showBroadCastMessage} content={broadCastMessagecontent} title="BroadCast Message" trigger="click"  onVisibleChange={(visible) => setShowBroadCastMessage(visible)} overlayStyle={{width: "250px"}}>
-            <Button text={<Chat style={{margin: 0}}></Chat>} hierarchy="white"></Button>
+        <Popover visible={showSetTimer} content={setTimerContent} title="Set Countdown Timer" trigger="click"  onVisibleChange={(visible) => setShowSetTimer(visible)} overlayStyle={{width: "420px"}}>
+                <Button text={<HourglassEmpty style={{margin: 0}}></HourglassEmpty>} hierarchy="tertiary"></Button>
         </Popover>
+        <Popover visible={showBroadCastMessage} content={broadCastMessagecontent} title="BroadCast Message" trigger="click"  onVisibleChange={(visible) => setShowBroadCastMessage(visible)} overlayStyle={{width: "250px"}}>
+                <Button text={<Chat style={{margin: 0}}></Chat>} hierarchy="tertiary"></Button>
+            </Popover>
         <Popover visible={showAddNewRoom} content={addRoomcontent} title="Add New Room" trigger="click"  onVisibleChange={(visible) => setShowAddNewRoom(visible)} overlayStyle={{width: "250px"}}>
-            <Button text="Add New Room" hierarchy="tertiary"></Button>
+            <Button text="+ Add" hierarchy="secondary"></Button>
         </Popover>
         <Popconfirm
                     title="Are you sure to close all rooms?"

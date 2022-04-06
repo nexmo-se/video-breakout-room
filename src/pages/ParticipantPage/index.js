@@ -21,6 +21,7 @@ import VideoControl from "components/VideoControl";
 import AskNameDialog from "components/AskNameDialog";
 import LayoutContainer from "components/LayoutContainer";
 import PromptChooseRoom from "components/PromptChooseRoom";
+import CountDownTimer from "components/CountdownTimer";
 import Button from "components/Button";
  
 export default function ParticipantPage(){
@@ -65,6 +66,13 @@ export default function ParticipantPage(){
     }
   // eslint-disable-next-line
   }, [ mRoom.signal ])
+
+  useEffect(() => {
+    if (mMessage.timer) {
+      mNotification.openNotification(`Room Countdown Timer Triggered`, `Room will be closed in ${mMessage.timer.period} minutes`,
+     () => {})
+    }
+  }, [mMessage.timer])
 
   useEffect(() => {
     if (mSubscriber.subscribers) subscriberRef.current = mSubscriber;
@@ -140,6 +148,9 @@ export default function ParticipantPage(){
               zIndex: 2 
             }}
           />
+          <CountDownTimer
+              handleChangeRoom={handleChangeRoom}>  
+          </CountDownTimer>
         </div>
         <div className={mStyles.rightContainer}>
           <div className={mStyles.moderator}>

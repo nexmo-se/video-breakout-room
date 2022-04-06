@@ -11,6 +11,7 @@ export default function MessageProvider({ children }){
   const [ messages, setMessages ] = useState([]);
   const [ breakoutRooms, setBreakoutRooms ] = useState([]);
   const [ breakoutRoomsType, setBreakoutRoomsType ] = useState("automatic");
+  const [ timer, setTimer ] = useState();
 
   const [ roomSessionListeners, setSessionListeners ] = useState([]);
 
@@ -28,9 +29,21 @@ export default function MessageProvider({ children }){
   }
 
   useEffect(() => {
-    if (!mSession.participants.find((user) => user.role === "moderator")) {
+
+    if (mSession.participants) {
       const newRooms = [...breakoutRooms];
-      newRooms.forEach((room) => room["member"] = []);
+      if (!mSession.participants.find((user) => user.role === "moderator")) {
+        newRooms.forEach((room) => room["member"] = []);
+        setBreakoutRooms(newRooms);
+        return;
+      }
+      const memberList = mSession.participants.reduce(
+        (acc, next) => {acc.push(next["name"]); return acc;},
+        []
+      );
+      newRooms.forEach((room) => {
+        room["member"] = room["member"].filter((member) => memberList.includes(member.name));
+      })
       setBreakoutRooms(newRooms);
     }
   }, [mSession.participants])
@@ -69,7 +82,13 @@ export default function MessageProvider({ children }){
 
         setBreakoutRoomsType(jsonData.type ?? "automatic");
         setBreakoutRooms(jsonData.breakoutRooms)
-      })
+      });
+  
+      mSession.session.on("signal:count-down-timer", ({ data }) => {
+        const jsonData = JSON.parse(data);
+        setTimer(Object.keys(jsonData).length === 0 ? null : jsonData);
+      });
+
       setSessionListeners([...roomSessionListeners, mSession.session])
     }
   }, [ mSession.session, roomSessionListeners ])
@@ -81,7 +100,8 @@ export default function MessageProvider({ children }){
       messages,
       breakoutRoomsType,
       breakoutRooms,
-      setBreakoutRooms
+      setBreakoutRooms,
+      timer
     }}>
       {children}
     </MessageContext.Provider>

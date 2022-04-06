@@ -89,4 +89,16 @@ export default class RoomAPI{
       });
     })
   };
+
+  static async sendCountDownTimer(session, timer){
+    await new Promise((resolve, reject) => {
+      session.signal({
+        type: "count-down-timer",
+        data: JSON.stringify(timer)
+      }, (err) => {
+        if(err) reject(err);
+        else resolve();
+      });
+    })
+  };
 }
