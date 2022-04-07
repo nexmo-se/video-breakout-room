@@ -72,9 +72,6 @@ function SessionProvider({ children }){
   }
 
   function handleStreamDestroyed(e){
-    // if (JSON.parse(e.stream.connection.data).role === "moderator") {
-    //   mRoom.handleExitRoom();
-    // }
     setPrevRoomStreams((prevStreams)=> {
       const newStream = {...prevStreams};
       const sessionId = e.target.sessionId;

@@ -101,4 +101,16 @@ export default class RoomAPI{
       });
     })
   };
+
+  static async sendCohostList(session, cohostList){
+    await new Promise((resolve, reject) => {
+      session.signal({
+        type: "co-host",
+        data: JSON.stringify(cohostList)
+      }, (err) => {
+        if(err) reject(err);
+        else resolve();
+      });
+    })
+  };
 }

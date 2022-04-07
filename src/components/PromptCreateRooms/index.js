@@ -3,12 +3,14 @@ import { Modal, Form, InputNumber, Radio, Input } from "antd";
 import useRoom from "hooks/room";
 import useSession from "hooks/session";
 import RoomAPI from "api/room"
+import useMessage from "hooks/message";
 
 
 export default function PromptCreateRooms(props) {
   const [form] = Form.useForm();
   const mRoom = useRoom();
   const mSession = useSession();
+  const mMessage = useMessage();
 
 
   const { when, onOK, onCancel, title, okText, cancelText } = props;
@@ -35,7 +37,7 @@ export default function PromptCreateRooms(props) {
 
 
       return mRoom.handleRoomCreate(data).then((response) => {
-        const participants = mSession.participants.filter((p) => p.role !== "moderator").map((p) => p.name);
+        const participants = mSession.participants.filter((p) => (p.role !== "moderator" && !mMessage.cohosts.includes(p.name))).map((p) => p.name);
         if (formValue.modifier === "automatic" && participants.length !== 0) {
           participants.sort(()=> { return 0.5 - Math.random()});
           response.forEach((data) => {

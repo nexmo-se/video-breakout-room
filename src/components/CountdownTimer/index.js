@@ -18,7 +18,7 @@ export default function CountDownTimer({handleChangeRoom, closeAllRoom}) {
 
     useEffect(() => {
         if (mMessage.timer && 
-            (mSession.user.role === "moderator" || (mSession.user.role === "participant" && mRoom.inBreakoutRoom)) && 
+            (mSession.user.role === "moderator" || mMessage.cohosts.includes(mSession.user.name) ||(mSession.user.role === "participant" && mRoom.inBreakoutRoom)) && 
             mMessage.timer.endTime > new Date().getTime()) {
             if (triggeredTimer) {
             clearInterval(triggeredTimer);
@@ -45,10 +45,10 @@ export default function CountDownTimer({handleChangeRoom, closeAllRoom}) {
     }, [countDown])
 
     function exitBreakoutRoom() {
-        if (mMessage.timer.isManualReturn && mRoom.inBreakoutRoom) {
+        if (mMessage.timer && mMessage.timer.isManualReturn && mRoom.inBreakoutRoom) {
             mNotification.openNotification("Breakout Room Session Ended", `Please return to Main Room`, () => {})
         }
-        else if (!mMessage.timer.isManualReturn && mSession.user.role === "moderator" && mMessage.breakoutRooms.length !== 0){
+        else if (mMessage.timer && !mMessage.timer.isManualReturn && mSession.user.role === "moderator" && mMessage.breakoutRooms.length !== 0){
             return mRoom.handleRoomRemove(mRoom.mainRoom).then((response) => {
                 RoomAPI.sendCountDownTimer(mSession.userSessions[0], {});
                 RoomAPI.sendBreakoutRoom(mSession.userSessions[0], {"breakoutRooms":[]})

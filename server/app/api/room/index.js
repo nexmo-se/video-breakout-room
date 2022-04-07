@@ -73,7 +73,6 @@ class RoomAPI{
   static async getDetailById(room){
     return await DatabaseAPI.query(async (client) => {
       const queryResponse = await client.query("SELECT * FROM rooms WHERE id = $1", [ room.id ]);
-      console.log(room)
       if(queryResponse.rowCount === 0) throw new CustomError("room/not-found", "Cannot find room");
       else return Promise.resolve(RoomAPI.parseQueryResponse(queryResponse));
     })

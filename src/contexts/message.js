@@ -44,7 +44,7 @@ export default function MessageProvider({ children }){
         []
       );
       newRooms.forEach((room) => {
-        room["member"] = room["member"].filter((member) => memberList.includes(member.name));
+        room["member"] = room["member"].filter((member) => memberList.includes(member));
       })
       setBreakoutRooms(newRooms);
     }

@@ -35,7 +35,7 @@ export default function ModeratorPage() {
     const mStyles = useStyles();
     const mRoom = useRoom();
     const mNotification = useNotification();
-    const mPublisher = usePublisher("cameraContainer", true, false);
+    const mPublisher = usePublisher("cameraContainer", true, true);
     const mMessage = useMessage();
     const mSubscriber = useSubscriber({ 
       moderator: "cameraContainer", 
@@ -47,14 +47,14 @@ export default function ModeratorPage() {
 
     useEffect(() => {
       if (mRoom.signal === 'breakoutRoomRemoved') {  
-        mNotification.openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.", () => handleChangeRoom())
+        mNotification.openNotification("Room removed by Host/Co-host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.", () => handleChangeRoom())
       }
       if (mRoom.signal === 'breakoutRoomRenamed') {  
-        mNotification.openNotification("Room renamed by Host", "Room rename by host, new Room Name: " +  mRoom.inBreakoutRoom, ()=>{});
+        mNotification.openNotification("Room renamed by Host/Co-host", "Room rename by host, new Room Name: " +  mRoom.inBreakoutRoom, ()=>{});
       }
       if (mRoom.signal === 'breakoutRoomChanged') {
         let roomAssinged = mMessage.breakoutRooms.find((room) => room["member"].includes(mSession.user.name))
-          mNotification.openNotification("Room changed by Host", `You have been reassigned to Room: ${roomAssinged ? roomAssinged.name : "Main Room"}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged ? roomAssinged.name : ''))
+          mNotification.openNotification("Room changed by Host/Co-host", `You have been reassigned to Room: ${roomAssinged ? roomAssinged.name : "Main Room"}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged ? roomAssinged.name : ''))
       }
     // eslint-disable-next-line
     }, [ mRoom.signal ])

@@ -24,7 +24,7 @@ export default function RoomContextProvider({ children }){
       if (roomNameFound) {
         setSignal('breakoutRoomChanged');
       }
-      else if (isBreakoutRoomCreated && mSession.user.role === "participant" && mMessage.breakoutRoomsType !== "automatic") setSignal('breakoutRoomCreated');
+      else if (isBreakoutRoomCreated && mSession.user.role == "participant" && mMessage.breakoutRoomsType !== "automatic") setSignal('breakoutRoomCreated');
     }
     else if (mMessage.breakoutRooms.length === 0) {  
       if (inBreakoutRoom) setSignal('breakoutRoomRemoved');
@@ -125,11 +125,6 @@ export default function RoomContextProvider({ children }){
 
   function handleExitRoom() {
     const newRooms = [...mMessage.breakoutRooms];
-
-    if (mSession.user.role === "moderator") {
-      newRooms.forEach((room) => room["member"] = []);
-      return RoomAPI.sendBreakoutRoom(mSession.userSessions[0], { "breakoutRooms": newRooms})
-    }
     const targetRoomIndex = newRooms.findIndex((room) => room.name === inBreakoutRoom);
 
     if (targetRoomIndex !== -1 ) {

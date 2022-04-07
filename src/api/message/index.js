@@ -26,7 +26,6 @@ export default class MessageAPI{
     })
     .then(res => res.json())
     .then(res => {
-      // console.log(res)
       return Promise.resolve(res);
     })
     .catch(error => {

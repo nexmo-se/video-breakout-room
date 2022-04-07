@@ -187,8 +187,6 @@ class RoomListener{
       const { data } = req.body;
       const { type } = data ?? "raise-hand";
 
-      console.log(roomId)
-
       if ( undefined === roomId ) throw new Error("Empty params");
 
       var room = new Room(roomId);
@@ -202,7 +200,6 @@ class RoomListener{
       var relatedSessions = await RoomAPI.getRelatedSessions(selectedRoom);
       var tempRes = await RoomAPI.broadcastMsg(relatedSessions, type, data);
 
-      // console.log(tempRes)
       
       res.json({
         apiKey: process.env.API_KEY,

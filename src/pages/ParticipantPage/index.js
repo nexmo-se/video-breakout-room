@@ -24,15 +24,19 @@ import PromptChooseRoom from "components/PromptChooseRoom";
 import CountDownTimer from "components/CountdownTimer";
 import Button from "components/Button";
 import MessageBar from "components/MessageBar";
+import BreakoutRoomButton from "components/BreakoutRoomButton";
+import BreakoutRoomControl from "components/BreakoutRoomControl";
  
 export default function ParticipantPage(){
   const [ chooseRoomPrompt, setChooseRoomPrompt ] = useState(false);
 
   const [ activeRoom, setActiveRoom ] = useState();
+  const [isBreakout, setIsBreakout] = useState(false);
+  const [isCohost, setIsCohost] = useState(false);
 
   const mSession = useSession();
   const mRoom = useRoom();
-  const mPublisher = usePublisher("cameraContainer", true, false);
+  const mPublisher = usePublisher("cameraContainer", true, true);
   const mStyles = useStyles();
   const mMessage = useMessage();
   const mNotification = useNotification();
@@ -49,21 +53,21 @@ export default function ParticipantPage(){
     if (mRoom.signal === 'breakoutRoomCreated') {
       let roomAssinged = mMessage.breakoutRooms.find((room) => room["member"].includes(mSession.user.name))
       if (roomAssinged) {
-         mNotification.openNotification("Room assigned by Host", `You have been assigned to Room: ${roomAssinged.name}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged.name))
+         mNotification.openNotification("Room assigned by Host/Co-host", `You have been assigned to Room: ${roomAssinged.name}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged.name))
       }
       else if (mMessage.breakoutRooms[0]["member"].length === 0) {
         setChooseRoomPrompt(true);
       }
     }
     if (mRoom.signal === 'breakoutRoomRemoved') {  
-      mNotification.openNotification("Room removed by Host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.",  () => handleChangeRoom())
+      mNotification.openNotification("Room removed by Host/Co-host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.",  () => handleChangeRoom())
     }
     if (mRoom.signal === 'breakoutRoomRenamed') {  
-      mNotification.openNotification("Room renamed by Host", "Room rename by host, new Room Name: " + mRoom.inBreakoutRoom, ()=>{});
+      mNotification.openNotification("Room renamed by Host/Co-host", "Room rename by host, new Room Name: " + mRoom.inBreakoutRoom, ()=>{});
     }
     if (mRoom.signal === 'breakoutRoomChanged') {
       let roomAssinged = mMessage.breakoutRooms.find((room) => room["member"].includes(mSession.user.name))
-        mNotification.openNotification("Room changed by Host", `You have been reassigned to Room: ${roomAssinged ? roomAssinged.name : "Main Room"}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged ? roomAssinged.name : ''))
+        mNotification.openNotification("Room changed by Host/Co-host", `You have been reassigned to Room: ${roomAssinged ? roomAssinged.name : "Main Room"}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged ? roomAssinged.name : ''))
     }
   // eslint-disable-next-line
   }, [ mRoom.signal ])
@@ -111,6 +115,19 @@ export default function ParticipantPage(){
       mSubscriber.subscribe(mSession.streams);
     }
   }, [ mSession.streams, mSession.session, mSession.isConnected, mSubscriber ]);
+
+  useEffect(() => {
+      if (!isCohost && mSession.user && mMessage.cohosts.includes(mSession.user.name)) {
+        mNotification.openNotification("New role: Co-host assigned", "You have been assigned to a new Role: Co-host, you are allowed to manage breakout rooms in this meeting ", () => {setIsCohost(true)})
+      }
+      else if (isCohost && mSession.user && !mMessage.cohosts.includes(mSession.user.name)) {
+        mNotification.openNotification("Role: Co-host removed", "Co-host permission removed", () => {setIsCohost(false)})
+      }
+  }, [mMessage.cohosts, mSession.user])
+
+  useEffect(() => {
+    if (mMessage.breakoutRooms.length !== 0 ) setIsBreakout(true);
+  }, [mMessage.breakoutRooms])
 
   if(!mSession.user && !mSession.session){
     return (
@@ -163,7 +180,14 @@ export default function ParticipantPage(){
             <VideoControl 
               publisher={mPublisher.publisher} 
             >
-            </VideoControl>
+            { isCohost ?
+              <BreakoutRoomButton
+              isBreakout={isBreakout}
+              setIsBreakout={setIsBreakout}
+            />
+            : null
+            }
+            </VideoControl> 
           </div>
           <div className={mStyles.chatContainer}>
             <ChatList/>
@@ -181,6 +205,14 @@ export default function ParticipantPage(){
         activeRoom={activeRoom}
         setActiveRoom={setActiveRoom}
       ></PromptChooseRoom>
+      { isCohost ?
+      <BreakoutRoomControl
+        when={isBreakout}
+        setIsBreakout={setIsBreakout}
+        handleChangeRoom={handleChangeRoom}
+      ></BreakoutRoomControl>
+      : null
+      }
     </>
   )
 }
