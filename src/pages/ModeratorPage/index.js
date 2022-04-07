@@ -21,6 +21,7 @@ import ChatInput from "components/ChatInput";
 import BreakoutRoomButton from "components/BreakoutRoomButton";
 import BreakoutRoomControl from "components/BreakoutRoomControl";
 import Button from "components/Button";
+import MessageBar from "components/MessageBar";
 
 import useStyles from "./styles"
 
@@ -119,6 +120,7 @@ export default function ModeratorPage() {
               zIndex: 2 
             }}
           />
+          <MessageBar />
         </div>
         <div className={mStyles.rightContainer}>
           <div className={mStyles.videoControl}>

@@ -22,6 +22,7 @@ import AskNameDialog from "components/AskNameDialog";
 import LayoutContainer from "components/LayoutContainer";
 import PromptChooseRoom from "components/PromptChooseRoom";
 import Button from "components/Button";
+import MessageBar from "components/MessageBar";
  
 export default function ParticipantPage(){
   const [ chooseRoomPrompt, setChooseRoomPrompt ] = useState(false);
@@ -140,6 +141,7 @@ export default function ParticipantPage(){
               zIndex: 2 
             }}
           />
+          <MessageBar />
         </div>
         <div className={mStyles.rightContainer}>
           <div className={mStyles.moderator}>
