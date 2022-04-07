@@ -8,7 +8,7 @@ import OT from "@opentok/client";
 function usePublisher(containerId, autoLayout=true, displayName=true){
   const [ publisher, setPublisher ] = useState();
   const [ stream, setStream ] = useState();
-  const [ layoutManager, setLayoutManager ] = useState();
+  const [ layoutManager, setLayoutManager ] = useState(new LayoutManager(containerId));
   const [ onAccessDenied, setOnAccessDenied ] = useState();
   const mSession = useSession();
 
@@ -21,7 +21,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
   }
 
   function handleStreamDestroyed(e){
-    e.preventDefault();
+    if (e.stream.name !== "sharescreen") e.preventDefault();
     setStream(null);
   }
 
@@ -53,8 +53,8 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
         }
       };
       const finalOptions = Object.assign({}, options, extraData);
-      if (!publisher) {
 
+      if (!publisher) {
         const initPublisher = OT.initPublisher(containerId, finalOptions);
         mSession.session.publish(initPublisher);
         setPublisher(initPublisher);
@@ -89,10 +89,6 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
       console.log(err.stack);
     }
   }, [ publisher, stream, layoutManager, autoLayout, containerId ])
-
-  useEffect(() => {
-    if (containerId) setLayoutManager(new LayoutManager(containerId))
-  }, [containerId])
 
   return { 
     unpublish, 

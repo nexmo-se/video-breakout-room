@@ -23,9 +23,10 @@ import ManagePeopleButton from "components/ManagePeopleButton";
 import BreakoutRoomControl from "components/BreakoutRoomControl";
 import Button from "components/Button";
 import MessageBar from "components/MessageBar";
+import ShareScreen from "components/ShareScreen";
+import CountDownTimer from "components/CountdownTimer";
 
 import useStyles from "./styles"
-import CountDownTimer from "components/CountdownTimer";
 
 export default function ModeratorPage() {
     const [isBreakout, setIsBreakout] = useState(false);
@@ -145,6 +146,7 @@ export default function ModeratorPage() {
               isManagePeople={isManagePeople}
               setIsManagePeople={setIsManagePeople}
             />
+            <ShareScreen/>
             </VideoControl>
           </div>
           <div className={mStyles.chatContainer}>

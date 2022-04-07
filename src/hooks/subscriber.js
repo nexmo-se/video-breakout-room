@@ -7,8 +7,8 @@ function useSubscriber({ moderator, screen, camera, custom }){
   const [ subscribed, setSubscribed ] = useState([]);
   const [ subscribers, setSubscribers ] = useState([]);
 
-  const [ cameraLayout, setCameraLayout ] = useState();
-  const [ screenLayout, setScreenLayout ] = useState();
+  const [ cameraLayout, setCameraLayout ] = useState(new LayoutManager(camera));
+  const [ screenLayout, setScreenLayout ] = useState(new LayoutManager(screen));
   const mSession = useSession();
 
   function getContainerId(user, videoType){
@@ -58,11 +58,6 @@ function useSubscriber({ moderator, screen, camera, custom }){
       setSubscribers((prevSubscribers) => [ ...prevSubscribers, subscriber ]);
     }));
   };
-
-  useEffect(() => {
-    if (camera) setCameraLayout(new LayoutManager(camera));
-    if (screen) setScreenLayout(new LayoutManager(screen));
-  }, [camera, screen])
 
   useEffect(() => {
     try{
