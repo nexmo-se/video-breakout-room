@@ -12,6 +12,7 @@ export default function MessageProvider({ children }){
   const [ breakoutRooms, setBreakoutRooms ] = useState([]);
   const [ breakoutRoomsType, setBreakoutRoomsType ] = useState("automatic");
   const [ timer, setTimer ] = useState();
+  const [ cohosts, setCohosts ] = useState([]);
 
   const [ roomSessionListeners, setSessionListeners ] = useState([]);
 
@@ -35,6 +36,7 @@ export default function MessageProvider({ children }){
       if (!mSession.participants.find((user) => user.role === "moderator")) {
         newRooms.forEach((room) => room["member"] = []);
         setBreakoutRooms(newRooms);
+        setCohosts([]);
         return;
       }
       const memberList = mSession.participants.reduce(
@@ -89,6 +91,11 @@ export default function MessageProvider({ children }){
         setTimer(Object.keys(jsonData).length === 0 ? null : jsonData);
       });
 
+      mSession.session.on("signal:co-host", ({ data }) => {
+        const jsonData = JSON.parse(data);
+        setCohosts(jsonData);
+      });
+
       setSessionListeners([...roomSessionListeners, mSession.session])
     }
   }, [ mSession.session, roomSessionListeners ])
@@ -101,7 +108,8 @@ export default function MessageProvider({ children }){
       breakoutRoomsType,
       breakoutRooms,
       setBreakoutRooms,
-      timer
+      timer,
+      cohosts
     }}>
       {children}
     </MessageContext.Provider>

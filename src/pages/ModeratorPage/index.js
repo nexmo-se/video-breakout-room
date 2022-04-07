@@ -19,6 +19,7 @@ import VideoControl from "components/VideoControl";
 import ChatList from "components/ChatList";
 import ChatInput from "components/ChatInput";
 import BreakoutRoomButton from "components/BreakoutRoomButton";
+import ManagePeopleButton from "components/ManagePeopleButton";
 import BreakoutRoomControl from "components/BreakoutRoomControl";
 import Button from "components/Button";
 
@@ -27,6 +28,7 @@ import CountDownTimer from "components/CountdownTimer";
 
 export default function ModeratorPage() {
     const [isBreakout, setIsBreakout] = useState(false);
+    const [isManagePeople, setIsManagePeople] = useState(false);
 
     const mSession = useSession();
     const mStyles = useStyles();
@@ -136,6 +138,10 @@ export default function ModeratorPage() {
             <BreakoutRoomButton
               isBreakout={isBreakout}
               setIsBreakout={setIsBreakout}
+            />
+            <ManagePeopleButton
+              isManagePeople={isManagePeople}
+              setIsManagePeople={setIsManagePeople}
             />
             </VideoControl>
           </div>
