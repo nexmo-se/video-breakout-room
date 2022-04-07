@@ -9,6 +9,7 @@ import CredentialAPI from "api/credential";
 export const RoomContext = createContext({});
 export default function RoomContextProvider({ children }){
   const [inBreakoutRoom, setInBreakoutRoom] = useState(null);
+  const [inBreakoutRoomId, setInBreakoutRoomId] = useState(null);
   const [isBreakoutRoomCreated, setIsBreakoutRoomCreated] = useState(true);
   const [mainRoom, setMainRoom] = useState();
 
@@ -24,7 +25,7 @@ export default function RoomContextProvider({ children }){
       if (roomNameFound) {
         setSignal('breakoutRoomChanged');
       }
-      else if (isBreakoutRoomCreated && mSession.user.role == "participant" && mMessage.breakoutRoomsType !== "automatic") setSignal('breakoutRoomCreated');
+      else if (isBreakoutRoomCreated && mSession.user.role === "participant" && mMessage.breakoutRoomsType !== "automatic") setSignal('breakoutRoomCreated');
     }
     else if (mMessage.breakoutRooms.length === 0) {  
       if (inBreakoutRoom) setSignal('breakoutRoomRemoved');
@@ -51,7 +52,17 @@ export default function RoomContextProvider({ children }){
       setSignal(null);
     }
   // eslint-disable-next-line
-  }, [ mMessage.breakoutRooms ]) 
+  }, [ mMessage.breakoutRooms ])
+  
+  useEffect(() => {
+    if (inBreakoutRoom) {
+      let roomInfo = mMessage.breakoutRooms.find((room) => room.name === inBreakoutRoom)
+      setInBreakoutRoomId(roomInfo ? roomInfo.id : null)
+    }
+    else {
+      setInBreakoutRoomId(null)
+    }
+  }, [inBreakoutRoom])
 
   async function handleRoomCreate(breakoutRooms) {
     const generatedRoom = await RoomAPI.generateSession(mainRoom, {breakoutRooms});
@@ -138,6 +149,7 @@ export default function RoomContextProvider({ children }){
   return (
     <RoomContext.Provider value={{ 
       inBreakoutRoom,
+      inBreakoutRoomId,
       signal,
       mainRoom,
       connect,

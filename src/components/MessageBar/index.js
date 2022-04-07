@@ -16,7 +16,7 @@ export default function MessageBar(props) {
   const mRoom = useRoom();
   
   // sometimes seeing both mRoom.inBreakoutRoom and mRoom.mainRoom are undefined..
-  const currentRoom = mRoom.inBreakoutRoom ?? mRoom.mainRoom;
+  const currentRoom = mRoom.inBreakoutRoomId ?? mRoom.mainRoom;
 
   if (!mSession.user || !currentRoom) {
     return null;

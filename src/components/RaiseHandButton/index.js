@@ -5,11 +5,9 @@ import User from "entities/user";
 
 import useSession from "hooks/session";
 import MessageAPI from "api/message";
-import useMessage from "hooks/message";
 
 function RaiseHandButton(props) {
   const mSession = useSession();
-  const mMessage = useMessage();
 
   function handleClick() {
     const { connection } = mSession.session;
@@ -17,9 +15,8 @@ function RaiseHandButton(props) {
     const user = User.fromJSON(data);
     user.id = connection.id;
 
-    let roomInfo = mMessage.breakoutRooms.find((room) => room.name === props.room)
 
-    MessageAPI.broadcastMsg(roomInfo ? roomInfo.id : props.room, 'raise-hand', user);
+    MessageAPI.broadcastMsg(props.room, 'raise-hand', user);
 
     const message = new Message(
         props.room, null, 
