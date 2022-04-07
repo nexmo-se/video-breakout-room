@@ -55,7 +55,9 @@ export default function MessageProvider({ children }){
         setRaisedHands((prevRaisedHands) => {
           const jsonData = JSON.parse(data);
           const user = User.fromJSON(jsonData);
-          const isNewUser = prevRaisedHands.filter((raisedHand) => raisedHand.id === user.id).length === 0;
+          user.raisedHandsFromRoom = jsonData.fromRoom.name ?? 'X';
+          const isNewUser = prevRaisedHands.filter((raisedHand) => raisedHand.id === user.id 
+                                  && raisedHand.raisedHandsFromRoom === user.raisedHandsFromRoom).length === 0;
           if(isNewUser) return [ ...prevRaisedHands, user ]
           else return prevRaisedHands;
         })

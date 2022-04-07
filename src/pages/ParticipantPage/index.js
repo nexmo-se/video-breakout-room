@@ -23,6 +23,7 @@ import LayoutContainer from "components/LayoutContainer";
 import PromptChooseRoom from "components/PromptChooseRoom";
 import CountDownTimer from "components/CountdownTimer";
 import Button from "components/Button";
+import MessageBar from "components/MessageBar";
  
 export default function ParticipantPage(){
   const [ chooseRoomPrompt, setChooseRoomPrompt ] = useState(false);
@@ -151,6 +152,7 @@ export default function ParticipantPage(){
           <CountDownTimer
               handleChangeRoom={handleChangeRoom}>  
           </CountDownTimer>
+          <MessageBar />
         </div>
         <div className={mStyles.rightContainer}>
           <div className={mStyles.moderator}>
