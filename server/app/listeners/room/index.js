@@ -6,7 +6,7 @@ const Room = require("@app/entities/room");
 class RoomListener{
   static async info(req, res){
     try{
-      const { roomId } = req.params;
+      const { roomId } = req.params ?? 'demoRoom';
       // const { role } = req.body ?? "publisher";
       // const { data } = req.body ?? {};
 
@@ -74,6 +74,8 @@ class RoomListener{
       const { role } = req.body ?? "publisher";
       const { data } = req.body ?? {};
 
+      if ( undefined === roomId ) throw new Error("Empty params");
+
       const user = new User(role);
       const room = new Room(roomId);
 
@@ -96,7 +98,9 @@ class RoomListener{
       const { data } = req.body;
       const { name:newRoomName } = data;
 
-      if (!newRoomName) throw new Error( "You need to set a new name" )
+      if ( undefined === roomId ) throw new Error("Empty params");
+
+      if ( !newRoomName ) throw new Error( "You need to set a new name" )
 
       const room = new Room(roomId);
 
@@ -174,6 +178,43 @@ class RoomListener{
     } catch(err) {
       console.error(err.stack);
       res.status(500).end(err.message);
+    }
+  }
+
+  static async broadcast(req, res, next) {
+    try {
+      const { roomId } = req.params;
+      const { data } = req.body;
+      const { type } = data ?? "raise-hand";
+
+      console.log(roomId)
+
+      if ( undefined === roomId ) throw new Error("Empty params");
+
+      var room = new Room(roomId);
+      var [ selectedRoom ] = await RoomAPI.getDetailById(room);
+
+      data.fromRoom = {
+        id: selectedRoom.id,
+        name: selectedRoom.name ?? selectedRoom.id
+      };
+
+      var relatedSessions = await RoomAPI.getRelatedSessions(selectedRoom);
+      var tempRes = await RoomAPI.broadcastMsg(relatedSessions, type, data);
+
+      // console.log(tempRes)
+      
+      res.json({
+        apiKey: process.env.API_KEY,
+        tempRes
+      });
+    } catch(err) {
+      console.error(err.stack);
+      res.json({
+        apiKey: process.env.API_KEY,
+        error: err.message
+      });
+      //res.status(500).end(err.message);
     }
   }
 

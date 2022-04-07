@@ -36,6 +36,8 @@ const RoomListener = require("@app/listeners/room");
 
   app.get("/rooms", RoomListener.getAllMainRooms);
 
+  app.post("/room/:roomId/broadcast", RoomListener.broadcast);
+
 //   app.get("*", (req, res) => {
 //     res.sendFile(path.join(__dirname, "../build/index.html"));
 //   });
