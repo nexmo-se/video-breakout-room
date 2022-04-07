@@ -28,6 +28,7 @@ export default function RoomContextProvider({ children }){
     }
     else if (mMessage.breakoutRooms.length === 0) {  
       if (inBreakoutRoom) setSignal('breakoutRoomRemoved');
+      else setSignal(null);
       setIsBreakoutRoomCreated(true);
     }
     else if (mMessage.breakoutRooms.length !== 0  && inBreakoutRoom) {
