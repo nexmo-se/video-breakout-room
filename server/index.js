@@ -20,6 +20,13 @@ const RoomListener = require("@app/listeners/room");
   app.use(cors());
 
   app.use(express.static(path.join(__dirname, "../build")));
+
+  // app.use((req, res, next) => {
+  //   console.log("\n>>>", `${req.method} ${req.url}`)
+  //   if ("POST" == req.method) console.log(">>>>>>", JSON.stringify(req.body))
+  //   next()
+  // });
+
   app.get("/room/:roomId/info", RoomListener.info);
 
   app.post("/room/:roomId/createSession", RoomListener.createSession);

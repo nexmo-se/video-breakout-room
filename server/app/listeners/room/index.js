@@ -384,7 +384,6 @@ class RoomListener{
     try {
       const { roomId } = req.params;
       const { data, type } = req.body;
-
       if ( undefined === roomId ) throw new Error("Empty params");
 
       let room = new Room(roomId);
@@ -437,6 +436,7 @@ class RoomListener{
       res.json({
         error: err.message
       });
+      // res.status(500).end(err.message);
     }
   }
 
