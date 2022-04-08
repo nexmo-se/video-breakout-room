@@ -74,7 +74,7 @@ export default function ParticipantPage(){
     if (mMessage.breakoutRoomSignal.message === 'roomEdited' && !roomNameFound && roomSessionIdFound) {
        mNotification.openNotification("Room renamed by Host/Co-host", "Room rename by host, new Room Name: " + mRoom.inBreakoutRoom, ()=>{mRoom.setInBreakoutRoom(roomSessionIdFound.name)});
     }
-    if (mMessage.breakoutRoomSignal.message === 'participantMoved' && (roomNameFound && !roomNameFound["member"].includes(mSession.user.name) || (!roomNameFound && roomAssigned))) {
+    if (mMessage.breakoutRoomSignal.message === 'participantMoved' && ((roomNameFound && !roomNameFound["member"].includes(mSession.user.name)) || ((!roomNameFound && roomAssigned)))) {
         mNotification.openNotification("Room changed by Host/Co-host", `You have been reassigned to Room: ${roomAssigned ? roomAssigned.name : "Main Room"}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name : ''))
     }
   // eslint-disable-next-line

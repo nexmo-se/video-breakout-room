@@ -5,9 +5,8 @@ import useMessage from "hooks/message";
 import useRoom from "hooks/room";
 import useSession from "hooks/session";
 import useNotification from "hooks/notification";
-import RoomAPI from "api/room"
 
-export default function CountDownTimer({handleChangeRoom, closeAllRoom}) {
+export default function CountDownTimer({handleChangeRoom}) {
     const [ showCountDownTimer, setShowCountDownTimer ] = useState(false);
     const [ countDown, setCountDown ] = useState(null);
     const [ triggeredTimer, setTriggeredTimer ] = useState();

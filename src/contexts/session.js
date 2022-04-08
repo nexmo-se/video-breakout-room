@@ -4,8 +4,6 @@ import { v4 as uuid } from "uuid";
 import OT from "@opentok/client";
 
 import User from "entities/user";
-import useRoom from "hooks/room";
-
 
 export const SessionContext = createContext({});
 function SessionProvider({ children }){

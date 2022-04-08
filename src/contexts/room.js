@@ -1,5 +1,5 @@
 // @flow
-import { useState, useEffect, createContext, useRef } from "react";
+import { useState, useEffect, createContext } from "react";
 import useSession from "hooks/session";
 import RoomAPI from "api/room";
 import useMessage from "hooks/message";

@@ -1,5 +1,6 @@
 // @flow
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+
+const url = new URL(window.location.href);
 
 export default class MessageAPI{
 
@@ -18,7 +19,7 @@ export default class MessageAPI{
   static async broadcastMsg(roomId, type, data) {
     if (undefined === roomId) return null;
     data.type = type ?? 'raise-hand';
-    const apiURL = `${REACT_APP_API_URL}/room/${roomId}/broadcast`;
+    const apiURL = `${url.protocol}//${url.hostname}:${url.port}}/room/${roomId}/broadcast`;
     return fetch(apiURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -1,5 +1,5 @@
 // @flow
-// require("dotenv").config(); // TODO
+require("dotenv").config();
 
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
@@ -19,7 +19,7 @@ const RoomListener = require("@app/listeners/room");
   app.use(express.json());
   app.use(cors());
 
-//   app.use(express.static(path.join(__dirname, "../build")));
+  app.use(express.static(path.join(__dirname, "../build")));
   app.get("/room/:roomId/info", RoomListener.info);
 
   app.post("/room/:roomId/createSession", RoomListener.createSession);
