@@ -34,7 +34,7 @@ export default function EditRoomContent(props) {
 
     Promise.all(p).then((response) => {
         setIsLoading(false);
-        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], {"breakoutRooms": newRooms});
+        RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "roomEdited", "breakoutRooms": newRooms});
     })
 
 }

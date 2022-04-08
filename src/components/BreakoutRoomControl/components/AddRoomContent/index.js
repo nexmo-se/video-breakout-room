@@ -30,7 +30,7 @@ export default function AddRoomContent(props) {
             let newRoom = response.find((room) => room.name === roomName);
             newRoom["member"] = [];
             setIsLoading(false);
-            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], {"breakoutRooms": [...mMessage.breakoutRooms, newRoom]});
+            RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "roomAdded", "breakoutRooms": [...mMessage.breakoutRooms, newRoom]});
         });
     }
 

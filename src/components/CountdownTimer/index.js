@@ -48,11 +48,8 @@ export default function CountDownTimer({handleChangeRoom, closeAllRoom}) {
         if (mMessage.timer && mMessage.timer.isManualReturn && mRoom.inBreakoutRoom) {
             mNotification.openNotification("Breakout Room Session Ended", `Please return to Main Room`, () => {})
         }
-        else if (mMessage.timer && !mMessage.timer.isManualReturn && mSession.user.role === "moderator" && mMessage.breakoutRooms.length !== 0){
-            return mRoom.handleRoomRemove(mRoom.mainRoom).then((response) => {
-                RoomAPI.sendCountDownTimer(mSession.userSessions[0], {});
-                RoomAPI.sendBreakoutRoom(mSession.userSessions[0], {"breakoutRooms":[]})
-            })
+        else if (mMessage.timer && !mMessage.timer.isManualReturn && mRoom.inBreakoutRoom) {
+            mNotification.openNotification("Breakout Room Session Ended", `Please return to Main Room`, () => {handleChangeRoom()})
         }
     }
 

@@ -18,6 +18,7 @@ function SessionProvider({ children }){
   const [ prevRoomConnections, setPrevRoomConnections ] = useState([]);
   const [ connections, setConnections ] = useState([]);
   const [ participants, setParticipants ] = useState([]);
+  const [ mainSession, setMainSession] = useState();
   const [ userSessions, setUserSessions ] = useState([]);
   const [ user, setUser ] = useState();
 
@@ -84,7 +85,7 @@ function SessionProvider({ children }){
     if (session && isConnected) {
       const sessionId = session.sessionId;
       const targetStreams = {...prevRoomStreams}[sessionId];
-      const mainSessionId = userSessions[0].sessionId;
+      const mainSessionId = mainSession.sessionId;
       const targetConnections = {...prevRoomConnections}[mainSessionId];
 
       if (targetStreams && targetStreams !== streams) {
@@ -129,6 +130,7 @@ function SessionProvider({ children }){
             else resolve();
           })
         });
+        if (userSessions.length === 0) {setMainSession(session)}
         setUserSessions([...userSessions, session]);
       }
       setSession(session);
@@ -149,6 +151,7 @@ function SessionProvider({ children }){
       connections,
       participants,
       disconnectSession,
+      mainSession,
       userSessions,
       user,
       createUser,

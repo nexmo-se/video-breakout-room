@@ -51,10 +51,10 @@ export default function PromptCreateRooms(props) {
         }
 
         const message = {
-          "type": formValue.modifier,
+          "message": "roomCreated (" + formValue.modifier + ")",
           "breakoutRooms": response
         }
-        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], message)
+        RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, message)
       });
 
     }

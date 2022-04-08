@@ -34,7 +34,7 @@ export default function MoveRoomContent(props) {
             newRooms[prevRoomIndex]["member"] = [...newRooms[prevRoomIndex]["member"]].filter((a) => a !== selectedParticipant);
         }
 
-        RoomAPI.sendBreakoutRoom(mSession.userSessions[0], {"breakoutRooms": newRooms});
+        RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "participantMoved", "breakoutRooms": newRooms});
     }
 
     return (

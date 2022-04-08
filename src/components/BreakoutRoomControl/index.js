@@ -59,7 +59,7 @@ export default function BreakoutRoomControl(props) {
 
         if (participantAssigned.length === 0 && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
             handleCloseAllRoom();
-            RoomAPI.sendCountDownTimer(mSession.userSessions[0], {});
+            RoomAPI.sendCountDownTimer(mSession.mainSession, {});
         }
         setRoomGroup(newRoomGroup);
         setIsLoading(false);
@@ -102,7 +102,7 @@ export default function BreakoutRoomControl(props) {
     function handleCloseAllRoom() {    
         setIsLoading(true); 
         return mRoom.handleRoomRemove(mRoom.mainRoom).then((response) => {
-            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], {"breakoutRooms":[]})
+            RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "allRoomRemoved", "breakoutRooms":[]})
             setIsBreakout(false);
         })
     }

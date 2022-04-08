@@ -14,7 +14,7 @@ export default function SetTimerContent({setShowSetTimer}) {
 
     function handleSetTimer() {
         setShowSetTimer(null);
-        RoomAPI.sendCountDownTimer(mSession.userSessions[0], {
+        RoomAPI.sendCountDownTimer(mSession.mainSession, {
             endTime: (new Date().getTime()) + (period * 60 * 1000),
             period,
             countDownTimer,

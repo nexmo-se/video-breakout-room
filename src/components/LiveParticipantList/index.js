@@ -20,7 +20,8 @@ export default function LiveParticipantList({onClose, visible}) {
         else {
             newCoHostList.push(name);
         }
-        RoomAPI.sendCohostList(mSession.userSessions[0], newCoHostList);
+        RoomAPI.sendCohostList(mSession.mainSession, newCoHostList);
+        RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "roomUpdate", "breakoutRooms": mMessage.breakoutRooms});
         return;
     }
 

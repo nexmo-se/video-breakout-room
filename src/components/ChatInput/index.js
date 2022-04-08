@@ -21,7 +21,7 @@ function ChatInput({ byPass, toBreakoutRoom, resetSelectedRoom }){
     const fromRoomName = mRoom.inBreakoutRoom ? mRoom.inBreakoutRoom : 'Main Room';
     const message = new Message(fromRoomName, toBreakoutRoom ?? null, mSession.user, text, isApproved);
         
-    MessageAPI.sendMessage(toBreakoutRoom ? mSession.userSessions[0]: mSession.session, message);
+    MessageAPI.sendMessage(toBreakoutRoom ? mSession.mainSession: mSession.session, message);
     setText("");
     if( resetSelectedRoom) resetSelectedRoom();
   }

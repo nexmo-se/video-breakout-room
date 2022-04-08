@@ -54,7 +54,7 @@ export default function ActionButtons(props) {
         mRoom.handleRoomRemove(newRooms[targetIndex].id).then((response) => {
             newRooms.splice(targetIndex, 1);
             setIsLoading(false);
-            RoomAPI.sendBreakoutRoom(mSession.userSessions[0], {"breakoutRooms": newRooms})
+            RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "roomRemoved", "breakoutRooms": newRooms})
         })
     }
 

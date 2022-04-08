@@ -36,7 +36,7 @@ export default function ModeratorPage() {
     const mStyles = useStyles();
     const mRoom = useRoom();
     const mNotification = useNotification();
-    const mPublisher = usePublisher("cameraContainer", true, true);
+    const mPublisher = usePublisher("cameraContainer", true, false);
     const mMessage = useMessage();
     const mSubscriber = useSubscriber({ 
       moderator: "cameraContainer", 
@@ -47,18 +47,28 @@ export default function ModeratorPage() {
     const subscriberRef = useRef(null);
 
     useEffect(() => {
-      if (mRoom.signal === 'breakoutRoomRemoved') {  
-        mNotification.openNotification("Room removed by Host/Co-host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.", () => handleChangeRoom())
+      if (!mMessage.breakoutRoomSignal) return;
+      let roomNameFound;
+      let roomSessionIdFound;
+      let roomAssigned = mMessage.breakoutRoomSignal.breakoutRooms.find((room) => room["member"].includes(mSession.user.name));
+      if (mRoom.inBreakoutRoom) {
+        roomNameFound = mMessage.breakoutRoomSignal.breakoutRooms.find((room) => room.name === mRoom.inBreakoutRoom);
+        roomSessionIdFound = mMessage.breakoutRoomSignal.breakoutRooms.find((room) => room.sessionId === mSession.session.sessionId);
       }
-      if (mRoom.signal === 'breakoutRoomRenamed') {  
-        mNotification.openNotification("Room renamed by Host/Co-host", "Room rename by host, new Room Name: " +  mRoom.inBreakoutRoom, ()=>{});
+      if (mMessage.breakoutRoomSignal.message === 'allRoomRemoved' && mRoom.inBreakoutRoom) {  
+        mNotification.openNotification("Room removed by Host/Co-host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.",  () => handleChangeRoom())
       }
-      if (mRoom.signal === 'breakoutRoomChanged') {
-        let roomAssinged = mMessage.breakoutRooms.find((room) => room["member"].includes(mSession.user.name))
-          mNotification.openNotification("Room changed by Host/Co-host", `You have been reassigned to Room: ${roomAssinged ? roomAssinged.name : "Main Room"}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssinged ? roomAssinged.name : ''))
+      if (mMessage.breakoutRoomSignal.message === 'roomRemoved' && mRoom.inBreakoutRoom && !roomNameFound) {  
+          mNotification.openNotification("Room removed by Host/Co-host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.",  () => handleChangeRoom())
+      }
+      if (mMessage.breakoutRoomSignal.message === 'roomEdited' && !roomNameFound && roomSessionIdFound) {
+         mNotification.openNotification("Room renamed by Host/Co-host", "Room rename by host, new Room Name: " + mRoom.inBreakoutRoom, ()=>{mRoom.setInBreakoutRoom(roomSessionIdFound.name)});
+      }
+      if (mMessage.breakoutRoomSignal.message === 'participantMoved' && (roomNameFound && !roomNameFound["member"].includes(mSession.user.name) || (!roomNameFound && roomAssigned))) {
+          mNotification.openNotification("Room changed by Host/Co-host", `You have been reassigned to Room: ${roomAssigned ? roomAssigned.name : "Main Room"}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name : ''))
       }
     // eslint-disable-next-line
-    }, [ mRoom.signal ])
+    }, [ mMessage.breakoutRoomSignal ])
 
     useEffect(() => {
     if(mSession.user) mRoom.connect(mSession.user, "moderator");

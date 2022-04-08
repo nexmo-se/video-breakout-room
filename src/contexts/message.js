@@ -10,7 +10,8 @@ export default function MessageProvider({ children }){
   const [ raisedHands, setRaisedHands ] = useState([]);
   const [ messages, setMessages ] = useState([]);
   const [ breakoutRooms, setBreakoutRooms ] = useState([]);
-  const [ breakoutRoomsType, setBreakoutRoomsType ] = useState("automatic");
+  const [ breakoutRoomSignal, setBreakoutRoomSignal ] = useState();
+
   const [ timer, setTimer ] = useState();
   const [ cohosts, setCohosts ] = useState([]);
 
@@ -82,12 +83,30 @@ export default function MessageProvider({ children }){
       })
 
       mSession.session.on("signal:breakout-room", ({ data }) => {
-        const jsonData = JSON.parse(data);          
-
-        setBreakoutRoomsType(jsonData.type ?? "automatic");
-        setBreakoutRooms(jsonData.breakoutRooms)
+        const jsonData = JSON.parse(data);
+        setBreakoutRooms(jsonData.breakoutRooms);
+        setBreakoutRoomSignal(jsonData);
       });
   
+      mSession.session.on("signal:join-breakout-room", ({ data }) => {
+        const jsonData = JSON.parse(data);          
+
+        setBreakoutRooms((prevBreakoutRoom) => {
+          const newRoom = [...prevBreakoutRoom];
+          if (jsonData.fromRoom) {
+            const prevRoomIndex = newRoom.findIndex((room) => room.name === jsonData.fromRoom);
+            if (prevRoomIndex !== -1) newRoom[prevRoomIndex]["member"] = [...newRoom[prevRoomIndex]["member"]].filter((member) => member !== jsonData.user.name)
+          }
+          if (jsonData.toRoom) {
+            const targetRoomIndex = newRoom.findIndex((room) => room.name === jsonData.toRoom);
+            if (targetRoomIndex !== -1 && !newRoom[targetRoomIndex]["member"].includes(jsonData.user.name)) {
+              newRoom[targetRoomIndex]["member"] = [...newRoom[targetRoomIndex]["member"], jsonData.user.name];
+            }
+          }
+          return newRoom
+        })
+      });
+
       mSession.session.on("signal:count-down-timer", ({ data }) => {
         const jsonData = JSON.parse(data);
         setTimer(Object.keys(jsonData).length === 0 ? null : jsonData);
@@ -107,9 +126,9 @@ export default function MessageProvider({ children }){
       raisedHands,
       removeRaisedHand,
       messages,
-      breakoutRoomsType,
       breakoutRooms,
       setBreakoutRooms,
+      breakoutRoomSignal,
       timer,
       cohosts
     }}>

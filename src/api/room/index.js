@@ -78,7 +78,7 @@ export default class RoomAPI{
     return Promise.resolve(room);
   }
 
-  static async sendBreakoutRoom(session, breakoutRoom){
+  static async sendBreakoutRoomUpdate(session, breakoutRoom){
     await new Promise((resolve, reject) => {
       session.signal({
         type: "breakout-room",
@@ -89,6 +89,19 @@ export default class RoomAPI{
       });
     })
   };
+
+  static async sendJoinBreakoutRoom(session, data){
+    await new Promise((resolve, reject) => {
+      session.signal({
+        type: "join-breakout-room",
+        data: JSON.stringify(data)
+      }, (err) => {
+        if(err) reject(err);
+        else resolve();
+      });
+    })
+  };
+
 
   static async sendCountDownTimer(session, timer){
     await new Promise((resolve, reject) => {
