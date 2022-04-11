@@ -1,7 +1,6 @@
 // @flow
 import Credential from "entities/credential";
 import config from "config";
-import  Room from "entities/room";
 
 export default class CredentialAPI{
   static async generateCredential({roomId = config.roomName, role="publisher", data={}}){
