@@ -1,11 +1,11 @@
 // @flow
-import { useState, useEffect, useCallback } from "react";
-import User from "entities/user";
+import { useState, useEffect } from 'react';
+import User from 'entities/user';
 
-import useSession from "hooks/session";
-import usePublisher from "hooks/publisher";
-import ShareScreenButton from "components/ShareScreenButton";
-import useRoom from "hooks/room";
+import ShareScreenButton from 'components/ShareScreenButton';
+import useSession from 'hooks/session';
+import usePublisher from 'hooks/publisher';
+import useRoom from 'hooks/room';
 
 function ShareScreen(){
   const [ sharing, setSharing ] = useState(false);
@@ -31,7 +31,9 @@ function ShareScreen(){
   }, [screenPublisher])
 
   useEffect(() => {
-     if (screenPublisher) unpublish();
+     if (screenPublisher) {
+       unpublish();
+     }
   }, [inBreakoutRoom])
 
   return (

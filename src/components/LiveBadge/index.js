@@ -1,7 +1,7 @@
 // @flow
-import { useState, useEffect } from "react";
-import clsx from "clsx";
-import { motion } from "framer-motion";
+import { useState, useEffect } from 'react';
+import clsx from 'clsx';
+import { motion } from 'framer-motion';
 
 
 function LiveBadge({ style, className }){

@@ -19,7 +19,7 @@ export default class MessageAPI{
   static async broadcastMsg(roomId, type, data) {
     if (undefined === roomId) return null;
     data.type = type ?? 'raise-hand';
-    const apiURL = `${url.protocol}//${url.hostname}:${url.port}}/room/${roomId}/broadcast`;
+    const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${roomId}/broadcast`;
     return fetch(apiURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

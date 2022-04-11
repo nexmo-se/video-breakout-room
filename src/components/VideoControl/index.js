@@ -1,13 +1,13 @@
 // @flow
-import { useState , useEffect } from "react";
+import { useState , useEffect } from 'react';
 
-import useStyles from "./styles";
-import useSession from "hooks/session";
+import HangupButton from 'components/HangupButton';
+import MuteButton from 'components/MuteButton';
+import VideoButton from 'components/VideoButton';
 
-import HangupButton from "components/HangupButton";
-import MuteButton from "components/MuteButton";
-import VideoButton from "components/VideoButton";
-import useRoom from "hooks/room";
+import useStyles from './styles';
+import useSession from 'hooks/session';
+import useRoom from 'hooks/room';
 
 function VideoControl({ publisher, children }){
   const [ hasAudio, setHasAudio ] = useState(true);

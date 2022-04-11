@@ -1,7 +1,7 @@
-import { useRef } from "react"
-import RoomAPI from "api/room";
+import { useRef } from 'react';
 import { Input, InputNumber } from 'antd';
-import Button from 'components/Button'
+import RoomAPI from 'api/room';
+import Button from 'components/Button';
 import useMessage from "hooks/message";
 import useSession from "hooks/session";
 import useRoom from "hooks/room";
@@ -28,6 +28,7 @@ export default function AddRoomContent(props) {
             ];
         mRoom.handleRoomCreate(data).then((response) => {
             let newRoom = response.find((room) => room.name === roomName);
+            newRoom["memberAssigned"] = [];
             newRoom["member"] = [];
             setIsLoading(false);
             RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "roomAdded", "breakoutRooms": [...mMessage.breakoutRooms, newRoom]});

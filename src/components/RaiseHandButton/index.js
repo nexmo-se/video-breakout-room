@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import Message from "entities/message";
-import User from "entities/user";
+import Message from 'entities/message';
+import User from 'entities/user';
 
-import useSession from "hooks/session";
-import MessageAPI from "api/message";
+import useSession from 'hooks/session';
+import MessageAPI from 'api/message';
 
 function RaiseHandButton(props) {
   const mSession = useSession();

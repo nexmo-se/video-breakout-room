@@ -1,8 +1,8 @@
 // @flow
-import { useRef, useEffect } from "react"
-import useMessage from "hooks/message";
+import { useRef, useEffect } from 'react';
+import useMessage from 'hooks/message';
 
-import ChatBubble from "components/ChatBubble";
+import ChatBubble from 'components/ChatBubble';
 
 function ChatList(){
   const mMessage = useMessage();

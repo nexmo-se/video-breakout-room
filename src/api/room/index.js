@@ -11,7 +11,7 @@ export default class RoomAPI{
     })).json();
     const mainRoom = new Room(jsonResult.apiKey, jsonResult.id, jsonResult.name, jsonResult.sessionId)
     let breakoutRooms = [];
-    if ( jsonResult.breakoutRooms) jsonResult.breakoutRooms.forEach((room) => {
+    if (jsonResult.breakoutRooms) jsonResult.breakoutRooms.forEach((room) => {
       breakoutRooms.push(new Room(jsonResult.apiKey, room.id, room.name, room.sessionId, room.maxParticipants))
     });
     return {mainRoom, breakoutRooms};

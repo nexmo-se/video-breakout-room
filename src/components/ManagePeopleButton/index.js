@@ -1,8 +1,6 @@
-// @flow
-
 import People from '@mui/icons-material/People';
-import ControlButton from "components/ControlButton";
-import LiveParticipantList from "components/LiveParticipantList"
+import ControlButton from 'components/ControlButton';
+import LiveParticipantList from 'components/LiveParticipantList';
 
 export default function ManagePeopleButton({...props }){
 

@@ -1,23 +1,21 @@
-import { useState } from "react";
-import MoveRoomContent from "../MoveRoomContent";
-import Person from "@material-ui/icons/Person"
-import SwapVert from "@material-ui/icons/SwapVert"
-import Button from 'components/Button'
+import { useState } from 'react';
 import { Popover } from 'antd';
-
+import Person from '@material-ui/icons/Person';
+import SwapVert from '@material-ui/icons/SwapVert';
+import MoveRoomContent from '../MoveRoomContent';
+import Button from 'components/Button';
 
 export default function ParticipantList(props) {
 
-    const { roomName, participantList, styles, roomOption } = props;
+    const { roomName, participantList, styles, roomOptions } = props;
     const [ selectedParticipant, setSelectedParticipant ] = useState();
 
 
-    const moveRoomContent = (participant, roomName) => {
+    const moveRoomContent = (roomName) => {
         return (
             <MoveRoomContent
-                participant={participant}
                 defaultRoom={roomName}
-                roomOption={roomOption}
+                roomOptions={roomOptions}
                 selectedParticipant={selectedParticipant}
             ></MoveRoomContent>
         )
@@ -28,10 +26,12 @@ export default function ParticipantList(props) {
         participantList.map((participant, i) => {
         return (
             <div key={`participant-${i}`} style={styles.container}>
-            <p ><Person style={styles.personIcon}></Person>{participant}</p> 
-            <Popover visible={selectedParticipant === participant? true: false} content={moveRoomContent(participant, roomName)} title="Move Participant" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedParticipant(participant) : setSelectedParticipant(null)} overlayStyle={styles.popover}>
+            <p ><Person style={styles.personIcon}></Person>{participant}</p>
+            {!participant.includes(" (joining") ?
+            <Popover visible={selectedParticipant === participant? true: false} content={moveRoomContent(roomName)} title="Move Participant" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedParticipant(participant) : setSelectedParticipant(null)} overlayStyle={styles.popover}>
                 <Button value={participant} hierarchy="link" text={<SwapVert style={styles.swapIcon}/>} onClick={() => setSelectedParticipant(participant)} style={styles.button}></Button>      
-            </Popover>
+            </Popover> : null
+            }
             </div>
         )
     })

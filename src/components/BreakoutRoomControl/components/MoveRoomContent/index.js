@@ -1,15 +1,15 @@
-import { useState } from "react"
-import useMessage from "hooks/message";
-import useSession from "hooks/session";
-import Button from 'components/Button'
-import RoomAPI from "api/room"
+import { useState } from 'react';
 import { Select } from 'antd';
+import useMessage from 'hooks/message';
+import useSession from 'hooks/session';
+import Button from 'components/Button';
+import RoomAPI from 'api/room';
 const { Option } = Select
 
 
 export default function MoveRoomContent(props) {  
     
-    const { participant, defaultRoom, roomOption, selectedParticipant, styles } = props;
+    const { defaultRoom, roomOptions, selectedParticipant, styles } = props;
     const [ selectedParticipantRoom, setSelectedParticipantRoom ] = useState();
     const mMessage = useMessage();
     const mSession = useSession();
@@ -28,7 +28,7 @@ export default function MoveRoomContent(props) {
         }
         
         if (targetRoomIndex !==  -1)  {
-            newRooms[targetRoomIndex]["member"] = [...newRooms[targetRoomIndex]["member"], selectedParticipant];
+            newRooms[targetRoomIndex]["memberAssigned"] = [...newRooms[targetRoomIndex]["memberAssigned"], selectedParticipant];
         }
         if (prevRoomIndex !==  -1) {
             newRooms[prevRoomIndex]["member"] = [...newRooms[prevRoomIndex]["member"]].filter((a) => a !== selectedParticipant);
@@ -39,12 +39,12 @@ export default function MoveRoomContent(props) {
 
     return (
     <>
-    <p>Move <strong>{participant}</strong> to Room:</p>
+    <p>Move <strong>{selectedParticipant}</strong> to Room:</p>
     <Select defaultValue={defaultRoom} style={styles.select} onChange={(value) => setSelectedParticipantRoom(value)}>
     {
-        roomOption && roomOption.map((option, i) => {
+        roomOptions && roomOptions.map((option, i) => {
             return (
-                <Option key={`Option-${participant}-${i}`} value={option}>{option}</Option>
+                <Option key={`Option-${selectedParticipant}-${i}`} value={option}>{option}</Option>
             )
         })
     }

@@ -1,9 +1,9 @@
 // @flow
-import { useState } from "react";
-import clsx from "clsx";
-import { motion } from "framer-motion";
-import useStyles from "./styles";
-import { default as Loader } from "react-spinners/BounceLoader";
+import { useState } from 'react';
+import clsx from 'clsx';
+import { motion } from 'framer-motion';
+import useStyles from './styles';
+import { default as Loader } from 'react-spinners/BounceLoader';
 
 function ControlButton({ size=50, fontSize=24, loading, active, onClick, className, children, ...props }){
   const [ isBig, setIsBig ] = useState(false);

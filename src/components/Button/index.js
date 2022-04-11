@@ -1,5 +1,5 @@
 
-import clsx from "clsx";
+import clsx from 'clsx';
 
 export default function Button(props){
     const { text, style, hierarchy, value} = props;

@@ -1,7 +1,6 @@
-import TextInput from "components/TextInput";
-import { useState } from "react";
-import User from "entities/user";
-
+import { useState } from 'react';
+import User from 'entities/user';
+import TextInput from 'components/TextInput';
 
 export default function AskNameDialog(props) {
   const { role, pin, onSubmit } = props;

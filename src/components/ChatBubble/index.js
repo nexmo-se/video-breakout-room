@@ -1,5 +1,4 @@
-import React from "react";
-
+import React from 'react';
 import Avatar from 'react-avatar';
 
 function ChatBubble(props){

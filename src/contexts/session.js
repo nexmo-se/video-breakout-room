@@ -1,24 +1,24 @@
 // @flow
-import { useState, createContext, useEffect } from "react";
+import { useState, createContext, useEffect, useRef } from "react";
 import { v4 as uuid } from "uuid";
 import OT from "@opentok/client";
-
 import User from "entities/user";
 
 export const SessionContext = createContext({});
 function SessionProvider({ children }){
+  const [ user, setUser ] = useState();
   const [ isConnected, setIsConnected ] = useState(false);
   const [ session, setSession ] = useState();
-  const [ changedStream, setChangedStream ] = useState();
-  const [ streams, setStreams ] = useState([]);
-  const [ prevRoomStreams, setPrevRoomStreams ] = useState([]);
-
-  const [ prevRoomConnections, setPrevRoomConnections ] = useState([]);
-  const [ connections, setConnections ] = useState([]);
-  const [ participants, setParticipants ] = useState([]);
   const [ mainSession, setMainSession] = useState();
   const [ userSessions, setUserSessions ] = useState([]);
-  const [ user, setUser ] = useState();
+  const [ streams, setStreams ] = useState([]);
+  const [ changedStream, setChangedStream ] = useState();
+  const [ allRoomsStreams, setAllRoomsStreams ] = useState([]);
+  const [ connections, setConnections ] = useState([]);
+  const [ participants, setParticipants ] = useState([]);
+
+  const mainSessionRef = useRef(null);
+  mainSessionRef.current = mainSession;
 
   useEffect(() => {
     const participants = connections.map((connection) => {
@@ -36,32 +36,34 @@ function SessionProvider({ children }){
     setParticipants(participants);
   }, [ connections ]);
 
+  useEffect(() => {
+    if (session && isConnected) {
+      const sessionId = session.sessionId;
+      const targetStreams = {...allRoomsStreams}[sessionId];
+
+      if (targetStreams && targetStreams !== streams) {
+        setStreams(targetStreams)
+      }
+    }
+  // eslint-disable-next-line
+  }, [allRoomsStreams, session, isConnected])
+
   function handleStreamPropertyChanged({ stream, changedProperty, newValue, oldValue }){
     setChangedStream({ stream, changedProperty, newValue, oldValue, token: uuid() });
   }
 
   function handleConnectionCreated(e){
-    setPrevRoomConnections((prevConnection)=> {
-      const newConnection = {...prevConnection};
-      const sessionId = e.target.sessionId;
-      if (newConnection[sessionId]) newConnection[sessionId] = [...newConnection[sessionId], e.connection];
-      else newConnection[sessionId] = [e.connection];
-      return newConnection;
-    })
-      // setConnections((prevConnections) => [ ...prevConnections, e.connection ]);
+    if (mainSessionRef.current && e.target.sessionId !== mainSessionRef.current.sessionId) return;
+    setConnections((prevConnections) => [ ...prevConnections, e.connection ]);
   }
 
   function handleConnectionDestroyed(e){
-    setPrevRoomConnections((prevConnection)=> {
-      const newConnection = {...prevConnection};
-      const sessionId = e.target.sessionId;
-      newConnection[sessionId] = newConnection[sessionId].filter((connection) => connection.id !== e.connection.id);
-      return newConnection;
-    });
+    if (e.target.sessionId !== mainSessionRef.current.sessionId) return;
+    setConnections((prevConnections) => [ ...prevConnections].filter((connection) => connection.id !== e.connection.id));
   }
 
   function handleStreamCreated(e){
-    setPrevRoomStreams((prevStreams)=> {
+    setAllRoomsStreams((prevStreams)=> {
       const newStream = {...prevStreams};
       const sessionId = e.target.sessionId;
       if (newStream[sessionId]) newStream[sessionId] = [...newStream[sessionId], e.stream];
@@ -71,32 +73,12 @@ function SessionProvider({ children }){
   }
 
   function handleStreamDestroyed(e){
-    setPrevRoomStreams((prevStreams)=> {
+    setAllRoomsStreams((prevStreams)=> {
       const newStream = {...prevStreams};
       const sessionId = e.target.sessionId;
       newStream[sessionId] = newStream[sessionId].filter((stream) => stream.id !== e.stream.id);
       return newStream;
     })
-  }
-
-  useEffect(() => {
-    if (session && isConnected) {
-      const sessionId = session.sessionId;
-      const targetStreams = {...prevRoomStreams}[sessionId];
-      const mainSessionId = mainSession.sessionId;
-      const targetConnections = {...prevRoomConnections}[mainSessionId];
-
-      if (targetStreams && targetStreams !== streams) {
-        setStreams(targetStreams)
-      }
-      targetConnections ? setConnections(targetConnections) : setConnections([]);
-    }
-  // eslint-disable-next-line
-  }, [prevRoomStreams, prevRoomConnections,  session, isConnected])
-
-
-  function disconnectSession() {
-    setIsConnected(false);
   }
 
   function handleSessionDisconnected(e) {
@@ -141,18 +123,19 @@ function SessionProvider({ children }){
   
   return (
     <SessionContext.Provider value={{
-      connect,
+      user,
       session,
-      changedStream,
-      isConnected,
-      streams,
-      connections,
-      participants,
-      disconnectSession,
       mainSession,
       userSessions,
-      user,
+      isConnected,
+      streams,
+      changedStream,
+      allRoomsStreams,
+      connections,
+      participants,
+      connect,
       createUser,
+      setIsConnected
     }}>
       {children}
     </SessionContext.Provider>

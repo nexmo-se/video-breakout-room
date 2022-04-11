@@ -7,15 +7,9 @@ class RoomListener{
   static async info(req, res){
     try{
       const { roomId } = req.params ?? 'demoRoom';
-      // const { role } = req.body ?? "publisher";
-      // const { data } = req.body ?? {};
-
-      //const user = new User(role);
       const room = new Room(roomId);
       
-      const generatedRoom = await RoomAPI.generateSession(room);
-      //const generatedUser = await UserAPI.generateToken(generatedRoom, user, data);
-      
+      const generatedRoom = await RoomAPI.generateSession(room);      
       generatedRoom.breakoutRooms = await RoomAPI.getBreakoutRooms(room);
 
       if (generatedRoom.breakoutRooms) {
@@ -35,7 +29,6 @@ class RoomListener{
 
       res.json({ 
         apiKey: process.env.API_KEY, 
-        //token: generatedUser.token, 
         ...generatedRoom
       });
     }catch(err){
@@ -211,7 +204,6 @@ class RoomListener{
         apiKey: process.env.API_KEY,
         error: err.message
       });
-      //res.status(500).end(err.message);
     }
   }
 

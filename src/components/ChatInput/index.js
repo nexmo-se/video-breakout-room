@@ -1,13 +1,13 @@
 // @flow
-import { useState } from "react";
-import MessageAPI from "api/message";
-import useSession from "hooks/session";
-import useRoom from "hooks/room"
+import { useState } from 'react';
+import MessageAPI from 'api/message';
+import useSession from 'hooks/session';
+import useRoom from 'hooks/room';
 
-import Message from "entities/message";
+import Message from 'entities/message';
 
-import TextInput from "components/TextInput";
-import Button from "components/Button";
+import TextInput from 'components/TextInput';
+import Button from 'components/Button';
 
 
 function ChatInput({ byPass, toBreakoutRoom, resetSelectedRoom }){
@@ -18,7 +18,7 @@ function ChatInput({ byPass, toBreakoutRoom, resetSelectedRoom }){
   function handleClick(e){
     if(e) e.preventDefault();
     const isApproved = (byPass)? true: false;
-    const fromRoomName = mRoom.inBreakoutRoom ? mRoom.inBreakoutRoom : 'Main Room';
+    const fromRoomName = mRoom.inBreakoutRoom ? mRoom.inBreakoutRoom : "Main Room";
     const message = new Message(fromRoomName, toBreakoutRoom ?? null, mSession.user, text, isApproved);
         
     MessageAPI.sendMessage(toBreakoutRoom ? mSession.mainSession: mSession.session, message);

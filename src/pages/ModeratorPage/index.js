@@ -50,28 +50,28 @@ export default function ModeratorPage() {
       if (!mMessage.breakoutRoomSignal) return;
       let roomNameFound;
       let roomSessionIdFound;
-      let roomAssigned = mMessage.breakoutRoomSignal.breakoutRooms.find((room) => room["member"].includes(mSession.user.name));
+      let roomAssigned = mMessage.breakoutRoomSignal.breakoutRooms.find((room) => room["memberAssigned"].includes(mSession.user.name));
       if (mRoom.inBreakoutRoom) {
         roomNameFound = mMessage.breakoutRoomSignal.breakoutRooms.find((room) => room.name === mRoom.inBreakoutRoom);
         roomSessionIdFound = mMessage.breakoutRoomSignal.breakoutRooms.find((room) => room.sessionId === mSession.session.sessionId);
       }
       if (mMessage.breakoutRoomSignal.message === 'allRoomRemoved' && mRoom.inBreakoutRoom) {  
-        mNotification.openNotification("Room removed by Host/Co-host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.",  () => handleChangeRoom())
+        mNotification.openNotification("Room removed by Host/Co-host", "You will be redirected to main session in 5 seconds.",  () => handleChangeRoom())
       }
       if (mMessage.breakoutRoomSignal.message === 'roomRemoved' && mRoom.inBreakoutRoom && !roomNameFound) {  
-          mNotification.openNotification("Room removed by Host/Co-host", "Click confirm to Return to main session OR you will be directed to main session automatically after 5 seconds.",  () => handleChangeRoom())
+          mNotification.openNotification("Room removed by Host/Co-host", "You will be redirected to main session in 5 seconds.",  () => handleChangeRoom())
       }
       if (mMessage.breakoutRoomSignal.message === 'roomEdited' && !roomNameFound && roomSessionIdFound) {
-         mNotification.openNotification("Room renamed by Host/Co-host", "Room rename by host, new Room Name: " + mRoom.inBreakoutRoom, ()=>{mRoom.setInBreakoutRoom(roomSessionIdFound.name)});
+         mNotification.openNotification("Room renamed by Host/Co-host", "New Room Name: " + mRoom.inBreakoutRoom, ()=>{mRoom.setInBreakoutRoom(roomSessionIdFound.name)});
       }
       if (mMessage.breakoutRoomSignal.message === 'participantMoved' && ((roomNameFound && !roomNameFound["member"].includes(mSession.user.name)) || (!roomNameFound && roomAssigned))) {
-          mNotification.openNotification("Room changed by Host/Co-host", `You have been reassigned to Room: ${roomAssigned ? roomAssigned.name : "Main Room"}. Click confirm to join the room OR you will be directed to the room automatically after 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name : ''))
+          mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned ? roomAssigned.name : "Main Room"} in 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name : ''))
       }
     // eslint-disable-next-line
     }, [ mMessage.breakoutRoomSignal ])
 
     useEffect(() => {
-    if(mSession.user) mRoom.connect(mSession.user, "moderator");
+    if(mSession.user) mRoom.connect(mSession.user);
       // eslint-disable-next-line
     }, [ mSession.user ]);
 
@@ -90,10 +90,6 @@ export default function ModeratorPage() {
       if (mSubscriber.subscribers) subscriberRef.current = mSubscriber;
     }, [mSubscriber.subscribers, mSubscriber] )
 
-    function handleChangeRoom(roomName = '') {
-      mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, roomName);
-    }
-
     useEffect(() => {
       if (mMessage.breakoutRooms.length !== 0 ) setIsBreakout(true);
     }, [mMessage.breakoutRooms])
@@ -104,12 +100,16 @@ export default function ModeratorPage() {
       }
     }, [mMessage.timer])
 
+    function handleChangeRoom(roomName = '') {
+      mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, roomName);
+    }
+
     if(!mSession.user && !mSession.session) {
     return (
         <AskNameDialog 
           pin={config.moderatorPin}
           role="moderator"
-          onSubmit={(user, room) => { mRoom.createMainRoom(user, room);}}
+          onSubmit={(user, room) => { mRoom.joinMainRoom(user, room);}}
         />
       )
     }

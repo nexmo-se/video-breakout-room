@@ -1,17 +1,15 @@
-import { useState } from "react"
-import { Drawer, List, Popconfirm } from "antd";
-import Avatar from "react-avatar";
-import useSession from "hooks/session";
-import Button from "components/Button";
-import People from "@material-ui/icons/Work"
-import useMessage from "hooks/message";
-import RoomAPI from "api/room"
+import { Drawer, List, Popconfirm } from 'antd';
+import People from '@material-ui/icons/Work';
+import Avatar from 'react-avatar';
+import Button from 'components/Button';
+import useSession from 'hooks/session';
+import useMessage from 'hooks/message';
+import RoomAPI from 'api/room';
 
 export default function LiveParticipantList({onClose, visible}) {
     const mSession = useSession();
     const mMessage = useMessage();
 
-    
     function handleChangeParticipantRole(name) {
         const newCoHostList = [...mMessage.cohosts];
         if (newCoHostList.includes(name)) {

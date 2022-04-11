@@ -22,9 +22,6 @@ class RoomAPI{
     });
   }
 
-  /**
-   * Update first, then Select again
-   */
   static async renameRoom(room, newRoomName){
     try {
       await DatabaseAPI.query(async (client) => {

@@ -1,15 +1,15 @@
 
-import { useState } from "react";
-import { InputNumber, Checkbox } from "antd";
-import Button from "components/Button"
-import RoomAPI from "api/room"
-import useSession from "hooks/session";
+import { useState } from 'react';
+import { InputNumber, Checkbox } from 'antd';
+import Button from 'components/Button';
+import RoomAPI from 'api/room';
+import useSession from 'hooks/session';
 
 export default function SetTimerContent({setShowSetTimer}) {
 
     const [ isManualReturn, setIsManualReturn ] = useState(false);
     const [ period, setPeriod ] = useState(10);
-    const [ countDownTimer , setCountDownTimer ] = useState(120);
+    const [ countDownTimer , setCountDownTimer ] = useState(30);
     const mSession = useSession();
 
     function handleSetTimer() {

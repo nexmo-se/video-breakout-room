@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Radio } from "antd";
-import useMessage from "hooks/message";
-import Person from "@material-ui/icons/Person"
-import { Collapse } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Collapse, Modal, Radio } from 'antd';
+import Person from '@material-ui/icons/Person';
+import useMessage from 'hooks/message';
 const { Panel } = Collapse;
 
 
@@ -40,7 +39,6 @@ export default function PromptChooseRooms(props) {
       if(activeRoom) {
         setButtonDisabled(false)
       }
-
     }, [activeRoom])
 
     function handleRoomChange(e) {
@@ -76,7 +74,7 @@ export default function PromptChooseRooms(props) {
                 value.map((participant, i) => (
                     <h6 key={"participant-" + i}><Person></Person>{participant}</h6>
                 ))
-                }
+            }
             </Panel>
         )})
         }

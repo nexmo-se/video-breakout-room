@@ -1,10 +1,10 @@
 
-import { useEffect, useState } from "react"
-import Alarm from "@material-ui/icons/Alarm"
-import useMessage from "hooks/message";
-import useRoom from "hooks/room";
-import useSession from "hooks/session";
-import useNotification from "hooks/notification";
+import { useEffect, useState } from 'react';
+import Alarm from '@material-ui/icons/Alarm';
+import useMessage from 'hooks/message';
+import useRoom from 'hooks/room';
+import useSession from 'hooks/session';
+import useNotification from 'hooks/notification';
 
 export default function CountDownTimer({handleChangeRoom}) {
     const [ showCountDownTimer, setShowCountDownTimer ] = useState(false);
@@ -44,18 +44,18 @@ export default function CountDownTimer({handleChangeRoom}) {
     }, [countDown])
 
     function exitBreakoutRoom() {
-        if (mMessage.timer && mMessage.timer.isManualReturn && mRoom.inBreakoutRoom) {
-            mNotification.openNotification("Breakout Room Session Ended", `Please return to Main Room`, () => {})
+        if (!mMessage.timer || !mRoom.inBreakoutRoom) return; 
+        if (mMessage.timer.isManualReturn) {
+            mNotification.openNotification("Breakout Room Session Ended", `Please return to Main Room.`, () => {})
         }
-        else if (mMessage.timer && !mMessage.timer.isManualReturn && mRoom.inBreakoutRoom) {
-            mNotification.openNotification("Breakout Room Session Ended", `Please return to Main Room`, () => {handleChangeRoom()})
+        else if (!mMessage.timer.isManualReturn) {
+            mNotification.openNotification("Breakout Room Session Ended", `You will be redirected to main session in 5 seconds.`, () => {handleChangeRoom()})
         }
     }
 
     if (!showCountDownTimer) {
         return (null)
     }
-
     return (
         <div style={{position: "absolute", left: "16px", bottom: "16px", color: "white"}}>
             <Alarm style={{fontSize: "32px", verticalAlign: "bottom"}}></Alarm>

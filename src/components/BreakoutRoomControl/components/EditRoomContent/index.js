@@ -1,9 +1,9 @@
 
 import { Input, InputNumber, Form } from 'antd';
 import Button from 'components/Button'
-import RoomAPI from "api/room";
-import useMessage from "hooks/message";
-import useSession from "hooks/session";
+import RoomAPI from 'api/room';
+import useMessage from 'hooks/message';
+import useSession from 'hooks/session';
 
 export default function EditRoomContent(props) {
    const { roomName, maxParticipant, selectedRoom, setIsLoading, setSelectedRoom } = props
@@ -49,7 +49,7 @@ export default function EditRoomContent(props) {
         <Form.Item
         label="Room Name"
         name={roomName}
-        rules={[{ required: true, message: 'Please input a room name!' }]}
+        rules={[{ required: true, message: 'Missing input: Room name' }]}
         initialValue={roomName}
     >
         <Input/>
@@ -57,7 +57,7 @@ export default function EditRoomContent(props) {
         <Form.Item
         label="Max Participants"
         name={roomName + '-maxParticipants'}
-        rules={[{ required: true, message: 'Please input max participants!' }]}
+        rules={[{ required: true, message: 'Missing input: Max participants' }]}
         initialValue={maxParticipant}
     >
         <InputNumber min={1}/>

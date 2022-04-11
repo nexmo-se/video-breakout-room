@@ -1,23 +1,22 @@
-import { useEffect, useState } from "react";
-import useStyles from "./styles";
-import useRoom from "hooks/room"
-import useSession from "hooks/session"
-import useMessage from "hooks/message"
-import clsx from "clsx";
-import ActionButtons from "./components/ActionButtons";
-import AddRoomContent from "./components/AddRoomContent"
-import SetTimerContent from "./components/SetTimerContent"
-
-
+import { useEffect, useState } from 'react';
 import { Collapse, Popconfirm, Popover } from 'antd';
-import Button from 'components/Button'
-import RoomAPI from "api/room";
-import ParticipantList from "./components/ParticipantList";
-import Chat from "@material-ui/icons/Chat";
-import HourglassEmpty from "@material-ui/icons/HourglassEmpty";
 
+import Chat from '@material-ui/icons/Chat';
+import HourglassEmpty from '@material-ui/icons/HourglassEmpty';
+import ActionButtons from './components/ActionButtons';
+import AddRoomContent from './components/AddRoomContent';
+import SetTimerContent from './components/SetTimerContent';
+import MessageRoomContent from './components/MessageRoomContent';
+import ParticipantList from './components/ParticipantList';
+import Button from 'components/Button';
 
-import MessageRoomContent from "./components/MessageRoomContent";
+import clsx from 'clsx';
+import useStyles from './styles';
+import useRoom from 'hooks/room';
+import useSession from 'hooks/session';
+import useMessage from 'hooks/message';
+import RoomAPI from 'api/room';
+
 const { Panel } = Collapse;
 
 export default function BreakoutRoomControl(props) {
@@ -44,26 +43,32 @@ export default function BreakoutRoomControl(props) {
         let newRoomGroup = {
             "Main Room": []
         };
-        let participantAssigned = [];
-        let participantUnAssigned = [];
+        let participantJoined = [];
+        let participantNotJoin = [];
         mMessage.breakoutRooms.forEach((room) => {
-            newRoomGroup[room.name] = room.member;
-            participantAssigned = participantAssigned.concat(room.member);
+            const roomMember = room.member.concat(room.memberAssigned.map((member) => member + ' (joining)'));
+            newRoomGroup[room.name] = roomMember;
+            participantJoined = participantJoined.concat(room.member.concat(room.memberAssigned));
         })
         mSession.participants.forEach((user) => {
-            if (!participantAssigned.includes(user.name)) {
-                participantUnAssigned.push(user.name);
+            if (participantJoined.includes(user.name)) return;
+            if (user.name === mSession.user.name || (mSession.allRoomsStreams.length !== 0 && mSession.allRoomsStreams[mSession.mainSession.sessionId].find((session) => session.name === user.name))) {
+                participantNotJoin.push(user.name);
+            }
+            else {
+                participantNotJoin.push(user.name + ' (joining)');
             }
         })
-        newRoomGroup["Main Room"] = participantUnAssigned;
+        newRoomGroup["Main Room"] = participantNotJoin;
 
-        if (participantAssigned.length === 0 && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
+        if (participantJoined.length === 0 && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
             handleCloseAllRoom();
             RoomAPI.sendCountDownTimer(mSession.mainSession, {});
         }
         setRoomGroup(newRoomGroup);
         setIsLoading(false);
-    }, [mMessage.breakoutRooms, mSession.participants, setIsBreakout])
+    }, [mMessage.breakoutRooms, mSession.participants, setIsBreakout, mSession.allRoomsStreams[mSession.mainSession.sessionId]])
+
     
     const [ position, setPosition ] = useState({
         diffX: 0,
@@ -144,14 +149,13 @@ export default function BreakoutRoomControl(props) {
           return(
             <Panel header={key + ' (' + value.length + ')'} key={"chooseroom-" + i} 
             extra={<ActionButtons 
-                index={i} 
                 roomName={key} 
                 setIsLoading={setIsLoading}
                 handleChangeRoom={handleChangeRoom}/>}
             >
             <ParticipantList 
                 roomName={key}
-                roomOption = {Object.keys(roomGroup)}
+                roomOptions = {Object.keys(roomGroup)}
                 participantList= {value}
             />                    
             </Panel>

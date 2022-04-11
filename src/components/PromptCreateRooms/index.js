@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Form, InputNumber, Radio, Input } from "antd";
-import useRoom from "hooks/room";
-import useSession from "hooks/session";
-import RoomAPI from "api/room"
-import useMessage from "hooks/message";
-
+import React, { useEffect, useState } from 'react';
+import { Modal, Form, InputNumber, Radio, Input } from 'antd';
+import useRoom from 'hooks/room';
+import useSession from 'hooks/session';
+import useMessage from 'hooks/message';
+import RoomAPI from 'api/room';
 
 export default function PromptCreateRooms(props) {
   const [form] = Form.useForm();
@@ -35,18 +34,12 @@ export default function PromptCreateRooms(props) {
         data.push({name: roomName, maxParticipants: maxParticipants})
       }
 
-
       return mRoom.handleRoomCreate(data).then((response) => {
         const participants = mSession.participants.filter((p) => (p.role !== "moderator" && !mMessage.cohosts.includes(p.name))).map((p) => p.name);
         if (formValue.modifier === "automatic" && participants.length !== 0) {
           participants.sort(()=> { return 0.5 - Math.random()});
           response.forEach((data) => {
-              data["member"] = participants.splice(0, data["maxParticipants"]);
-          })
-        }
-        else {
-          response.forEach((data) => {
-            data["member"] = [];
+              data["memberAssigned"] = participants.splice(0, data["maxParticipants"]);
           })
         }
 
@@ -69,8 +62,6 @@ export default function PromptCreateRooms(props) {
       onCancel={onCancel}
       cancelText={cancelText}
       closable={true}
-      getContainer={false}
-      forceRender
     >
       <Form
         form={form}
@@ -80,7 +71,7 @@ export default function PromptCreateRooms(props) {
       >
         <div>Assign {numberOfParticipants} participants into <Form.Item
           name="roomCount"
-          rules={[{ required: true, message: 'Please input the number of breakout rooms!' }]}
+          rules={[{ required: true, message: 'Missing input: number of breakout rooms' }]}
           style={{width: "92px", display: "inline-block"}}
         >
           <InputNumber min={1} onChange={handleRoomChange}/>
@@ -90,7 +81,7 @@ export default function PromptCreateRooms(props) {
               <Form.Item
               label="Room Name"
               name={`roomName ${i+1}`}
-              rules={[{ required: true, message: 'Please input a room name!' }]}
+              rules={[{ required: true, message: 'Missing input: Room name' }]}
               style={{marginRight: "24px"}}
               initialValue={`Room ${i+1}`}
             >
@@ -99,7 +90,7 @@ export default function PromptCreateRooms(props) {
               <Form.Item
               label="Max Participants"
               name={`maxParticipants ${i+1}`}
-              rules={[{ required: true, message: 'Please input max participants!' }]}
+              rules={[{ required: true, message: 'Missing input: Max participants' }]}
               initialValue={1}
             >
               <InputNumber min={1}/>

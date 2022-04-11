@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import useMessage from "hooks/message";
-import useSession from "hooks/session";
-import useRoom from "hooks/room";
+import useMessage from 'hooks/message';
+import useSession from 'hooks/session';
+import useRoom from 'hooks/room';
 
-import RaiseHandButton from "components/RaiseHandButton";
+import RaiseHandButton from 'components/RaiseHandButton';
 
 import Alert from '@mui/material/Alert';
 import useStyles from "./styles";
@@ -15,13 +15,13 @@ export default function MessageBar(props) {
   const mSession = useSession();
   const mRoom = useRoom();
   
-  // sometimes seeing both mRoom.inBreakoutRoom and mRoom.mainRoom are undefined..
   const currentRoom = mRoom.inBreakoutRoomId ?? mRoom.mainRoom;
 
   if (!mSession.user || !currentRoom) {
     return null;
   } 
-  else if ( "moderator" === mSession.user.role 
+  else if ( ("moderator" === mSession.user.role ||
+            mMessage.cohosts.includes(mSession.user.name))
             && mMessage.raisedHands 
             && mMessage.raisedHands.length > 0 
   ) {
