@@ -7,6 +7,7 @@ export default function AskNameDialog(props) {
   const [name, setName] = useState('');
   const [room, setRoom] = useState('');
   const [inputPin, setInputPin] = useState('');
+  const [disabled, setDisabled] = useState(false);
 
   const styles = {
     container: {
@@ -17,6 +18,7 @@ export default function AskNameDialog(props) {
 
   function handleSubmit(e) {
       e.preventDefault();
+      setDisabled(true);
       if(!name || !room) alert("Please fill in all fields");
       else if(onSubmit && inputPin === pin) {
         const user = new User(name, role);
@@ -36,7 +38,7 @@ export default function AskNameDialog(props) {
           <TextInput label="Password*" type="password" text={inputPin} onChange={setInputPin} placeholder="PIN" autocomplete="on"/>
         </div>
         <div className="Vlt-card__footer Vlt-card__footer--noborder">
-          <button type="submit" className="Vlt-btn Vlt-btn--primary Vlt-btn--app" onClick={handleSubmit}>Join</button>
+          <button type="submit" disabled={disabled} className="Vlt-btn Vlt-btn--primary Vlt-btn--app" onClick={handleSubmit}>Join</button>
         </div>
       </div>
     </form>

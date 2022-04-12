@@ -62,7 +62,7 @@ export default function ModeratorPage() {
           mNotification.openNotification("Room removed by Host/Co-host", "You will be redirected to main session in 5 seconds.",  () => handleChangeRoom())
       }
       if (mMessage.breakoutRoomSignal.message === 'roomEdited' && !roomNameFound && roomSessionIdFound) {
-         mNotification.openNotification("Room renamed by Host/Co-host", "New Room Name: " + mRoom.inBreakoutRoom, ()=>{mRoom.setInBreakoutRoom(roomSessionIdFound.name)});
+         mNotification.openNotification("Room renamed by Host/Co-host", "New Room Name: " + roomSessionIdFound.name, ()=>{mRoom.setInBreakoutRoom(roomSessionIdFound.name)});
       }
       if (mMessage.breakoutRoomSignal.message === 'participantMoved' && ((roomNameFound && !roomNameFound["member"].includes(mSession.user.name)) || (!roomNameFound && roomAssigned))) {
           mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned ? roomAssigned.name : "Main Room"} in 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name : ''))

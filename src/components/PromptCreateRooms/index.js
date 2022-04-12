@@ -17,8 +17,9 @@ export default function PromptCreateRooms(props) {
   const [ numberOfRooms, setNumberOfRooms] = useState(1);
 
     useEffect(() => {
-      setNumberOfParticipants(mSession.participants.length);
-    }, [mSession.participants.length])
+      // exclude co-hosts and moderator
+      setNumberOfParticipants(mSession.participants.length - mMessage.cohosts.length - 1);
+    }, [mSession.participants.length, mMessage.cohosts])
 
     function handleRoomChange(value) {
       setNumberOfRooms(value);

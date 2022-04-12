@@ -20,8 +20,7 @@ export default function MessageBar(props) {
   if (!mSession.user || !currentRoom) {
     return null;
   } 
-  else if ( ("moderator" === mSession.user.role ||
-            mMessage.cohosts.includes(mSession.user.name))
+  else if ( "moderator" === mSession.user.role
             && mMessage.raisedHands 
             && mMessage.raisedHands.length > 0 
   ) {

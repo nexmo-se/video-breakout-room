@@ -1,5 +1,6 @@
 // @flow
 import { useState , useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 
 import HangupButton from 'components/HangupButton';
 import MuteButton from 'components/MuteButton';
@@ -9,12 +10,14 @@ import useStyles from './styles';
 import useSession from 'hooks/session';
 import useRoom from 'hooks/room';
 
+
 function VideoControl({ publisher, children }){
   const [ hasAudio, setHasAudio ] = useState(true);
   const [ hasVideo, setHasVideo ] = useState(true);
   const mSession = useSession();
   const mStyles = useStyles();
   const mRoom = useRoom();
+  const navigate = useNavigate();
 
   function handleVideoClick(){
     setHasVideo((prevVideo) => !prevVideo);
@@ -27,7 +30,7 @@ function VideoControl({ publisher, children }){
   function handleHangupClick(){
     mRoom.handleExitRoom();
     mSession.session.disconnect();
-    window.location.replace("/thank-you");
+    navigate("/thank-you");
   }
 
   useEffect(() => {
