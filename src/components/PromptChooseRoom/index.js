@@ -72,7 +72,8 @@ export default function PromptChooseRooms(props) {
             <Panel header={key + ' (' + value.length + ')'} key={"chooseroom-" +i} extra={genExtra()}>
             {
                 value.map((participant, i) => (
-                    <h6 key={"participant-" + i}><Person></Person>{participant}</h6>
+                    <h6 key={"participant-" + i}><Person style={{marginRight: "12px", marginLeft:"24px", verticalAlign:"bottom", fontSize: "18px"
+                  }}></Person>{participant}</h6>
                 ))
             }
             </Panel>
