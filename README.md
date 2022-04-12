@@ -37,7 +37,7 @@ You need to setup some environment variables
   - `REACT_APP_PARTICIPANT_PIN` -- pin number for participant to join in
 
 ## Architecture
-This townhall application contains `backend` and `frontend`. However, the `backend` needs a database to store session information. You need to install `postgres` for the database. Any other than `postgres` will not work.
+This Breakout Room application contains `backend` and `frontend`. However, the `backend` needs a database to store session information. You need to install `postgres` for the database. Any other than `postgres` will not work.
 
   - Backend -- we use `express`
   - Frontend -- we use `ReactJS`
@@ -45,7 +45,7 @@ This townhall application contains `backend` and `frontend`. However, the `backe
 
 
 ## Deploy to Heroku
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/nexmo-se/townhall)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/nexmo-se/video-breakout-room)
 
 ## Manual Deployment
 This section is for manual deployment. It means you need to have a 
