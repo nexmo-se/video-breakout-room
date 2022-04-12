@@ -1,70 +1,68 @@
-# Getting Started with Create React App
+# Vonage Video Breakout Room Demo App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Breakout rooms are additional rooms where you can split from main session for participants to work in separate, smaller groups.
 
-## Available Scripts
+The Breakout Room app has following roles:
+  - Single Moderator -- moderator full control of breakout room features,  moderator can add/remove participants’ co-hosts permissions.
+  - Multiple Co-Host -- Co-Host has full control of breakout room features
+  - Multiple Participant -- participant can join a breakout room and return to the main room
 
-In the project directory, you can run:
 
-### `npm start`
+Moderator/Co-host:
+  - Create, Edit, Remove breakout rooms sessions
+  - Allow participants to choose a room
+  - Join and Leave a breakout room
+  - Move participants to across rooms
+  - Send message to specific room
+  - Broadcast message to all rooms
+  - Set Countdown timer to end the breakout rooms.
+  - Moderator's privilege: Promote participant to Co-Host
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Participants:
+  - Join a breakout room
+  - Return to main session
+  - Request moderator's help from breakout room
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+When you first launch the app, you will be asked to enter a main session room name. Ensure both moderator and participant have the same room name so they can join the same main session.
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Environment Variables
+You need to setup some environment variables 
 
-### `npm run build`
+  - `PORT` -- this variable works only for manual deployment. Heroku deployment will automatically fill the value.
+  - `API_KEY` -- your Vonage Video API - API Key
+  - `API_SECRET` -- your Vonage Video API - API Secret
+  - `DATABASE_URL` -- this variable works only for manual deployment. Heroku deployment will automatically fill the value.
+  - `REACT_APP_MODERATOR_PIN` -- pin number for moderator to join in
+  - `REACT_APP_PARTICIPANT_PIN` -- pin number for participant to join in
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Architecture
+This townhall application contains `backend` and `frontend`. However, the `backend` needs a database to store session information. You need to install `postgres` for the database. Any other than `postgres` will not work.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  - Backend -- we use `express`
+  - Frontend -- we use `ReactJS`
+  - Database -- we use `postgres`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+## Deploy to Heroku
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/nexmo-se/townhall)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Manual Deployment
+This section is for manual deployment. It means you need to have a 
+  
+  - Linux machine with `SSH`. Make sure you can `SSH` to your machine.
+  - `NodeJS` installed
+  - `yarn` or `npm` installed
+  - `postgres` installed 
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Once you satisfy the requirements, you can proceed to below steps.
+  
+  - Clone and navigate inside this repository.
+  - Rename `.env.example` to `.env` and fill in the environment variable.
+  - Build the package by typing `yarn build` if you are using `yarn` or `npm run build` if you are using `npm`
+  - Start the server `yarn start:express:prod` or `npm run start:express:prod`
+  - Open your web browser. For example `http://localhost:3002`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+The local deployment has been done. You can use various technology such as `ngrok` or `nginx` to make it public. Furthermore, for this demo to run smoothly in public, you need `https` or `SSL`. 
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+`ngrok` will automatically grant you `SSL` certificate. However, if `nginx` was choose as public deployment, you can use `Let's Encrypt` to get your free `SSL` certificate.

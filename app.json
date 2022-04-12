@@ -1,0 +1,38 @@
+{
+    "name": "Breakout Rooms Web App",
+    "description": "A reference application for creating breakout rooms from the main meeting",
+    "repository": "https://github.com/nexmo-se/video-breakout-room",
+    "logo": "https://node-js-sample.herokuapp.com/node.png",
+    "addons": [
+      {
+        "plan": "heroku-postgresql:hobby-dev",
+        "options": {
+          "version": "11"
+        }
+      }
+    ],
+    "env": {
+      "PGSSLMODE": {
+        "description": "SSL Mode for PG. Set it to no-verify",
+        "value": "no-verify",
+        "required": true
+      },
+      "API_KEY": {
+        "desription": "Vonage Video API - API Key",
+        "required": true
+      },
+      "API_SECRET" : {
+        "description": "Vonage Video API - API Secret",
+        "required": true
+      },
+      "REACT_APP_MODERATOR_PIN": {
+        "description": "Pin for moderator to log in",
+        "required": true
+      },
+      "REACT_APP_PARTICIPANT_PIN": {
+        "description": "Pin for participant to log in",
+        "required": true
+      }
+    }
+  }
+  
