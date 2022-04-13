@@ -18,9 +18,9 @@ export default function AskNameDialog(props) {
 
   function handleSubmit(e) {
       e.preventDefault();
-      setDisabled(true);
       if(!name || !room) alert("Please fill in all fields");
       else if(onSubmit && inputPin === pin) {
+        setDisabled(true);
         const user = new User(name, role);
         onSubmit(user, room);
       }else if(inputPin !== pin) alert("Wrong PIN");
