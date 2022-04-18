@@ -15,9 +15,7 @@ export default function MessageBar(props) {
   const mSession = useSession();
   const mRoom = useRoom();
   
-  const currentRoom = mRoom.inBreakoutRoomId ?? mRoom.mainRoom;
-
-  if (!mSession.user || !currentRoom) {
+  if (!mSession.user || !mRoom.currentRoom) {
     return null;
   } 
   else if ( "moderator" === mSession.user.role
@@ -38,7 +36,7 @@ export default function MessageBar(props) {
     return (<div className={mStyle.container}>
       <RaiseHandButton 
         user={mSession.user}
-        room={currentRoom}
+        room={mRoom.currentRoom.id}
       /> 
     </div>)
   } else {

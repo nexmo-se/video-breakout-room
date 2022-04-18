@@ -7,6 +7,7 @@ import OT from "@opentok/client";
 
 function usePublisher(containerId, autoLayout=true, displayName=true){
   const [ publisher, setPublisher ] = useState();
+
   const [ stream, setStream ] = useState();
   const [ layoutManager, setLayoutManager ] = useState(new LayoutManager(containerId));
   const [ onAccessDenied, setOnAccessDenied ] = useState();
@@ -16,13 +17,12 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
     setPublisher(undefined);
   }
 
-  function handleStreamCreated({ stream }){
-    setStream(stream);
+  function handleStreamCreated(e){
+    setStream(e.stream);
   }
 
   function handleStreamDestroyed(e){
     if (e.stream.name !== "sharescreen") e.preventDefault();
-    setStream(null);
   }
 
   function handleAccessDenied(){
@@ -56,6 +56,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
 
       if (!publisher) {
         const initPublisher = OT.initPublisher(containerId, finalOptions);
+
         mSession.session.publish(initPublisher);
         setPublisher(initPublisher);
       }

@@ -8,20 +8,31 @@ import Message from 'entities/message';
 
 import TextInput from 'components/TextInput';
 import Button from 'components/Button';
+import useMessage from 'hooks/message';
 
 
 function ChatInput({ byPass, toBreakoutRoom, resetSelectedRoom }){
   const [ text, setText ] = useState("");
   const mSession = useSession();
   const mRoom = useRoom();
+  const mMessage = useMessage();
 
   function handleClick(e){
     if(e) e.preventDefault();
     const isApproved = (byPass)? true: false;
-    const fromRoomName = mRoom.inBreakoutRoom ? mRoom.inBreakoutRoom : "Main Room";
+    const fromRoomName = mRoom.currentRoom.name;
     const message = new Message(fromRoomName, toBreakoutRoom ?? null, mSession.user, text, isApproved);
-        
-    MessageAPI.sendMessage(toBreakoutRoom ? mSession.mainSession: mSession.session, message);
+    
+    if (toBreakoutRoom) {
+      let toBreakoutRoomInfo = mMessage.breakoutRooms.find((room) => room.name === toBreakoutRoom)
+
+      toBreakoutRoom === 'all' ? 
+      MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'message', message) :
+      MessageAPI.crossRoomMsg(mRoom.currentRoom.id, toBreakoutRoomInfo.id, 'message', message)
+    }
+    else {
+      MessageAPI.sendMessage(mSession.session, message);
+    }
     setText("");
     if( resetSelectedRoom) resetSelectedRoom();
   }

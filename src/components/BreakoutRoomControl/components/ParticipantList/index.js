@@ -7,7 +7,7 @@ import Button from 'components/Button';
 
 export default function ParticipantList(props) {
 
-    const { roomName, participantList, styles, roomOptions } = props;
+    const { roomName, participantList, setIsLoading, styles, roomOptions } = props;
     const [ selectedParticipant, setSelectedParticipant ] = useState();
 
 
@@ -17,6 +17,8 @@ export default function ParticipantList(props) {
                 defaultRoom={roomName}
                 roomOptions={roomOptions}
                 selectedParticipant={selectedParticipant}
+                setSelectedParticipant={setSelectedParticipant}
+                setIsLoading = {setIsLoading}
             ></MoveRoomContent>
         )
     }

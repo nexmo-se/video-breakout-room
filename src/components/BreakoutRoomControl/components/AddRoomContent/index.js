@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Input, InputNumber } from 'antd';
-import RoomAPI from 'api/room';
+import MessageAPI from 'api/message';
 import Button from 'components/Button';
 import useMessage from "hooks/message";
 import useSession from "hooks/session";
@@ -30,9 +30,10 @@ export default function AddRoomContent(props) {
             let newRoom = response.find((room) => room.name === roomName);
             newRoom["memberAssigned"] = [];
             newRoom["member"] = [];
+            return MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "roomAdded", "breakoutRooms": [...mMessage.breakoutRooms, newRoom]});
+        }).then(() => {
             setIsLoading(false);
-            RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "roomAdded", "breakoutRooms": [...mMessage.breakoutRooms, newRoom]});
-        });
+        })
     }
 
     return (

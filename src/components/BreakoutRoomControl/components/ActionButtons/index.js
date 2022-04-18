@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Popconfirm, Popover } from 'antd';
 import Delete from "@material-ui/icons/Delete";
 import Edit from "@material-ui/icons/Edit";
@@ -11,7 +11,7 @@ import MessageRoomContent from '../MessageRoomContent';
 import useMessage from 'hooks/message';
 import useRoom from 'hooks/room';
 import useSession from "hooks/session";
-import RoomAPI from "api/room";
+import MessageAPI from "api/message";
 
 export default function ActionButtons(props) {
     const {roomName, setIsLoading, handleChangeRoom, styles} = props;
@@ -47,25 +47,40 @@ export default function ActionButtons(props) {
         )
     }
 
-    function handleDeleteRoom(roomName) {
+    async function handleDeleteRoom(roomName) {
         setIsLoading(true);
         const newRooms = [...mMessage.breakoutRooms];
         let targetIndex = newRooms.findIndex((room) => room.name === roomName);
-        
-        mRoom.handleRoomRemove(newRooms[targetIndex].id).then((response) => {
-            newRooms.splice(targetIndex, 1);
-            setIsLoading(false);
-            RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "roomRemoved", "breakoutRooms": newRooms})
-        })
+
+        newRooms.splice(targetIndex, 1);
+        await MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "roomRemoved", "breakoutRooms": newRooms});
+        await mRoom.handleRoomRemove(mMessage.breakoutRooms[targetIndex].id);
+        setIsLoading(false);
     }
 
-    function handleJoinRoom(e) {
-        if (mRoom.inBreakoutRoom === e.target.value) {
+    async function handleJoinRoom(e) {
+        setIsLoading(true);
+        if (mRoom.currentRoom.name === e.target.value) {
             return handleChangeRoom();
         }
-        handleChangeRoom(e.target.value);
+        return handleChangeRoom(e.target.value);
     }
 
+    useEffect(() => {
+        if (mRoom.inBreakoutRoom) {
+            const room = mMessage.breakoutRooms.find((room) => room.name === mRoom.inBreakoutRoom.name)
+            if (room.member.includes(mSession.user.name)) {
+                setIsLoading(false);
+            }
+        }
+        else {
+            let isMainRoom = true;
+            mMessage.breakoutRooms.forEach((room) => {
+                if(room.member.includes(mSession.user.name)) isMainRoom = false; 
+            }) 
+            if (isMainRoom) setIsLoading(false);
+        }
+    }, [mRoom.inBreakoutRoom, mMessage.breakoutRooms])
 
     return (
             roomName !== "Main Room"? 
@@ -86,7 +101,7 @@ export default function ActionButtons(props) {
                 >
                 <Button hierarchy="link" text={<Delete style={styles.icon}/>} key={'delete-' + roomName} style={styles.button}></Button> 
             </Popconfirm>
-            <Button value={roomName} text={mRoom.inBreakoutRoom === roomName ? "Leave" : "Join"} key={'joinroom-' + roomName} onClick={handleJoinRoom} style={{...styles.button,  padding: "0px 4px"}}></Button> 
+            <Button value={roomName} text={mRoom.currentRoom.name === roomName ? "Leave" : "Join"} key={'joinroom-' + roomName} onClick={handleJoinRoom} style={{...styles.button,  padding: "0px 4px"}}></Button> 
             </>
             : null
       ); 

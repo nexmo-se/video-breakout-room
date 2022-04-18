@@ -1,20 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Select } from 'antd';
 import useMessage from 'hooks/message';
-import useSession from 'hooks/session';
 import Button from 'components/Button';
-import RoomAPI from 'api/room';
+import MessageAPI from 'api/message';
+import useRoom from 'hooks/room';
 const { Option } = Select
 
 
 export default function MoveRoomContent(props) {  
     
-    const { defaultRoom, roomOptions, selectedParticipant, styles } = props;
+    const { defaultRoom, roomOptions, selectedParticipant, setSelectedParticipant, setIsLoading, styles } = props;
     const [ selectedParticipantRoom, setSelectedParticipantRoom ] = useState();
     const mMessage = useMessage();
-    const mSession = useSession();
+    const mRoom = useRoom();
 
     function handleMoveRoom() {
+        setIsLoading(true);
+        setSelectedParticipant(null);
         const newRooms = mMessage.breakoutRooms.map(room => ({...room}));
         let targetRoomIndex = newRooms.findIndex((room) => room.name === selectedParticipantRoom);
         let prevRoomIndex = newRooms.findIndex((room) => room["member"].includes(selectedParticipant));
@@ -34,8 +36,13 @@ export default function MoveRoomContent(props) {
             newRooms[prevRoomIndex]["member"] = [...newRooms[prevRoomIndex]["member"]].filter((a) => a !== selectedParticipant);
         }
 
-        RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "participantMoved", "breakoutRooms": newRooms});
+        MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "participantMoved", "breakoutRooms": newRooms});
+        
     }
+
+    useEffect(() => {
+        setIsLoading(false);
+    }, [mMessage.breakoutRooms])
 
     return (
     <>

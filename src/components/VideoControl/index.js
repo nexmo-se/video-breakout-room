@@ -9,6 +9,8 @@ import VideoButton from 'components/VideoButton';
 import useStyles from './styles';
 import useSession from 'hooks/session';
 import useRoom from 'hooks/room';
+import MessageAPI from 'api/message';
+import useMessage from 'hooks/message';
 
 
 function VideoControl({ publisher, children }){
@@ -17,6 +19,7 @@ function VideoControl({ publisher, children }){
   const mSession = useSession();
   const mStyles = useStyles();
   const mRoom = useRoom();
+  const mMessage = useMessage();
   const navigate = useNavigate();
 
   function handleVideoClick(){
@@ -28,8 +31,6 @@ function VideoControl({ publisher, children }){
   }
 
   function handleHangupClick(){
-    mRoom.handleExitRoom();
-    mSession.session.disconnect();
     navigate("/thank-you");
   }
 

@@ -3,7 +3,7 @@ import { Modal, Form, InputNumber, Radio, Input } from 'antd';
 import useRoom from 'hooks/room';
 import useSession from 'hooks/session';
 import useMessage from 'hooks/message';
-import RoomAPI from 'api/room';
+import MessageAPI from 'api/message';
 
 export default function PromptCreateRooms(props) {
   const [form] = Form.useForm();
@@ -13,13 +13,13 @@ export default function PromptCreateRooms(props) {
 
 
   const { when, onOK, onCancel, title, okText, cancelText } = props;
-  const [ numberOfParticipants, setNumberOfParticipants] = useState(mSession.participants.length);
+  const [ numberOfParticipants, setNumberOfParticipants] = useState(mMessage.participants.length);
   const [ numberOfRooms, setNumberOfRooms] = useState(1);
 
     useEffect(() => {
       // exclude co-hosts and moderator
-      setNumberOfParticipants(mSession.participants.length - mMessage.cohosts.length - 1);
-    }, [mSession.participants.length, mMessage.cohosts])
+      setNumberOfParticipants(mMessage.participants.length - mMessage.cohosts.length - 1);
+    }, [mMessage.participants.length, mMessage.cohosts])
 
     function handleRoomChange(value) {
       setNumberOfRooms(value);
@@ -36,7 +36,7 @@ export default function PromptCreateRooms(props) {
       }
 
       return mRoom.handleRoomCreate(data).then((response) => {
-        const participants = mSession.participants.filter((p) => (p.role !== "moderator" && !mMessage.cohosts.includes(p.name))).map((p) => p.name);
+        const participants = mMessage.participants.filter((p) => (p.role !== "moderator" && !mMessage.cohosts.includes(p.name))).map((p) => p.name);
         if (formValue.modifier === "automatic" && participants.length !== 0) {
           participants.sort(()=> { return 0.5 - Math.random()});
           response.forEach((data) => {
@@ -48,7 +48,7 @@ export default function PromptCreateRooms(props) {
           "message": "roomCreated (" + formValue.modifier + ")",
           "breakoutRooms": response
         }
-        RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, message)
+        MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', message);
       });
 
     }

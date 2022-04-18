@@ -169,9 +169,11 @@ class RoomAPI{
 
       sessions.push(room.sessionId);
 
-      room.breakoutRooms.forEach(e => {
-        sessions.push(e.sessionId)
-      });
+      if (room.breakoutRooms) {
+        room.breakoutRooms.forEach(e => {
+          sessions.push(e.sessionId)
+        });
+      }
       return Promise.resolve(sessions);
     }
     catch(err) {
@@ -192,6 +194,21 @@ class RoomAPI{
         res.push([_res, sessions[i], payload])
         // break;
       }
+      return Promise.resolve(res);
+    }
+    catch(err) {
+      console.error(err);
+      return Promise.resolve(false);
+    }
+  }
+
+  static async sendCrossRoomMsg(session, type = 'message', data = 'Hello') {
+    try {
+        let payload = {
+          type: type,
+          data: JSON.stringify(data)
+        }
+        let res = await RoomAPI.sendingSignal(session, payload);
       return Promise.resolve(res);
     }
     catch(err) {

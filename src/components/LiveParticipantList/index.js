@@ -4,13 +4,14 @@ import Avatar from 'react-avatar';
 import Button from 'components/Button';
 import useSession from 'hooks/session';
 import useMessage from 'hooks/message';
-import RoomAPI from 'api/room';
+import MessageAPI from 'api/message';
+import useRoom from 'hooks/room';
 
 export default function LiveParticipantList({onClose, visible}) {
-    const mSession = useSession();
     const mMessage = useMessage();
+    const mRoom = useRoom();
 
-    function handleChangeParticipantRole(name) {
+    async function handleChangeParticipantRole(name) {
         const newCoHostList = [...mMessage.cohosts];
         if (newCoHostList.includes(name)) {
             newCoHostList.splice(newCoHostList.indexOf(name), 1);
@@ -18,9 +19,9 @@ export default function LiveParticipantList({onClose, visible}) {
         else {
             newCoHostList.push(name);
         }
-        RoomAPI.sendCohostList(mSession.mainSession, newCoHostList);
-        RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "roomUpdate", "breakoutRooms": mMessage.breakoutRooms});
-        return;
+        await MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'co-host', newCoHostList);
+        MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "roomUpdate", "breakoutRooms": mMessage.breakoutRooms});        
+
     }
 
     return (
@@ -32,10 +33,10 @@ export default function LiveParticipantList({onClose, visible}) {
         visible={visible}
         key="left"
       >
-        { mSession.participants ?
+        { mMessage.participants.length !== 0 ?
         <List
             itemLayout="horizontal"
-            dataSource={mSession.participants}
+            dataSource={mMessage.participants}
             size="large"
             renderItem={item => {
             const isCohost = mMessage.cohosts.includes(item.name);

@@ -177,8 +177,7 @@ class RoomListener{
   static async broadcast(req, res, next) {
     try {
       const { roomId } = req.params;
-      const { data } = req.body;
-      const { type } = data ?? "raise-hand";
+      const { data, type } = req.body;
 
       if ( undefined === roomId ) throw new Error("Empty params");
 
@@ -191,7 +190,41 @@ class RoomListener{
       };
 
       var relatedSessions = await RoomAPI.getRelatedSessions(selectedRoom);
-      var tempRes = await RoomAPI.broadcastMsg(relatedSessions, type, data);
+      var tempRes = await RoomAPI.broadcastMsg(relatedSessions, type ?? 'raise-hand', data);
+
+      
+      res.json({
+        apiKey: process.env.API_KEY,
+        tempRes
+      });
+    } catch(err) {
+      console.error(err.stack);
+      res.json({
+        apiKey: process.env.API_KEY,
+        error: err.message
+      });
+    }
+  }
+
+  static async crossRoomMsg(req, res, next) {
+    try {
+      const { roomId } = req.params;
+      const { data, type, toRoomId } = req.body;
+
+      if ( undefined === roomId ) throw new Error("Empty params");
+
+      var room = new Room(roomId);
+      var [ selectedRoom ] = await RoomAPI.getDetailById(room);
+
+      var toRoom = new Room(toRoomId);
+      var [ selectedToRoom ] = await RoomAPI.getDetailById(toRoom);
+
+      data.fromRoom = {
+        id: selectedRoom.id,
+        name: selectedRoom.name ?? selectedRoom.id
+      };
+
+      var tempRes = await RoomAPI.sendCrossRoomMsg(selectedToRoom.sessionId, type ?? 'message', data);
 
       
       res.json({

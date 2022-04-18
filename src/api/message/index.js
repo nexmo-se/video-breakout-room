@@ -18,12 +18,37 @@ export default class MessageAPI{
 
   static async broadcastMsg(roomId, type, data) {
     if (undefined === roomId) return null;
-    data.type = type ?? 'raise-hand';
-    const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${roomId}/broadcast`;
+
+    if (!type) { type = 'raise-hand'};
+    // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${roomId}/broadcast`;
+    const apiURL = `http://localhost:3002/room/${roomId}/broadcast`;
     return fetch(apiURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ data: data })
+      keepalive: true,
+      body: JSON.stringify({ type, data})
+    })
+    .then(res => res.json())
+    .then(res => {
+      return Promise.resolve(res);
+    })
+    .catch(error => {
+        console.error(`HTTP error!!`, this.url, error);
+        return Promise.resolve(null);
+    });
+  }
+
+  static async crossRoomMsg(roomId, toRoomId, type, data) {
+    if (undefined === roomId || undefined === toRoomId) return null;
+
+    if (!type) { type = 'message'};
+    // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${roomId}/crossRoomMsg`;
+    const apiURL = `http://localhost:3002/room/${roomId}/crossRoomMsg`;
+
+    return fetch(apiURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type, toRoomId, data})
     })
     .then(res => res.json())
     .then(res => {

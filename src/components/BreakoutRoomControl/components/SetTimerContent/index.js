@@ -2,23 +2,26 @@
 import { useState } from 'react';
 import { InputNumber, Checkbox } from 'antd';
 import Button from 'components/Button';
-import RoomAPI from 'api/room';
-import useSession from 'hooks/session';
+import MessageAPI from 'api/message';
+import useRoom from 'hooks/room';
+import useMessage from 'hooks/message';
 
 export default function SetTimerContent({setShowSetTimer}) {
 
     const [ isManualReturn, setIsManualReturn ] = useState(false);
     const [ period, setPeriod ] = useState(10);
     const [ countDownTimer , setCountDownTimer ] = useState(30);
-    const mSession = useSession();
+    const mRoom = useRoom();
+    const mMessage = useMessage();
 
     function handleSetTimer() {
         setShowSetTimer(null);
-        RoomAPI.sendCountDownTimer(mSession.mainSession, {
+        MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'count-down-timer', {
             endTime: (new Date().getTime()) + (period * 60 * 1000),
             period,
             countDownTimer,
             isManualReturn
+
         });
     }
     return (

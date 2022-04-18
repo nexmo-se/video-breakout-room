@@ -1,15 +1,16 @@
 
 import { Input, InputNumber, Form } from 'antd';
-import Button from 'components/Button'
+import Button from 'components/Button';
 import RoomAPI from 'api/room';
+import MessageAPI from 'api/message';
 import useMessage from 'hooks/message';
-import useSession from 'hooks/session';
+import useRoom from 'hooks/room';
 
 export default function EditRoomContent(props) {
    const { roomName, maxParticipant, selectedRoom, setIsLoading, setSelectedRoom } = props
    const [form] = Form.useForm();
    const mMessage = useMessage();
-   const mSession = useSession();
+   const mRoom = useRoom();
 
    function handleEditRoom() {
     const formRoomName = form.getFieldValue(selectedRoom);
@@ -33,8 +34,9 @@ export default function EditRoomContent(props) {
     }
 
     Promise.all(p).then((response) => {
+        return MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "roomEdited", "breakoutRooms": newRooms});
+    }).then(() => {
         setIsLoading(false);
-        RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "roomEdited", "breakoutRooms": newRooms});
     })
 
 }

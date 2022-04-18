@@ -8,11 +8,12 @@ export const MessageContext = createContext({});
 export default function MessageProvider({ children }){
   const [ raisedHands, setRaisedHands ] = useState([]);
   const [ messages, setMessages ] = useState([]);
+  const [ participants, setParticipants] = useState([]);
   const [ breakoutRooms, setBreakoutRooms ] = useState([]);
   const [ breakoutRoomSignal, setBreakoutRoomSignal ] = useState();
   const [ timer, setTimer ] = useState();
   const [ cohosts, setCohosts ] = useState([]);
-  const [ roomSessionListeners, setSessionListeners ] = useState([]);
+  const [ roomSessionListeners, setSessionListeners ] = useState();
   const mSession = useSession();
 
   const sessionRef = useRef(null);
@@ -28,29 +29,49 @@ export default function MessageProvider({ children }){
   }
 
   useEffect(() => {
-    if (!mSession.participants) return;
-
+    if (!participants) return;
     const newRooms = [...breakoutRooms];
-
     // If moderator leave main session
-    if (!mSession.participants.find((user) => user.role === "moderator")) {
-      newRooms.forEach((room) => room["member"] = []);
-      setBreakoutRooms(newRooms);
+    if (!participants.find((user) => user.role === "moderator")) {
+      setBreakoutRooms([]);
+      setBreakoutRoomSignal({"message": "forceReturn", "breakoutRooms": []});
       setCohosts([]);
       return;
     }
-
-    const memberList = mSession.participants.reduce(
+    const memberList = participants.reduce(
       (acc, next) => {acc.push(next["name"]); return acc;},
-      []);
+      []);    
     newRooms.forEach((room) => {
       room["member"] = room["member"].filter((member) => memberList.includes(member));
-    })
+    });
     setBreakoutRooms(newRooms);
-  }, [mSession.participants])
+
+  }, [participants])
 
   useEffect(() => {
-    if(!mSession.session || roomSessionListeners.find((session) => session.sessionId === mSession.session.sessionId)) return;
+    if (!mSession.streams) return;
+    mSession.streams.forEach((stream) => {
+      if(!participants.find((user) => user.name === stream.name)) {
+        const data = JSON.parse(stream.connection.data);
+        const user = User.fromJSON(data);
+        setParticipants([...participants, user]);
+      }
+    })
+
+  }, [mSession.streams])
+
+  useEffect(() => {
+    if(!mSession.session) return;
+    if (roomSessionListeners) {
+      roomSessionListeners.off("signal:raise-hand");
+      roomSessionListeners.off("signal:message");
+      roomSessionListeners.off("signal:breakout-room");
+      roomSessionListeners.off("signal:join-breakout-room");
+      roomSessionListeners.off("signal:count-down-timer");
+      roomSessionListeners.off("signal:cohost");
+      roomSessionListeners.off("signal:participant-joined");
+    }
+
     mSession.session.on("signal:raise-hand", ({ data }) => {
       setRaisedHands((prevRaisedHands) => {
         const jsonData = JSON.parse(data);
@@ -66,13 +87,6 @@ export default function MessageProvider({ children }){
     mSession.session.on("signal:message", (e) => {
       const jsonData = JSON.parse(e.data)
       const message = Message.fromJSON(jsonData);
-
-      // Ignore chat from other rooms
-      if (!message.toBreakoutRoom && e.target.sessionId !== sessionRef.current.sessionId) return;
-      if (message.toBreakoutRoom && message.toBreakoutRoom !== 'all') {
-        const userRoom = breakoutRoomsRef.current.find((room) => room["member"].includes(mSession.user.name));
-        if (!userRoom || userRoom.name !== message.toBreakoutRoom) return;
-      }
       setMessages((prevMessages) => {
         return [ ...prevMessages, message ]
       })
@@ -89,23 +103,23 @@ export default function MessageProvider({ children }){
 
       setBreakoutRooms((prevBreakoutRoom) => {
         const newRoom = [...prevBreakoutRoom];
-        const prevRoomIndex = newRoom.findIndex((room) => room.name === jsonData.fromRoom);
+        const prevRoomIndex = newRoom.findIndex((room) => room.name === jsonData.fromRoom.name );
         const targetRoomIndex = newRoom.findIndex((room) => room.name === jsonData.toRoom);
 
         if (prevRoomIndex !== -1) newRoom[prevRoomIndex]["member"] = [...newRoom[prevRoomIndex]["member"]].filter((member) => member !== jsonData.user.name)
-  
+
         if (targetRoomIndex !== -1 && !newRoom[targetRoomIndex]["member"].includes(jsonData.user.name)) {
           newRoom[targetRoomIndex]["member"] = [...newRoom[targetRoomIndex]["member"], jsonData.user.name];
         }
         if (targetRoomIndex !== -1 && newRoom[targetRoomIndex]["memberAssigned"].includes(jsonData.user.name)) {
           newRoom[targetRoomIndex]["memberAssigned"] = [...newRoom[targetRoomIndex]["memberAssigned"]].filter((member) => member !== jsonData.user.name)            }
-      return newRoom
+          return newRoom
       })
     });
 
     mSession.session.on("signal:count-down-timer", ({ data }) => {
       const jsonData = JSON.parse(data);
-      setTimer(Object.keys(jsonData).length === 0 ? null : jsonData);
+      setTimer(jsonData.hasOwnProperty("period") ? jsonData : null);
     });
 
     mSession.session.on("signal:co-host", ({ data }) => {
@@ -113,8 +127,21 @@ export default function MessageProvider({ children }){
       setCohosts(jsonData);
     });
 
-    setSessionListeners([...roomSessionListeners, mSession.session])
-  }, [ mSession.session, roomSessionListeners ])
+    mSession.session.on("signal:participant-joined", ({ data }) => {
+      const jsonData = JSON.parse(data);
+      const user = User.fromJSON(jsonData);
+      setParticipants((prevParticipant) => [ ...prevParticipant, user ])
+    });
+
+    mSession.session.on("signal:participant-leaved", ({ data }) => {
+      const jsonData = JSON.parse(data);
+      setParticipants((prevParticipant) => {
+        return [ ...prevParticipant].filter((user) => user.name !== jsonData.name)
+      })
+    });
+
+    setSessionListeners(mSession.session)
+  }, [ mSession.session ])
 
   return (
     <MessageContext.Provider value={{ 
@@ -124,8 +151,10 @@ export default function MessageProvider({ children }){
       breakoutRoomSignal,
       timer,
       cohosts,
+      participants,
       removeRaisedHand,
-      setBreakoutRooms
+      setBreakoutRooms,
+      setParticipants,
     }}>
       {children}
     </MessageContext.Provider>

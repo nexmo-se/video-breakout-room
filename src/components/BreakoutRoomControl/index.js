@@ -16,6 +16,7 @@ import useRoom from 'hooks/room';
 import useSession from 'hooks/session';
 import useMessage from 'hooks/message';
 import RoomAPI from 'api/room';
+import MessageAPI from 'api/message';
 
 const { Panel } = Collapse;
 
@@ -50,24 +51,20 @@ export default function BreakoutRoomControl(props) {
             newRoomGroup[room.name] = roomMember;
             participantJoined = participantJoined.concat(room.member.concat(room.memberAssigned));
         })
-        mSession.participants.forEach((user) => {
+        mMessage.participants.forEach((user) => {
             if (participantJoined.includes(user.name)) return;
-            if (user.name === mSession.user.name || (mSession.allRoomsStreams.length !== 0 && mSession.allRoomsStreams[mSession.mainSession.sessionId].find((session) => session.name === user.name))) {
-                participantNotJoin.push(user.name);
-            }
-            else {
-                participantNotJoin.push(user.name + ' (joining)');
-            }
+            let userName = user.name; 
+            participantNotJoin.push(userName);
         })
         newRoomGroup["Main Room"] = participantNotJoin;
 
         if (participantJoined.length === 0 && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
             handleCloseAllRoom();
-            RoomAPI.sendCountDownTimer(mSession.mainSession, {});
+            MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'count-down-timer', {});
         }
         setRoomGroup(newRoomGroup);
         setIsLoading(false);
-    }, [mMessage.breakoutRooms, mSession.participants, setIsBreakout, mSession.allRoomsStreams[mSession.mainSession.sessionId]])
+    }, [mMessage.breakoutRooms, mMessage.participants, setIsBreakout])
 
     
     const [ position, setPosition ] = useState({
@@ -104,12 +101,11 @@ export default function BreakoutRoomControl(props) {
         setPosition(newPosition);
     }
 
-    function handleCloseAllRoom() {    
+    async function handleCloseAllRoom() {    
         setIsLoading(true); 
-        return mRoom.handleRoomRemove(mRoom.mainRoom).then((response) => {
-            RoomAPI.sendBreakoutRoomUpdate(mSession.mainSession, {"message": "allRoomRemoved", "breakoutRooms":[]})
-            setIsBreakout(false);
-        })
+        await MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "allRoomRemoved", "breakoutRooms":[]});
+        await mRoom.handleRoomRemove(mRoom.mainRoom.id);
+        setIsBreakout(false);
     }
     const addRoomcontent = () => {
         return (
@@ -157,6 +153,7 @@ export default function BreakoutRoomControl(props) {
                 roomName={key}
                 roomOptions = {Object.keys(roomGroup)}
                 participantList= {value}
+                setIsLoading = {setIsLoading}
             />                    
             </Panel>
         )})

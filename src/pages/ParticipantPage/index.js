@@ -52,12 +52,14 @@ export default function ParticipantPage(){
 
   useEffect(() => {
     if (!mMessage.breakoutRoomSignal) return;
+
     setChooseRoomPrompt(false);
+
     let roomNameFound;
     let roomSessionIdFound;
     let roomAssigned = mMessage.breakoutRoomSignal.breakoutRooms.find((room) => room["memberAssigned"].includes(mSession.user.name));
     if (mRoom.inBreakoutRoom) {
-      roomNameFound = mMessage.breakoutRoomSignal.breakoutRooms.find((room) => room.name === mRoom.inBreakoutRoom);
+      roomNameFound = mMessage.breakoutRoomSignal.breakoutRooms.find((room) => room.name === mRoom.inBreakoutRoom.name);
       roomSessionIdFound = mMessage.breakoutRoomSignal.breakoutRooms.find((room) => room.sessionId === mSession.session.sessionId);
     }
     if (mMessage.breakoutRoomSignal.message === 'roomCreated (chooseroom)' && !mRoom.inBreakoutRoom && !isCohost) {
@@ -73,13 +75,17 @@ export default function ParticipantPage(){
         mNotification.openNotification("Room removed by Host/Co-host", "You will be redirected to main session in 5 seconds.",  () => handleChangeRoom())
     }
     if (mMessage.breakoutRoomSignal.message === 'roomEdited' && !roomNameFound && roomSessionIdFound) {
-       mNotification.openNotification("Room renamed by Host/Co-host", "New Room Name: " + roomSessionIdFound.name, ()=>{mRoom.setInBreakoutRoom(roomSessionIdFound.name)});
+       mNotification.openNotification("Room renamed by Host/Co-host", "New Room Name: " + roomSessionIdFound.name, ()=>{mRoom.handleInBreakoutRoomChange(roomSessionIdFound.name)});
     }
     if (mMessage.breakoutRoomSignal.message === 'participantMoved' && ((roomNameFound && !roomNameFound["member"].includes(mSession.user.name)) || ((!roomNameFound && roomAssigned)))) {
         mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned ? roomAssigned.name : "Main Room"} in 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name : ''))
     }
+    if (mMessage.breakoutRoomSignal.message === "forceReturn" && mRoom.inBreakoutRoom ) {
+        mNotification.openNotification("Moderator left", "You will be redirected to main session in 5 seconds.",  () => handleChangeRoom())
+    }
   // eslint-disable-next-line
   }, [ mMessage.breakoutRoomSignal ])
+
 
   useEffect(() => {
     if (mMessage.timer) {
@@ -98,17 +104,17 @@ export default function ParticipantPage(){
   }, [ mSession.user ]);
 
   useEffect(() => {
-    if(mSession.session) {
+    if(mSession.session && mSession.session.currentState === "connected") {
       mPublisher.publish(mSession.user);
     }
     // eslint-disable-next-line
   }, [ mSession.session ]);
 
   useEffect(() => {
-    if(mSession.session && mSession.isConnected) {
+    if(mSession.session && mSession.session.currentState === "connected") {
       mSubscriber.subscribe(mSession.streams);
     }
-  }, [ mSession.streams, mSession.session, mSession.isConnected, mSubscriber ]);
+  }, [ mSession.streams, mSession.session, mSubscriber ]);
 
   useEffect(() => {
       if (!isCohost && mSession.user && mMessage.cohosts.includes(mSession.user.name)) {
@@ -122,6 +128,15 @@ export default function ParticipantPage(){
   useEffect(() => {
     if (mMessage.breakoutRooms.length !== 0 ) setIsBreakout(true);
   }, [mMessage.breakoutRooms])
+
+
+  useEffect(() => {
+    window.addEventListener('unload', () => mRoom.handleExitPage() )
+    return () => {
+      window.removeEventListener('unload', () => mRoom.handleExitPage())
+      mRoom.handleExitPage();
+    }
+  }, [])
 
   function handleConfirm() {
     handleChangeRoom(activeRoom);
@@ -151,13 +166,13 @@ export default function ParticipantPage(){
   else if(mSession.user && mSession.session) return (
     <>
       <div className={mStyles.container}>
-        {!mSession.isConnected ? <FullPageLoading/> : null}
+        {mSession.session.currentState !== "connected" ? <FullPageLoading/> : null}
       <div className={clsx(mStyles.leftContainer, mStyles.black)}>
             {
             mRoom.inBreakoutRoom ?
               (
               <div className={mStyles.header}>
-                <strong>{mRoom.inBreakoutRoom}</strong>
+                <strong>{mRoom.inBreakoutRoom.name}</strong>
                 <Button hierarchy="link" text="Return to main room" onClick={() => handleChangeRoom()} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
               </div>
               ) : null
