@@ -3,7 +3,7 @@
 Breakout rooms are additional rooms where you can split from main session for participants to work in separate, smaller groups.
 
 The Breakout Room app has following roles:
-  - Single Moderator -- moderator full control of breakout room features,  moderator can add/remove participants’ co-hosts permissions.
+  - Single Moderator -- moderator has full control of breakout room features and privilege to add/remove participants’ co-hosts permissions.
   - Multiple Co-Host -- Co-Host has full control of breakout room features
   - Multiple Participant -- participant can join a breakout room and return to the main room
 
