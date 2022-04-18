@@ -103,8 +103,8 @@ export default function MessageProvider({ children }){
       
       setBreakoutRooms((prevBreakoutRoom) => {
         const newRoom = [...prevBreakoutRoom];
-        const prevRoomIndex = newRoom.findIndex((room) => room.name === jsonData.fromRoom.name );
-        const targetRoomIndex = newRoom.findIndex((room) => room.name === jsonData.toRoom);
+        const prevRoomIndex = newRoom.findIndex((room) => room.name === jsonData.from );
+        const targetRoomIndex = newRoom.findIndex((room) => room.name === jsonData.to);
 
         if (prevRoomIndex !== -1) newRoom[prevRoomIndex]["member"] = [...newRoom[prevRoomIndex]["member"]].filter((member) => member !== jsonData.user.name)
 

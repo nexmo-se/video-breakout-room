@@ -19,7 +19,7 @@ const RoomListener = require("@app/listeners/room");
   app.use(express.json());
   app.use(cors());
 
-  // app.use(express.static(path.join(__dirname, "../build"))); // TODO
+  app.use(express.static(path.join(__dirname, "../build")));
   app.get("/room/:roomId/info", RoomListener.info);
 
   app.post("/room/:roomId/createSession", RoomListener.createSession);
@@ -41,9 +41,9 @@ const RoomListener = require("@app/listeners/room");
   app.post("/room/:roomId/crossRoomMsg", RoomListener.crossRoomMsg);
 
 
-  // app.get("*", (req, res) => {
-  //   res.sendFile(path.join(__dirname, "../build/index.html"));
-  // });
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../build/index.html"));
+  });
 
   app.listen(process.env.PORT, () => console.log(`Express is listening to ${process.env.PORT}`));
 })();

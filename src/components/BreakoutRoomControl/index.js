@@ -55,7 +55,7 @@ export default function BreakoutRoomControl(props) {
         })
         newRoomGroup[mRoom.mainRoom.name] = newRoomGroup[mRoom.mainRoom.name].concat(participantNotJoin);
 
-        if ((newRoomGroup[mRoom.mainRoom.name].length + participantNotJoin.length) === mMessage.participants.length && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
+        if (newRoomGroup[mRoom.mainRoom.name].length === mMessage.participants.length && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
             handleCloseAllRoom();
             MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'count-down-timer', {});
         }
@@ -160,7 +160,7 @@ export default function BreakoutRoomControl(props) {
         <Popover visible={showSetTimer} content={setTimerContent} title="Set Countdown Timer" trigger="click"  onVisibleChange={(visible) => setShowSetTimer(visible)} overlayStyle={{width: "420px"}}>
                 <Button text={<HourglassEmpty style={{margin: 0}}></HourglassEmpty>} hierarchy="tertiary"></Button>
         </Popover>
-        <Popover visible={showBroadCastMessage} content={broadCastMessagecontent} title="BroadCast Message" trigger="click"  onVisibleChange={(visible) => setShowBroadCastMessage(visible)} overlayStyle={{width: "250px"}}>
+        <Popover visible={showBroadCastMessage} content={broadCastMessagecontent} title="BroadCast Message" trigger="click"  onVisibleChange={(visible) => setShowBroadCastMessage(visible)} overlayStyle={{width: "400px"}}>
                 <Button text={<Chat style={{margin: 0}}></Chat>} hierarchy="tertiary"></Button>
             </Popover>
         <Popover visible={showAddNewRoom} content={addRoomcontent} title="Add New Room" trigger="click"  onVisibleChange={(visible) => setShowAddNewRoom(visible)} overlayStyle={{width: "250px"}}>

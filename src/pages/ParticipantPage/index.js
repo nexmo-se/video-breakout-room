@@ -120,7 +120,7 @@ export default function ParticipantPage(){
       else if (isCohost && mSession.user && !mMessage.cohosts.includes(mSession.user.name)) {
         mNotification.openNotification("Role: Co-host removed", "Co-host permission removed", () => {setIsCohost(false)})
       }
-  }, [mMessage.cohosts, mSession.user])
+  }, [mMessage.cohosts])
 
   useEffect(() => {
     if (mMessage.breakoutRooms.length !== 0 ) setIsBreakout(true);

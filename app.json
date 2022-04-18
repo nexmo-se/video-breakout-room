@@ -32,6 +32,11 @@
       "REACT_APP_PARTICIPANT_PIN": {
         "description": "Pin for participant to log in",
         "required": true
+      },
+      "REACT_APP_KEEP_ALL_CONNECTIONS": {
+        "description": "Always stay connect to main session",
+        "value": "no",
+        "required": true
       }
     }
   }

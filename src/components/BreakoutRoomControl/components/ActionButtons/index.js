@@ -51,7 +51,11 @@ export default function ActionButtons(props) {
         setIsLoading(true);
         const newRooms = [...mMessage.breakoutRooms];
         let targetIndex = newRooms.findIndex((room) => room.name === roomName);
+        let mainRoomIndex = newRooms.findIndex((room) => room.name === mRoom.mainRoom.name);
 
+        if (newRooms[targetIndex].member.length !== 0) {
+            newRooms[mainRoomIndex].memberAssigned = [...newRooms[mainRoomIndex].memberAssigned].concat([...newRooms[targetIndex].member])
+        }
         newRooms.splice(targetIndex, 1);
         await MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "roomRemoved", "breakoutRooms": newRooms});
         await mRoom.handleRoomRemove(mMessage.breakoutRooms[targetIndex].id);
@@ -85,7 +89,7 @@ export default function ActionButtons(props) {
     return (
             roomName !== mRoom.mainRoom.name? 
             <>
-            <Popover visible={selectedMessageRoom === roomName? true: false} content={messageRoomContent(roomName)} title="Message Room" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedMessageRoom(roomName) : setSelectedMessageRoom(null)} overlayStyle={styles.popover}>
+            <Popover visible={selectedMessageRoom === roomName? true: false} content={messageRoomContent(roomName)} title="Message Room" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedMessageRoom(roomName) : setSelectedMessageRoom(null)} overlayStyle={{width: "400px"}}>
                 <Button value={roomName} hierarchy="link" text={<Chat style={styles.icon}/>} key={'message-' + roomName} onClick={() => setSelectedMessageRoom(roomName)} style={styles.button}></Button>      
              </Popover>
             <Popover visible={selectedEditRoom === roomName? true: false} content={editRoomContent(roomName, breakoutRoom ? breakoutRoom["maxParticipants"] : 1)} title="Edit Room" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedEditRoom(roomName) : setSelectedEditRoom(null)} overlayStyle={styles.popover}>

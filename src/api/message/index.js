@@ -20,8 +20,7 @@ export default class MessageAPI{
     if (undefined === roomId) return null;
 
     if (!type) { type = 'raise-hand'};
-    // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${roomId}/broadcast`;
-    const apiURL = `http://localhost:3002/room/${roomId}/broadcast`;
+    const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${roomId}/broadcast`;
     return fetch(apiURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -42,8 +41,7 @@ export default class MessageAPI{
     if (undefined === roomId || undefined === toRoomId) return null;
 
     if (!type) { type = 'message'};
-    // const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${roomId}/crossRoomMsg`;
-    const apiURL = `http://localhost:3002/room/${roomId}/crossRoomMsg`;
+    const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${roomId}/crossRoomMsg`;
 
     return fetch(apiURL, {
       method: "POST",
