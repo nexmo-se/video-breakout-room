@@ -2,7 +2,6 @@ import { Drawer, List, Popconfirm } from 'antd';
 import People from '@material-ui/icons/Work';
 import Avatar from 'react-avatar';
 import Button from 'components/Button';
-import useSession from 'hooks/session';
 import useMessage from 'hooks/message';
 import MessageAPI from 'api/message';
 import useRoom from 'hooks/room';

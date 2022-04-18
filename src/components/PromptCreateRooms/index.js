@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Form, InputNumber, Radio, Input } from 'antd';
 import useRoom from 'hooks/room';
-import useSession from 'hooks/session';
 import useMessage from 'hooks/message';
 import MessageAPI from 'api/message';
 
 export default function PromptCreateRooms(props) {
   const [form] = Form.useForm();
   const mRoom = useRoom();
-  const mSession = useSession();
   const mMessage = useMessage();
 
 
@@ -40,10 +38,10 @@ export default function PromptCreateRooms(props) {
         if (formValue.modifier === "automatic" && participants.length !== 0) {
           participants.sort(()=> { return 0.5 - Math.random()});
           response.forEach((data) => {
+              if (data.name === mRoom.mainRoom.name) return;
               data["memberAssigned"] = participants.splice(0, data["maxParticipants"]);
           })
         }
-
         const message = {
           "message": "roomCreated (" + formValue.modifier + ")",
           "breakoutRooms": response

@@ -41,9 +41,9 @@ const RoomListener = require("@app/listeners/room");
   app.post("/room/:roomId/crossRoomMsg", RoomListener.crossRoomMsg);
 
 
-//   app.get("*", (req, res) => {
-//     res.sendFile(path.join(__dirname, "../build/index.html"));
-//   });
+  // app.get("*", (req, res) => {
+  //   res.sendFile(path.join(__dirname, "../build/index.html"));
+  // });
 
   app.listen(process.env.PORT, () => console.log(`Express is listening to ${process.env.PORT}`));
 })();

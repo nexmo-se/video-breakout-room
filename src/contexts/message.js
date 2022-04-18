@@ -99,8 +99,8 @@ export default function MessageProvider({ children }){
     });
 
     mSession.session.on("signal:join-breakout-room", ({ data }) => {
-      const jsonData = JSON.parse(data);          
-
+      const jsonData = JSON.parse(data);         
+      
       setBreakoutRooms((prevBreakoutRoom) => {
         const newRoom = [...prevBreakoutRoom];
         const prevRoomIndex = newRoom.findIndex((room) => room.name === jsonData.fromRoom.name );

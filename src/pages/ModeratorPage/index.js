@@ -66,9 +66,8 @@ export default function ModeratorPage() {
          mNotification.openNotification("Room renamed by Host/Co-host", "New Room Name: " + roomSessionIdFound.name, ()=>{mRoom.handleInBreakoutRoomChange(roomSessionIdFound.name)});
       }
       if (mMessage.breakoutRoomSignal.message === 'participantMoved' && ((roomNameFound && !roomNameFound["member"].includes(mSession.user.name)) || (!roomNameFound && roomAssigned))) {
-          mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned ? roomAssigned.name : "Main Room"} in 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name : ''))
+          mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned.name === mRoom.mainRoom.name ? '' : roomAssigned.name))
       }
-    // eslint-disable-next-line
     }, [ mMessage.breakoutRoomSignal ])
 
   
@@ -76,14 +75,12 @@ export default function ModeratorPage() {
     if(mSession.user) {
       mRoom.connect(mSession.user)
     };
-      // eslint-disable-next-line
     }, [ mSession.user ]);
 
     useEffect(() => {
       if(mSession.session && mSession.session.currentState === "connected") {
         mPublisher.publish(mSession.user);
       }
-      // eslint-disable-next-line
     }, [ mSession.session]);
 
     useEffect(() => {
@@ -136,7 +133,8 @@ export default function ModeratorPage() {
         { mRoom.inBreakoutRoom ?
               (
               <div className={mStyles.header}>
-                <strong>{mRoom.inBreakoutRoom.name}</strong>
+                <strong style={{paddingRight: "16px"}}>{mRoom.inBreakoutRoom.name}</strong>
+                {!config.keepAllConnection ? <span style={{fontStyle:"italic"}}>(Disconnected from main session)</span> : null}
                 <Button hierarchy="link" text="Return to main room" onClick={() => handleChangeRoom()} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
               </div>
               ) : null

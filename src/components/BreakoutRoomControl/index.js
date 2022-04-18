@@ -13,25 +13,23 @@ import Button from 'components/Button';
 import clsx from 'clsx';
 import useStyles from './styles';
 import useRoom from 'hooks/room';
-import useSession from 'hooks/session';
 import useMessage from 'hooks/message';
-import RoomAPI from 'api/room';
 import MessageAPI from 'api/message';
 
 const { Panel } = Collapse;
 
 export default function BreakoutRoomControl(props) {
     const { when, setIsBreakout, handleChangeRoom } = props
-    const mStyles = useStyles();
-    const mSession = useSession();
-    const mMessage = useMessage();
-    const mRoom = useRoom();
 
     const [ roomGroup, setRoomGroup] = useState({})
     const [ showAddNewRoom, setShowAddNewRoom ] = useState(false);
     const [ showSetTimer, setShowSetTimer ] = useState(false);
     const [ showBroadCastMessage, setShowBroadCastMessage ] = useState(false);
     const [ isLoading, setIsLoading ] = useState(true);
+
+    const mStyles = useStyles();
+    const mMessage = useMessage();
+    const mRoom = useRoom();
 
 
     useEffect(() => {
@@ -41,24 +39,23 @@ export default function BreakoutRoomControl(props) {
             setRoomGroup({});
             return setIsBreakout(false);
         }
-        let newRoomGroup = {
-            "Main Room": []
-        };
+        let newRoomGroup = {};
         let participantJoined = [];
         let participantNotJoin = [];
+
         mMessage.breakoutRooms.forEach((room) => {
             const roomMember = room.member.concat(room.memberAssigned.map((member) => member + ' (joining)'));
             newRoomGroup[room.name] = roomMember;
-            participantJoined = participantJoined.concat(room.member.concat(room.memberAssigned));
+            participantJoined = participantJoined.concat(room.member, room.memberAssigned);
         })
         mMessage.participants.forEach((user) => {
             if (participantJoined.includes(user.name)) return;
             let userName = user.name; 
             participantNotJoin.push(userName);
         })
-        newRoomGroup["Main Room"] = participantNotJoin;
+        newRoomGroup[mRoom.mainRoom.name] = newRoomGroup[mRoom.mainRoom.name].concat(participantNotJoin);
 
-        if (participantJoined.length === 0 && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
+        if ((newRoomGroup[mRoom.mainRoom.name].length + participantNotJoin.length) === mMessage.participants.length && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
             handleCloseAllRoom();
             MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'count-down-timer', {});
         }

@@ -13,9 +13,12 @@ export default class RoomAPI{
     })).json();
     const mainRoom = new Room(jsonResult.apiKey, jsonResult.id, jsonResult.name, jsonResult.sessionId)
     let breakoutRooms = [];
-    if (jsonResult.breakoutRooms) jsonResult.breakoutRooms.forEach((room) => {
+    if (jsonResult.breakoutRooms) {
+      breakoutRooms.push(new Room(jsonResult.apiKey, roomId, roomId, jsonResult.sessionId, null))
+      jsonResult.breakoutRooms.forEach((room) => {
       breakoutRooms.push(new Room(jsonResult.apiKey, room.id, room.name, room.sessionId, room.maxParticipants))
     });
+  }
     return {mainRoom, breakoutRooms};
   }
 
@@ -29,6 +32,7 @@ export default class RoomAPI{
       body: JSON.stringify(breakoutRooms)
     })).json();
     let breakoutRoomList = [];
+    breakoutRoomList.push(new Room(jsonResult.apiKey, mainRoom, mainRoom, jsonResult.sessionId, null))
     jsonResult.breakoutRooms.forEach((room) => {
       breakoutRoomList.push(new Room(jsonResult.apiKey, room.id, room.name, room.sessionId, room.maxParticipants))
     });

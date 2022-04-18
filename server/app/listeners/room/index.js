@@ -48,7 +48,7 @@ class RoomListener{
       
       const room = new Room({ id: roomId, name: roomName });
       const generatedRoom = await RoomAPI.generateSession(room);
-      // ---
+
       await RoomAPI.generateSessionBreakoutRoom(breakoutRooms, generatedRoom);
       generatedRoom.breakoutRooms = await RoomAPI.getBreakoutRooms(generatedRoom);
 

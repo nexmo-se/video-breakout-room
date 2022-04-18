@@ -35,7 +35,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "GENERATE_SOURCEMAP=false react-scripts start",
     "start:heroku": "serve -s build",
     "start:express": "nodemon --exec node -r dotenv/config server/index.js",
     "start:express:prod": "node -r dotenv/config server/index.js",

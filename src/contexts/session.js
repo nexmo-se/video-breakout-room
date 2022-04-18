@@ -1,8 +1,7 @@
 // @flow
-import { useState, createContext, useEffect, useRef } from "react";
+import { useState, createContext } from "react";
 import { v4 as uuid } from "uuid";
 import OT from "@opentok/client";
-import User from "entities/user";
 import config from "config";
 
 export const SessionContext = createContext({});

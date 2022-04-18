@@ -10,7 +10,6 @@ export default function ParticipantList(props) {
     const { roomName, participantList, setIsLoading, styles, roomOptions } = props;
     const [ selectedParticipant, setSelectedParticipant ] = useState();
 
-
     const moveRoomContent = (roomName) => {
         return (
             <MoveRoomContent
@@ -29,7 +28,7 @@ export default function ParticipantList(props) {
         return (
             <div key={`participant-${i}`} style={styles.container}>
             <p ><Person style={styles.personIcon}></Person>{participant}</p>
-            {!participant.includes(" (joining") ?
+            {!participant.includes(" (joining)") ?
             <Popover visible={selectedParticipant === participant? true: false} content={moveRoomContent(roomName)} title="Move Participant" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedParticipant(participant) : setSelectedParticipant(null)} overlayStyle={styles.popover}>
                 <Button value={participant} hierarchy="link" text={<SwapVert style={styles.swapIcon}/>} onClick={() => setSelectedParticipant(participant)} style={styles.button}></Button>      
             </Popover> : null

@@ -16,7 +16,6 @@ export default function MoveRoomContent(props) {
 
     function handleMoveRoom() {
         setIsLoading(true);
-        setSelectedParticipant(null);
         const newRooms = mMessage.breakoutRooms.map(room => ({...room}));
         let targetRoomIndex = newRooms.findIndex((room) => room.name === selectedParticipantRoom);
         let prevRoomIndex = newRooms.findIndex((room) => room["member"].includes(selectedParticipant));
@@ -25,7 +24,7 @@ export default function MoveRoomContent(props) {
             return;
         }
 
-        if (targetRoomIndex !==  -1 && newRooms[targetRoomIndex].member.length >= newRooms[targetRoomIndex].maxParticipants) {
+        if (targetRoomIndex !==  -1 && newRooms[targetRoomIndex].maxParticipants && newRooms[targetRoomIndex].member.length >= newRooms[targetRoomIndex].maxParticipants) {
             return alert(`Room: ${newRooms[targetRoomIndex].name} is full`);
         }
         
@@ -37,7 +36,7 @@ export default function MoveRoomContent(props) {
         }
 
         MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "participantMoved", "breakoutRooms": newRooms});
-        
+        setSelectedParticipant(null);
     }
 
     useEffect(() => {

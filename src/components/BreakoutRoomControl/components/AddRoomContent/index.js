@@ -3,7 +3,6 @@ import { Input, InputNumber } from 'antd';
 import MessageAPI from 'api/message';
 import Button from 'components/Button';
 import useMessage from "hooks/message";
-import useSession from "hooks/session";
 import useRoom from "hooks/room";
 
 
@@ -12,7 +11,6 @@ export default function AddRoomContent(props) {
     const inputRoomName = useRef(null);
     const inputMaxParticipant = useRef(null);
     const mMessage = useMessage();
-    const mSession = useSession();
     const mRoom = useRoom();
 
     function handleAddNewRoom() {

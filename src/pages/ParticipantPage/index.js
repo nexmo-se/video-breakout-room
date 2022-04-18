@@ -66,7 +66,7 @@ export default function ParticipantPage(){
         setChooseRoomPrompt(true);
     }
     if (mMessage.breakoutRoomSignal.message === 'roomCreated (automatic)'  && !mRoom.inBreakoutRoom && roomAssigned) {
-      mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name : ''))
+      mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned.name === mRoom.mainRoom.name ? '' : roomAssigned.name))
     }
     if (mMessage.breakoutRoomSignal.message === 'allRoomRemoved' && mRoom.inBreakoutRoom) {  
       mNotification.openNotification("Room removed by Host/Co-host", "You will be redirected to main session in 5 seconds.",  () => handleChangeRoom())
@@ -78,12 +78,11 @@ export default function ParticipantPage(){
        mNotification.openNotification("Room renamed by Host/Co-host", "New Room Name: " + roomSessionIdFound.name, ()=>{mRoom.handleInBreakoutRoomChange(roomSessionIdFound.name)});
     }
     if (mMessage.breakoutRoomSignal.message === 'participantMoved' && ((roomNameFound && !roomNameFound["member"].includes(mSession.user.name)) || ((!roomNameFound && roomAssigned)))) {
-        mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned ? roomAssigned.name : "Main Room"} in 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name : ''))
+        mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned.name === mRoom.mainRoom.name ? '' : roomAssigned.name))
     }
     if (mMessage.breakoutRoomSignal.message === "forceReturn" && mRoom.inBreakoutRoom ) {
         mNotification.openNotification("Moderator left", "You will be redirected to main session in 5 seconds.",  () => handleChangeRoom())
     }
-  // eslint-disable-next-line
   }, [ mMessage.breakoutRoomSignal ])
 
 
@@ -100,14 +99,12 @@ export default function ParticipantPage(){
 
   useEffect(() => {
     if(mSession.user) mRoom.connect(mSession.user)
-    // eslint-disable-next-line
   }, [ mSession.user ]);
 
   useEffect(() => {
     if(mSession.session && mSession.session.currentState === "connected") {
       mPublisher.publish(mSession.user);
     }
-    // eslint-disable-next-line
   }, [ mSession.session ]);
 
   useEffect(() => {
@@ -173,6 +170,7 @@ export default function ParticipantPage(){
               (
               <div className={mStyles.header}>
                 <strong>{mRoom.inBreakoutRoom.name}</strong>
+                {!config.keepAllConnection ? "(Disconnected from main session)" : null}
                 <Button hierarchy="link" text="Return to main room" onClick={() => handleChangeRoom()} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
               </div>
               ) : null

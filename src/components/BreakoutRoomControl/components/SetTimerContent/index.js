@@ -4,7 +4,6 @@ import { InputNumber, Checkbox } from 'antd';
 import Button from 'components/Button';
 import MessageAPI from 'api/message';
 import useRoom from 'hooks/room';
-import useMessage from 'hooks/message';
 
 export default function SetTimerContent({setShowSetTimer}) {
 
@@ -12,7 +11,6 @@ export default function SetTimerContent({setShowSetTimer}) {
     const [ period, setPeriod ] = useState(10);
     const [ countDownTimer , setCountDownTimer ] = useState(30);
     const mRoom = useRoom();
-    const mMessage = useMessage();
 
     function handleSetTimer() {
         setShowSetTimer(null);

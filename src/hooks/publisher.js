@@ -75,7 +75,6 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
       publisher.on("streamDestroyed", handleStreamDestroyed);
       publisher.on("accessDenied", handleAccessDenied)
     }
-    // eslint-disable-next-line
   }, [publisher])
 
   useEffect(() => {

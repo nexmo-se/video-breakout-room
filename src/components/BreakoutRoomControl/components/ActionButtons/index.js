@@ -69,21 +69,21 @@ export default function ActionButtons(props) {
     useEffect(() => {
         if (mRoom.inBreakoutRoom) {
             const room = mMessage.breakoutRooms.find((room) => room.name === mRoom.inBreakoutRoom.name)
-            if (room.member.includes(mSession.user.name)) {
+            if (room && room.member.includes(mSession.user.name)) {
                 setIsLoading(false);
             }
         }
         else {
-            let isMainRoom = true;
-            mMessage.breakoutRooms.forEach((room) => {
-                if(room.member.includes(mSession.user.name)) isMainRoom = false; 
-            }) 
-            if (isMainRoom) setIsLoading(false);
+            const room = mMessage.breakoutRooms.find((room) => room.name === mRoom.mainRoom.name)
+            if (room && room.member.includes(mSession.user.name)) {
+                setIsLoading(false);
+            }
         }
     }, [mRoom.inBreakoutRoom, mMessage.breakoutRooms])
 
+
     return (
-            roomName !== "Main Room"? 
+            roomName !== mRoom.mainRoom.name? 
             <>
             <Popover visible={selectedMessageRoom === roomName? true: false} content={messageRoomContent(roomName)} title="Message Room" trigger="click"  onVisibleChange={(visible) => visible ? setSelectedMessageRoom(roomName) : setSelectedMessageRoom(null)} overlayStyle={styles.popover}>
                 <Button value={roomName} hierarchy="link" text={<Chat style={styles.icon}/>} key={'message-' + roomName} onClick={() => setSelectedMessageRoom(roomName)} style={styles.button}></Button>      

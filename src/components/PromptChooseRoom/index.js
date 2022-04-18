@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Collapse, Modal, Radio } from 'antd';
 import Person from '@material-ui/icons/Person';
 import useMessage from 'hooks/message';
+import useRoom from 'hooks/room';
 const { Panel } = Collapse;
-
-
 
 export default function PromptChooseRooms(props) {
   const mMessage = useMessage();
@@ -13,10 +12,12 @@ export default function PromptChooseRooms(props) {
   const [roomGroup, setRoomGroup] = useState({})
   const [ buttonDisabled, setButtonDisabled] = useState(true);
   const [ roomOccupied, setRoomOccupied ] = useState([]);
+  const mRoom = useRoom();
 
     useEffect(() => {
         let newRoomGroup = {};
         mMessage.breakoutRooms.forEach((room) => {
+          if (room.name === mRoom.mainRoom.name) return;
           newRoomGroup[room.name] = room.member;
           setRoomGroup(newRoomGroup);
           if (room.member.length >= room.maxParticipants) {
@@ -32,7 +33,6 @@ export default function PromptChooseRooms(props) {
             })
           }
         })
-      // eslint-disable-next-line
     }, [mMessage.breakoutRooms])
 
     useEffect(() => {
