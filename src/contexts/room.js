@@ -119,7 +119,9 @@ export default function RoomContextProvider({ children }){
 
   async function handleExitPage() {
     await MessageAPI.broadcastMsg(currentRoomRef.current.id, 'participant-leaved', mSessionRef.current.user);
-    mSessionRef.current.session.disconnect();
+    if (mSessionRef.current.session) {
+      mSessionRef.current.session.disconnect();
+    }
   }
 
   return (
