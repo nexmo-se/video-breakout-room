@@ -92,7 +92,7 @@ export default function RoomContextProvider({ children }){
 
     await connect(mSession.user, targetRoomIndex!== -1  ? newRooms[targetRoomIndex].id : '');
 
-    MessageAPI.broadcastMsg(mainRoom.id, 'join-breakout-room', { "user": mSession.user, "from": currentRoom.id, "to": roomName ? roomName : mainRoom.name});
+    MessageAPI.broadcastMsg(mainRoom.id, 'join-breakout-room', { "user": mSession.user, "from": currentRoom.name, "to": roomName ? roomName : mainRoom.name});
     setInBreakoutRoom(targetRoomIndex !== -1 && newRooms[targetRoomIndex].name !== mainRoom.name ? newRooms[targetRoomIndex] : null);
   }
 
