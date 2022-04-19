@@ -170,7 +170,7 @@ export default function ParticipantPage(){
               (
               <div className={mStyles.header}>
                 <strong>{mRoom.inBreakoutRoom.name}</strong>
-                {!config.keepAllConnection ? "(Disconnected from main session)" : null}
+                {!config.keepAllConnection ? <span style={{fontStyle:"italic"}}>(Disconnected from main session)</span> : null}
                 <Button hierarchy="link" text="Return to main room" onClick={() => handleChangeRoom()} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
               </div>
               ) : null
