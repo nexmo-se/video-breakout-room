@@ -68,8 +68,9 @@ export default function MessageProvider({ children }){
       roomSessionListeners.off("signal:breakout-room");
       roomSessionListeners.off("signal:join-breakout-room");
       roomSessionListeners.off("signal:count-down-timer");
-      roomSessionListeners.off("signal:cohost");
+      roomSessionListeners.off("signal:co-host");
       roomSessionListeners.off("signal:participant-joined");
+      roomSessionListeners.off("signal:participant-leaved");
     }
 
     mSession.session.on("signal:raise-hand", ({ data }) => {
