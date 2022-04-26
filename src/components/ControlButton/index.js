@@ -4,8 +4,10 @@ import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import useStyles from './styles';
 import { default as Loader } from 'react-spinners/BounceLoader';
+import { Tooltip } from 'antd';
 
-function ControlButton({ size=50, fontSize=24, loading, active, onClick, className, children, ...props }){
+function ControlButton({ size=50, fontSize=24, loading, active, onClick, tooltip, className, children, ...props }){
+  
   const [ isBig, setIsBig ] = useState(false);
   const mStyles = useStyles({ size, fontSize });
 
@@ -30,7 +32,13 @@ function ControlButton({ size=50, fontSize=24, loading, active, onClick, classNa
       onClick={handleClick}
       disabled={loading}
     >
-      {loading? <Loader size={fontSize} color="white" />: children}
+      {loading? <Loader size={fontSize} color="white" />: (
+          <Tooltip title={tooltip}>
+            <div style={{ zIndex: 99999 }}>
+              {children}
+            </div>
+          </Tooltip>
+        )}
     </motion.div>
   )
 }

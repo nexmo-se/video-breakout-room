@@ -50,9 +50,9 @@ export default function BreakoutRoomControl(props) {
         })
         mMessage.participants.forEach((user) => {
             if (participantJoined.includes(user.name)) return;
-            let userName = user.name; 
-            participantNotJoin.push(userName);
+            participantNotJoin.push(user.name);
         })
+
         newRoomGroup[mRoom.mainRoom.name] = newRoomGroup[mRoom.mainRoom.name].concat(participantNotJoin);
 
         if (newRoomGroup[mRoom.mainRoom.name].length === mMessage.participants.length && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
@@ -100,7 +100,6 @@ export default function BreakoutRoomControl(props) {
 
     async function handleCloseAllRoom() {    
         setIsLoading(true); 
-        await MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "allRoomRemoved", "breakoutRooms":[]});
         await mRoom.handleRoomRemove(mRoom.mainRoom.id);
         setIsBreakout(false);
     }

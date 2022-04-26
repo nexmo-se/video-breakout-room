@@ -20,6 +20,7 @@ export default function ManagePeopleButton({...props }){
       active={isManagePeople}
       onClick={onManagePeopleButtonClicked}
       style={{ marginLeft: 8 }}
+      tooltip="Manage Participants"
     >
     <People fontSize="inherit"/>
     </ControlButton>

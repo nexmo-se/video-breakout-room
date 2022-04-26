@@ -12,7 +12,6 @@ export default function MessageProvider({ children }){
   const [ breakoutRooms, setBreakoutRooms ] = useState([]);
   const [ breakoutRoomSignal, setBreakoutRoomSignal ] = useState();
   const [ timer, setTimer ] = useState();
-  const [ cohosts, setCohosts ] = useState([]);
   const [ roomSessionListeners, setSessionListeners ] = useState();
   const mSession = useSession();
 
@@ -29,36 +28,11 @@ export default function MessageProvider({ children }){
   }
 
   useEffect(() => {
-    if (!participants) return;
-    const newRooms = [...breakoutRooms];
-    // If moderator leave main session
-    if (!participants.find((user) => user.role === "moderator")) {
-      setBreakoutRooms([]);
-      setBreakoutRoomSignal({"message": "forceReturn", "breakoutRooms": []});
-      setCohosts([]);
-      return;
+    const me = participants.find((user) => user.name === mSession.user.name)
+    if (me && me.isCohost !== mSession.user.isCohost) {
+      mSession.updateUser(me);
     }
-    const memberList = participants.reduce(
-      (acc, next) => {acc.push(next["name"]); return acc;},
-      []);    
-    newRooms.forEach((room) => {
-      room["member"] = room["member"].filter((member) => memberList.includes(member));
-    });
-    setBreakoutRooms(newRooms);
-
   }, [participants])
-
-  useEffect(() => {
-    if (!mSession.streams) return;
-    mSession.streams.forEach((stream) => {
-      if(!participants.find((user) => user.name === stream.name)) {
-        const data = JSON.parse(stream.connection.data);
-        const user = User.fromJSON(data);
-        setParticipants([...participants, user]);
-      }
-    })
-
-  }, [mSession.streams])
 
   useEffect(() => {
     if(!mSession.session) return;
@@ -68,9 +42,7 @@ export default function MessageProvider({ children }){
       roomSessionListeners.off("signal:breakout-room");
       roomSessionListeners.off("signal:join-breakout-room");
       roomSessionListeners.off("signal:count-down-timer");
-      roomSessionListeners.off("signal:co-host");
-      roomSessionListeners.off("signal:participant-joined");
-      roomSessionListeners.off("signal:participant-leaved");
+      roomSessionListeners.off("signal:update-participant");
     }
 
     mSession.session.on("signal:raise-hand", ({ data }) => {
@@ -101,21 +73,8 @@ export default function MessageProvider({ children }){
 
     mSession.session.on("signal:join-breakout-room", ({ data }) => {
       const jsonData = JSON.parse(data);         
-      
-      setBreakoutRooms((prevBreakoutRoom) => {
-        const newRoom = [...prevBreakoutRoom];
-        const prevRoomIndex = newRoom.findIndex((room) => room.name === jsonData.from );
-        const targetRoomIndex = newRoom.findIndex((room) => room.name === jsonData.to);
+      setBreakoutRooms(jsonData);
 
-        if (prevRoomIndex !== -1) newRoom[prevRoomIndex]["member"] = [...newRoom[prevRoomIndex]["member"]].filter((member) => member !== jsonData.user.name)
-
-        if (targetRoomIndex !== -1 && !newRoom[targetRoomIndex]["member"].includes(jsonData.user.name)) {
-          newRoom[targetRoomIndex]["member"] = [...newRoom[targetRoomIndex]["member"], jsonData.user.name];
-        }
-        if (targetRoomIndex !== -1 && newRoom[targetRoomIndex]["memberAssigned"].includes(jsonData.user.name)) {
-          newRoom[targetRoomIndex]["memberAssigned"] = [...newRoom[targetRoomIndex]["memberAssigned"]].filter((member) => member !== jsonData.user.name)            }
-          return newRoom
-      })
     });
 
     mSession.session.on("signal:count-down-timer", ({ data }) => {
@@ -123,22 +82,9 @@ export default function MessageProvider({ children }){
       setTimer(jsonData.hasOwnProperty("period") ? jsonData : null);
     });
 
-    mSession.session.on("signal:co-host", ({ data }) => {
+    mSession.session.on("signal:update-participant", ({ data }) => {
       const jsonData = JSON.parse(data);
-      setCohosts(jsonData);
-    });
-
-    mSession.session.on("signal:participant-joined", ({ data }) => {
-      const jsonData = JSON.parse(data);
-      const user = User.fromJSON(jsonData);
-      setParticipants((prevParticipant) => [ ...prevParticipant, user ])
-    });
-
-    mSession.session.on("signal:participant-leaved", ({ data }) => {
-      const jsonData = JSON.parse(data);
-      setParticipants((prevParticipant) => {
-        return [ ...prevParticipant].filter((user) => user.name !== jsonData.name)
-      })
+      setParticipants(jsonData);
     });
 
     setSessionListeners(mSession.session)
@@ -151,11 +97,10 @@ export default function MessageProvider({ children }){
       breakoutRooms,
       breakoutRoomSignal,
       timer,
-      cohosts,
       participants,
       removeRaisedHand,
       setBreakoutRooms,
-      setParticipants,
+      setParticipants
     }}>
       {children}
     </MessageContext.Provider>

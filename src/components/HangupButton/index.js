@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 import PhoneDisabledIcon from '@material-ui/icons/PhoneDisabled';
+import ControlButton from 'components/ControlButton';
 
 function HangupButton(props){
   const { size, fontSize } = props;
@@ -22,12 +23,17 @@ function HangupButton(props){
   }
 
   return (
+    <ControlButton
+    {...props}
+    tooltip="Hang Up"
+    >
     <motion.div 
     animate={{scale: isBig? 1.1 : 1}}
     className="Vlt-bg-red Vlt-white" style={styles.hangup}
       onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onClick={handleClick}>
       <PhoneDisabledIcon fontSize="inherit"/>
     </motion.div>
+    </ControlButton>
   )
 }
 

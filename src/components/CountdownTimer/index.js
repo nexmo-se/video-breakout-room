@@ -16,9 +16,7 @@ export default function CountDownTimer({handleChangeRoom}) {
     const mNotification = useNotification();
 
     useEffect(() => {
-        if (mMessage.timer && 
-            (mSession.user.role === "moderator" || mMessage.cohosts.includes(mSession.user.name) ||(mSession.user.role === "participant" && mRoom.inBreakoutRoom)) && 
-            mMessage.timer.endTime > new Date().getTime()) {
+        if (mMessage.timer && mMessage.timer.endTime > new Date().getTime()) {
             if (triggeredTimer) {
             clearInterval(triggeredTimer);
             }
@@ -31,18 +29,24 @@ export default function CountDownTimer({handleChangeRoom}) {
     }, [mMessage.timer, mRoom.inBreakoutRoom]);
 
     useEffect(() => {
+        if (mSession.user.role === "participant" && !mRoom.inBreakoutRoom && triggeredTimer) {
+            return resetTimer();
+        }
         if (countDown !== null && countDown <= mMessage.timer.countDownTimer && !showCountDownTimer) {
             setShowCountDownTimer(true);
         }
         if (countDown === 0) {
-            setShowCountDownTimer(false);
-            clearInterval(triggeredTimer);
-            setCountDown(null);
-            setTriggeredTimer(null);
+            resetTimer();
             exitBreakoutRoom();
         }
     }, [countDown])
 
+    function resetTimer() {
+        if (triggeredTimer) clearInterval(triggeredTimer);
+        setShowCountDownTimer(false);
+        setCountDown(null);
+        setTriggeredTimer(null);
+    }
     function exitBreakoutRoom() {
         if (!mMessage.timer || !mRoom.inBreakoutRoom) return; 
         if (mMessage.timer.isManualReturn) {

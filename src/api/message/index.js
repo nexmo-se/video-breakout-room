@@ -21,6 +21,7 @@ export default class MessageAPI{
 
     if (!type) { type = 'raise-hand'};
     const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${roomId}/broadcast`;
+
     return fetch(apiURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

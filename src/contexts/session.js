@@ -33,7 +33,7 @@ function SessionProvider({ children }){
     setStreams((prevStreams) => [ ...prevStreams].filter((stream) => stream.id !== e.stream.id));
   }
 
-  function createUser(user) {
+  function updateUser(user) {
     setUser(user)
   }
 
@@ -74,7 +74,7 @@ function SessionProvider({ children }){
             else resolve();
           })
         });
-        config.keepAllConnection ? setUserSessions([...userSessions, newSession]) : setUserSessions([newSession]);
+        if (config.keepAllConnection) setUserSessions([...userSessions, newSession]);
       }
       setSession(newSession);
     }catch(err){
@@ -90,7 +90,7 @@ function SessionProvider({ children }){
       changedStream,
       connections,
       connect,
-      createUser,
+      updateUser,
     }}>
       {children}
     </SessionContext.Provider>

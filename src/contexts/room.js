@@ -18,8 +18,8 @@ export default function RoomContextProvider({ children }){
   const mSession = useSession();
   const mMessage = useMessage();
 
-  const currentRoomRef = useRef();
-  currentRoomRef.current = currentRoom;
+  const mainRoomRef = useRef();
+  mainRoomRef.current = mainRoom;
 
   const mSessionRef = useRef();
   mSessionRef.current = mSession;
@@ -33,8 +33,8 @@ export default function RoomContextProvider({ children }){
       }
   }, [inBreakoutRoom, mainRoom])
 
-  async function handleRoomCreate(breakoutRooms) {
-    const generatedRoom = await RoomAPI.generateSession(mainRoom.id, {breakoutRooms});
+  async function handleRoomCreate(type, breakoutRooms) {
+    const generatedRoom = await RoomAPI.generateSession(mainRoom.id, {type, breakoutRooms});
     return new Promise((resolve, reject) => {
       resolve(generatedRoom);
     })
@@ -51,7 +51,6 @@ export default function RoomContextProvider({ children }){
       return new Promise((resolve, reject) => {
         resolve(removedRoom);
       })
-
   }
 
   function handleInBreakoutRoomChange(roomName) {
@@ -66,19 +65,26 @@ export default function RoomContextProvider({ children }){
 
   async function joinMainRoom(user, roomName) {
     const roomInfo = await RoomAPI.getRoomInfo(roomName);
-    setMainRoom({
-      id: roomInfo.mainRoom.id,
-      name: roomInfo.mainRoom.name
-    });
-    mSession.createUser(user);
+
+    setMainRoom(roomInfo.mainRoom);
+    mSession.updateUser(user);
     mMessage.setBreakoutRooms(roomInfo.breakoutRooms ?? []);
-    mMessage.setParticipants([user]);
-    MessageAPI.broadcastMsg(roomName, 'participant-joined', user);
+    await connect(user, roomInfo.mainRoom.id);
+    const { participants } = await RoomAPI.getParticipants(roomName);
+    mMessage.setParticipants(participants);
+  }
+
+  async function refreshInfo() {
+    const { participants } = await RoomAPI.getParticipants(mainRoom.id);
+    const { breakoutRooms } = await RoomAPI.getBreakoutRooms(mainRoom.id);
+    
+    mMessage.setParticipants(participants);
+    mMessage.setBreakoutRooms(breakoutRooms ?? []);
   }
 
   async function handleChangeRoom(publisher, subscriber, roomName) {
     const newRooms = [...mMessage.breakoutRooms];
-    const targetRoomIndex = newRooms.findIndex((room) => room.name === roomName);
+    let targetRoom = newRooms.find((room) => room.name === roomName);
 
     if (config.keepAllConnection) {
       mSession.session.unpublish(publisher);
@@ -89,11 +95,26 @@ export default function RoomContextProvider({ children }){
       mSession.session.disconnect();
     }
 
+    const connectionSuccess = await connect(mSession.user, targetRoom ? targetRoom.id : '');
 
-    await connect(mSession.user, targetRoomIndex!== -1  ? newRooms[targetRoomIndex].id : '');
+    if (!connectionSuccess) {
+      // Force connect to main room;
+      targetRoom = null;
+      roomName = '';
+      await connect(mSession.user);
+    }
 
-    MessageAPI.broadcastMsg(mainRoom.id, 'join-breakout-room', { "user": mSession.user, "from": currentRoom.name, "to": roomName ? roomName : mainRoom.name});
-    setInBreakoutRoom(targetRoomIndex !== -1 && newRooms[targetRoomIndex].name !== mainRoom.name ? newRooms[targetRoomIndex] : null);
+    let data = {
+      fromRoom: currentRoom.name, 
+      toRoom: roomName ? roomName : mainRoom.name, 
+      participant: mSession.user.name
+    }
+
+    setInBreakoutRoom(targetRoom && targetRoom.name !== mainRoom.name ? targetRoom : null);
+
+    const {participants, breakoutRooms} = await RoomAPI.joinBreakoutRoom(mainRoom.id, "join-breakout-room", data);
+    mMessage.setParticipants(participants);
+    mMessage.setBreakoutRooms(breakoutRooms);
   }
 
   async function connect(user, roomId){
@@ -103,22 +124,28 @@ export default function RoomContextProvider({ children }){
       role: userJson.role === "moderator" ? "moderator" : "publisher",
       data: userJson
     }
-    credentialInfo["roomId"] = mainRoom.id;
     if (roomId) {
       credentialInfo["roomId"] = roomId;
+    }
+    else {
+      credentialInfo["roomId"] = mainRoom.id;
     }
 
     try{
       const credential = await CredentialAPI.generateCredential(credentialInfo);
+      if (!credential) {
+        alert("Fail to generate token: Room Not found"); 
+        return Promise.resolve(false)
+      }
       await mSession.connect(credential);
-      return Promise.resolve();
+      return Promise.resolve(true);
     }catch(err){
       throw err;
     }
   }
 
   async function handleExitPage() {
-    await MessageAPI.broadcastMsg(currentRoomRef.current.id, 'participant-leaved', mSessionRef.current.user);
+    await RoomAPI.updateParticipant(mainRoomRef.current.id, {type: 'participant-leaved', participant: mSessionRef.current.user.name});
     if (mSessionRef.current.session) {
       mSessionRef.current.session.disconnect();
     }
@@ -135,7 +162,8 @@ export default function RoomContextProvider({ children }){
       handleRoomRemove,
       handleChangeRoom,
       handleInBreakoutRoomChange,
-      handleExitPage
+      handleExitPage,
+      refreshInfo
     }}>
       {children}
     </RoomContext.Provider>

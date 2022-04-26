@@ -24,12 +24,7 @@ export default function AddRoomContent(props) {
                     "maxParticipants": maxParticipants
                 }
             ];
-        mRoom.handleRoomCreate(data).then((response) => {
-            let newRoom = response.find((room) => room.name === roomName);
-            newRoom["memberAssigned"] = [];
-            newRoom["member"] = [];
-            return MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "roomAdded", "breakoutRooms": [...mMessage.breakoutRooms, newRoom]});
-        }).then(() => {
+        mRoom.handleRoomCreate("roomAdded", data).then((response) => {
             setIsLoading(false);
         })
     }

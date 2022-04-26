@@ -8,6 +8,7 @@ function VideoButton({ hasVideo, ...props }){
     <ControlButton 
       {...props}
       active={hasVideo}
+      tooltip="Mute/Unmute Video"
     >
       {hasVideo? <VideocamIcon fontSize="inherit"/>: <VideocamOffIcon fontSize="inherit"/>}
     </ControlButton>

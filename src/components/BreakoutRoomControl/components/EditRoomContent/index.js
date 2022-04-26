@@ -34,9 +34,7 @@ export default function EditRoomContent(props) {
     }
 
     Promise.all(p).then((response) => {
-        return MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "roomEdited", "breakoutRooms": newRooms});
-    }).then(() => {
-        setIsLoading(false);
+        return setIsLoading(false);
     })
 
 }

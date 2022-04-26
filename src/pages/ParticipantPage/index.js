@@ -38,7 +38,7 @@ export default function ParticipantPage(){
 
   const mSession = useSession();
   const mRoom = useRoom();
-  const mPublisher = usePublisher("cameraContainer", true, false);
+  const mPublisher = usePublisher("cameraContainer", true, true);
   const mStyles = useStyles();
   const mMessage = useMessage();
   const mNotification = useNotification();
@@ -98,10 +98,6 @@ export default function ParticipantPage(){
   }, [mSubscriber.subscribers, mSubscriber] )
 
   useEffect(() => {
-    if(mSession.user) mRoom.connect(mSession.user)
-  }, [ mSession.user ]);
-
-  useEffect(() => {
     if(mSession.session && mSession.session.currentState === "connected") {
       mPublisher.publish(mSession.user);
     }
@@ -114,13 +110,13 @@ export default function ParticipantPage(){
   }, [ mSession.streams, mSession.session, mSubscriber ]);
 
   useEffect(() => {
-      if (!isCohost && mSession.user && mMessage.cohosts.includes(mSession.user.name)) {
-        mNotification.openNotification("New role: Co-host assigned", "You have been assigned to a new Role: Co-host, you are allowed to manage breakout rooms in this meeting ", () => {setIsCohost(true)})
+      if (!isCohost && mSession.user && mSession.user.isCohost) {
+        mNotification.openNotification("New role: Co-host assigned", "You have been assigned to a new Role: Co-host, you are allowed to manage breakout rooms in this meeting ", () => {handleRoleChange(true)})
       }
-      else if (isCohost && mSession.user && !mMessage.cohosts.includes(mSession.user.name)) {
-        mNotification.openNotification("Role: Co-host removed", "Co-host permission removed", () => {setIsCohost(false)})
+      else if (isCohost && mSession.user && !mSession.user.isCohost) {
+        mNotification.openNotification("Role: Co-host removed", "Co-host permission removed", () => {handleRoleChange(false)})
       }
-  }, [mMessage.cohosts])
+  }, [mSession.user])
 
   useEffect(() => {
     if (mMessage.breakoutRooms.length !== 0 ) setIsBreakout(true);
@@ -134,6 +130,11 @@ export default function ParticipantPage(){
       mRoom.handleExitPage();
     }
   }, [])
+
+  function handleRoleChange(state) {
+    setIsCohost(state);
+    mRoom.refreshInfo();
+  }
 
   function handleConfirm() {
     handleChangeRoom(activeRoom);
@@ -169,29 +170,27 @@ export default function ParticipantPage(){
             mRoom.inBreakoutRoom ?
               (
               <div className={mStyles.header}>
-                <strong>{mRoom.inBreakoutRoom.name}</strong>
+                <strong style={{paddingRight: "16px"}}>{mRoom.inBreakoutRoom.name}</strong>
                 {!config.keepAllConnection ? <span style={{fontStyle:"italic"}}>(Disconnected from main session)</span> : null}
-                <Button hierarchy="link" text="Return to main room" onClick={() => handleChangeRoom()} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
+                {!mSession.user.isCohost ? <Button hierarchy="link" text="Return to main room" onClick={() => handleChangeRoom()} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button> : null}
               </div>
               ) : null
             }
           <LayoutContainer id="cameraContainer" size="big" />
-          <WhiteLayer/>
           <div className={mStyles.logoContainer}>
             <LiveBadge/>
           </div>
           <VonageLogo 
             style={{ 
               position: "absolute", 
-              bottom: 32, 
-              right: 32,
-              zIndex: 2 
+              bottom: 0, 
+              right: 0,
+              zIndex: 2
             }}
           />
           <CountDownTimer
               handleChangeRoom={handleChangeRoom}>  
           </CountDownTimer>
-          <MessageBar />
         </div>
         <div className={mStyles.rightContainer}>
           <div className={mStyles.moderator}>
@@ -202,6 +201,7 @@ export default function ParticipantPage(){
             <VideoControl 
               publisher={mPublisher.publisher} 
             >
+            <MessageBar />
             { isCohost ?
               <BreakoutRoomButton
               isBreakout={isBreakout}

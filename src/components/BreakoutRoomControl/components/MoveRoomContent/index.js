@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Select } from 'antd';
 import useMessage from 'hooks/message';
 import Button from 'components/Button';
-import MessageAPI from 'api/message';
+import RoomAPI from 'api/room';
 import useRoom from 'hooks/room';
 const { Option } = Select
 
@@ -29,15 +29,16 @@ export default function MoveRoomContent(props) {
         }
 
         setIsLoading(true);
-        
-        if (targetRoomIndex !==  -1)  {
-            newRooms[targetRoomIndex]["memberAssigned"] = [...newRooms[targetRoomIndex]["memberAssigned"], selectedParticipant];
-        }
-        if (prevRoomIndex !==  -1) {
-            newRooms[prevRoomIndex]["member"] = [...newRooms[prevRoomIndex]["member"]].filter((a) => a !== selectedParticipant);
-        }
 
-        MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "participantMoved", "breakoutRooms": newRooms});
+        let data = {
+            fromRoom: prevRoomIndex !== -1 ? newRooms[prevRoomIndex].name : null, 
+            toRoom: targetRoomIndex !== -1 ? newRooms[targetRoomIndex].name : null, 
+            participant: selectedParticipant
+        }
+        
+        // RoomAPI.manageRoomParticipants(mRoom.currentRoom.id, 'breakout-room', {"message": "participantMoved", "breakoutRooms": newRooms});
+        RoomAPI.moveParticipant(mRoom.mainRoom.id, "participantMoved", data);
+
         setSelectedParticipant(null);
     }
 

@@ -57,7 +57,6 @@ export default function ActionButtons(props) {
             newRooms[mainRoomIndex].memberAssigned = [...newRooms[mainRoomIndex].memberAssigned].concat([...newRooms[targetIndex].member])
         }
         newRooms.splice(targetIndex, 1);
-        await MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', {"message": "roomRemoved", "breakoutRooms": newRooms});
         await mRoom.handleRoomRemove(mMessage.breakoutRooms[targetIndex].id);
         setIsLoading(false);
     }

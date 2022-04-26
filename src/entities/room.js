@@ -1,8 +1,7 @@
 // @flow
 class Room{
   
-    constructor(apiKey = '', id= '', name = '', sessionId = '',  maxParticipants='', member=[], memberAssigned=[]){
-      this.apiKey = apiKey;
+    constructor(id= '', name = '', sessionId = '',  maxParticipants='', member=[], memberAssigned=[]){
       this.id = id;
       this.name = name;
       this.sessionId = sessionId;
@@ -13,7 +12,6 @@ class Room{
 
     toJSON() {
       const jsonData = {
-        apiKey: this.apiKey,
         id: this.id,
         name: this.name,
         sessionId: this.sessionId,
@@ -25,7 +23,7 @@ class Room{
     }
   
     static fromJSON(data){
-      const breakoutRoom = new Room(data.apiKey, data.id, data.name, data.sessionId, data.maxParticipants, data.member, data.memberAssigned);
+      const breakoutRoom = new Room(data.id, data.name, data.sessionId, data.maxParticipants, data.member, data.memberAssigned);
       return breakoutRoom;
     }
   }

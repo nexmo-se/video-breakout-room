@@ -16,8 +16,9 @@ export default function PromptCreateRooms(props) {
 
     useEffect(() => {
       // exclude co-hosts and moderator
-      setNumberOfParticipants(mMessage.participants.length - mMessage.cohosts.length - 1);
-    }, [mMessage.participants.length, mMessage.cohosts])
+      const numberOfParticipants = mMessage.participants.filter((p) => !p.isCohost)
+      setNumberOfParticipants(numberOfParticipants.length - 1); // exclude moderator
+    }, [mMessage.participants])
 
     function handleRoomChange(value) {
       setNumberOfRooms(value);
@@ -33,22 +34,7 @@ export default function PromptCreateRooms(props) {
         data.push({name: roomName, maxParticipants: maxParticipants})
       }
 
-      return mRoom.handleRoomCreate(data).then((response) => {
-        const participants = mMessage.participants.filter((p) => (p.role !== "moderator" && !mMessage.cohosts.includes(p.name))).map((p) => p.name);
-        if (formValue.modifier === "automatic" && participants.length !== 0) {
-          participants.sort(()=> { return 0.5 - Math.random()});
-          response.forEach((data) => {
-              if (data.name === mRoom.mainRoom.name) return;
-              data["memberAssigned"] = participants.splice(0, data["maxParticipants"]);
-          })
-        }
-        const message = {
-          "message": "roomCreated (" + formValue.modifier + ")",
-          "breakoutRooms": response
-        }
-        MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'breakout-room', message);
-      });
-
+      return mRoom.handleRoomCreate("roomCreated (" + formValue.modifier + ")" , data)
     }
 
 

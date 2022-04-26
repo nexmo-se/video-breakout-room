@@ -22,7 +22,8 @@ function ShareScreen(){
       );
       setSharing(true);
     }else if(session && sharing){
-        unpublish();
+        await unpublish();
+        setSharing(false);
     }
   }
 

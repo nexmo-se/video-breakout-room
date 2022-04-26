@@ -11,6 +11,7 @@ function MuteButton({ hasAudio, ...props }){
     <ControlButton
       {...props}
       active={hasAudio}
+      tooltip="Mute/Unmute"
     >
       {hasAudio? <MicIcon fontSize="inherit"/>: <MicOffIcon fontSize="inherit"/>}
     </ControlButton>

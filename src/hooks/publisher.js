@@ -10,7 +10,6 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
 
   const [ stream, setStream ] = useState();
   const [ layoutManager, setLayoutManager ] = useState(new LayoutManager(containerId));
-  const [ onAccessDenied, setOnAccessDenied ] = useState();
   const mSession = useSession();
 
   function handleDestroyed(){
@@ -22,33 +21,29 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
   }
 
   function handleStreamDestroyed(e){
-    if (e.stream.name !== "sharescreen") e.preventDefault();
+    if (e.stream && e.stream.name !== "sharescreen") e.preventDefault();
   }
 
   function handleAccessDenied(){
-    alert("Please enable camera and microphone access to conitnue. Refresh the page when you are done.");
-    if(onAccessDenied) onAccessDenied();
+    setPublisher(undefined);
   }
 
   async function unpublish(){
     if(publisher) mSession.session.unpublish(publisher);
-    else throw new Error("Cannot unpublish. No publisher found");
     layoutManager.layout();
   }
 
   async function publish(
     user, 
     extraData,
-    onAccessDenied
   ){
-    setOnAccessDenied(onAccessDenied);
     try{
       if(!mSession.session) throw new Error("You are not connected to session");
       const options = { 
         insertMode: "append",
         name: user.name,
         style: { 
-          buttonDisplayMode: "off",
+          buttonDisplayMode: "on",
           nameDisplayMode: displayName? "on": "off"
         }
       };
@@ -57,8 +52,19 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
       if (!publisher) {
         const initPublisher = OT.initPublisher(containerId, finalOptions);
 
-        mSession.session.publish(initPublisher);
+        // mSession.session.publish(initPublisher);
         setPublisher(initPublisher);
+
+        mSession.session.publish(
+          initPublisher,
+          (err) => {
+            if (err) {
+              console.log("err", err);
+            } else {
+              setPublisher(initPublisher);
+            }
+          }
+        )
       }
       else {
         mSession.session.publish(publisher);

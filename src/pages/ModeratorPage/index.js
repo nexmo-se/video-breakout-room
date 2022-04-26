@@ -36,7 +36,7 @@ export default function ModeratorPage() {
     const mStyles = useStyles();
     const mRoom = useRoom();
     const mNotification = useNotification();
-    const mPublisher = usePublisher("cameraContainer", true, false);
+    const mPublisher = usePublisher("cameraContainer", true, true);
     const mMessage = useMessage();
     const mSubscriber = useSubscriber({ 
       moderator: "cameraContainer", 
@@ -69,13 +69,6 @@ export default function ModeratorPage() {
           mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned.name === mRoom.mainRoom.name ? '' : roomAssigned.name))
       }
     }, [ mMessage.breakoutRoomSignal ])
-
-  
-    useEffect(() => {
-    if(mSession.user) {
-      mRoom.connect(mSession.user)
-    };
-    }, [ mSession.user ]);
 
     useEffect(() => {
       if(mSession.session && mSession.session.currentState === "connected") {
@@ -135,24 +128,21 @@ export default function ModeratorPage() {
               <div className={mStyles.header}>
                 <strong style={{paddingRight: "16px"}}>{mRoom.inBreakoutRoom.name}</strong>
                 {!config.keepAllConnection ? <span style={{fontStyle:"italic"}}>(Disconnected from main session)</span> : null}
-                <Button hierarchy="link" text="Return to main room" onClick={() => handleChangeRoom()} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button>
               </div>
               ) : null
           }
           <LayoutContainer id="cameraContainer" size="big" />
-          <WhiteLayer/>
           <div className={mStyles.logoContainer}>
             <LiveBadge/>
           </div>
           <VonageLogo 
             style={{ 
               position: "absolute", 
-              bottom: 32, 
-              right: 32,
+              bottom: 0, 
+              right: 0,
               zIndex: 2 
             }}
           />
-          <MessageBar />
         </div>
         <div className={mStyles.rightContainer}>
           <div className={mStyles.videoControl}>
@@ -160,6 +150,7 @@ export default function ModeratorPage() {
             <VideoControl 
               publisher={mPublisher.publisher} 
             >
+            <MessageBar />
             <BreakoutRoomButton
               isBreakout={isBreakout}
               setIsBreakout={setIsBreakout}

@@ -7,6 +7,7 @@ function ShareScreenButton({ isSharing, ...props }){
     <ControlButton 
       {...props}
       active={isSharing}
+      tooltip="Share Screen"
     >
       <ShareScreenIcon fontSize="inherit"/>
     </ControlButton>

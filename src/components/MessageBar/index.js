@@ -33,7 +33,7 @@ export default function MessageBar(props) {
       </div>)
   } 
   else if ( "participant" === mSession.user.role ) {
-    return (<div className={mStyle.container}>
+    return (<div>
       <RaiseHandButton 
         user={mSession.user}
         room={mRoom.currentRoom.id}

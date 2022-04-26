@@ -11,6 +11,20 @@ function useSubscriber({ moderator, screen, camera, custom }){
   const [ screenLayout, setScreenLayout ] = useState(new LayoutManager(screen));
   const mSession = useSession();
 
+  useEffect(() => {
+    const { changedStream } = mSession;
+    if(changedStream){
+      const targetSubscriber = subscribers.find((subscriber) => subscriber.stream.id === changedStream.stream.id)
+      
+      if (targetSubscriber && (changedStream.changedProperty === "hasAudio")) {
+        targetSubscriber.subscribeToAudio(changedStream.newValue);
+      }
+      if (targetSubscriber && (changedStream.changedProperty === "hasVideo")) {
+        targetSubscriber.subscribeToVideo(changedStream.newValue)
+      }
+    }
+  }, [ mSession.changedStream ])
+
   function getContainerId(user, videoType){
     if(user.role === "moderator" && videoType === "camera") return moderator;
     else if(videoType === "camera") return camera;
@@ -47,11 +61,14 @@ function useSubscriber({ moderator, screen, camera, custom }){
       const data = JSON.parse(connection.data);
       const containerId = getContainerId(data, videoType);
       const extraData = (data.role === "moderator")? { width: "100%", height: "100%" }: {}
-      const finalOptions = Object.assign({}, extraData, { insertMode: "append" });
+      const finalOptions = Object.assign({}, extraData, { insertMode: "append", style: { 
+        buttonDisplayMode: "on",
+        nameDisplayMode: "on"
+      }});
       const subscriber = await new Promise((resolve, reject) => {
         const subscriber = mSession.session.subscribe(stream, containerId, finalOptions, (err) => {
           if(!err) resolve(subscriber);
-        })        
+        })
       });
       setSubscribers((prevSubscribers) => [ ...prevSubscribers, subscriber ]);
     }));

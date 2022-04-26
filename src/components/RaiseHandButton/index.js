@@ -1,10 +1,12 @@
 import React from 'react';
-
 import Message from 'entities/message';
 import User from 'entities/user';
 
 import useSession from 'hooks/session';
 import MessageAPI from 'api/message';
+
+import RaiseHandIcon from '@material-ui/icons/PanTool';
+import ControlButton from 'components/ControlButton';
 
 function RaiseHandButton(props) {
   const mSession = useSession();
@@ -25,14 +27,18 @@ function RaiseHandButton(props) {
   }
 
   return (
-    <button 
-      className="Vlt-btn Vlt-bg-aqua Vlt-white" 
-      onClick={handleClick}
-    >
-      Raise Hand
-    </button>
+    <ControlButton 
+    {...props}
+    onClick = {handleClick}
+    active={true}
+    tooltip="Request Help"
+  >
+    <RaiseHandIcon fontSize="inherit"/>
+  </ControlButton>
   )
-}
+  }
+
+
 
 RaiseHandButton.defaultProps = { size: 50, fontSize: 24 }
 export default RaiseHandButton;

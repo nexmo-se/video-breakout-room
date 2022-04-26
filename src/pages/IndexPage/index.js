@@ -1,4 +1,3 @@
-import VonageLogo from "components/VonageLogo";
 import Button from "components/Button";
 import { useNavigate } from "react-router-dom";
 import useStyles from "./styles"
@@ -10,14 +9,6 @@ export default function IndexPage() {
     return (
         <>
             <div className={mStyles.container}>
-                <VonageLogo
-                style={{
-                    position: "absolute",
-                    bottom: 32,
-                    right: 32,
-                    zIndex: 2,
-                }}
-                />
                 <br />
                 <h4>
                 Please use the links below to get to the pages for the appropriate
