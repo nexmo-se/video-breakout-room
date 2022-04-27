@@ -1,7 +1,4 @@
 // @flow
-
-const url = new URL(window.location.href);
-
 export default class MessageAPI{
 
   static async sendMessage(session, message){
@@ -20,7 +17,7 @@ export default class MessageAPI{
     if (undefined === roomId) return null;
 
     if (!type) { type = 'raise-hand'};
-    const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${roomId}/broadcast`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/broadcast`;
 
     return fetch(apiURL, {
       method: "POST",
@@ -42,7 +39,7 @@ export default class MessageAPI{
     if (undefined === roomId || undefined === toRoomId) return null;
 
     if (!type) { type = 'message'};
-    const apiURL = `${url.protocol}//${url.hostname}:${url.port}/room/${roomId}/crossRoomMsg`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/crossRoomMsg`;
 
     return fetch(apiURL, {
       method: "POST",

@@ -13,7 +13,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
   const mSession = useSession();
 
   function handleDestroyed(){
-    setPublisher(undefined);
+    setPublisher(null);
   }
 
   function handleStreamCreated(e){
@@ -21,11 +21,18 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
   }
 
   function handleStreamDestroyed(e){
-    if (e.stream && e.stream.name !== "sharescreen") e.preventDefault();
+    if (e.stream.name !== "sharescreen") e.preventDefault();
   }
 
   function handleAccessDenied(){
-    setPublisher(undefined);
+    if (publisher) {
+      publisher.off("destroyed", handleDestroyed);
+      publisher.off("streamCreated", handleStreamCreated);
+      publisher.off("streamDestroyed", handleStreamDestroyed);
+      publisher.off("accessDenied", handleAccessDenied)
+      publisher.destroy();
+      setPublisher(null);
+    }
   }
 
   async function unpublish(){
@@ -43,7 +50,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
         insertMode: "append",
         name: user.name,
         style: { 
-          buttonDisplayMode: "on",
+          buttonDisplayMode: displayName? "on": "off",
           nameDisplayMode: displayName? "on": "off"
         }
       };
@@ -52,19 +59,8 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
       if (!publisher) {
         const initPublisher = OT.initPublisher(containerId, finalOptions);
 
-        // mSession.session.publish(initPublisher);
+        mSession.session.publish(initPublisher);
         setPublisher(initPublisher);
-
-        mSession.session.publish(
-          initPublisher,
-          (err) => {
-            if (err) {
-              console.log("err", err);
-            } else {
-              setPublisher(initPublisher);
-            }
-          }
-        )
       }
       else {
         mSession.session.publish(publisher);
