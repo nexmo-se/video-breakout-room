@@ -1,9 +1,13 @@
 import { Drawer, List, Popconfirm, Row, Col, Tooltip } from 'antd';
 import { 
-    Work as IconWork, 
+    AdminPanelSettings as IconBadge,
+    Settings as IconSettings, 
+    Mic as IconMicOn, 
     MicOff as IconMicOff, 
+    Link as IconLinkOn, 
     LinkOff as IconLinkOff, 
-    VoiceOverOff as IconVoiceOverOff 
+    PermCameraMic as IconCameraMicOn,
+    Block as IconCameraMicOff 
 } from '@mui/icons-material';
 import Avatar from 'react-avatar';
 import Button from 'components/Button';
@@ -13,6 +17,9 @@ import useRoom from 'hooks/room';
 import useSession from 'hooks/session';
 
 const iconStyle = {fill: 'black', width: "24px", height:"24px"}
+const iconStyleHost = {fill: 'green', width: "36px", height:"36px"}
+const iconStyleOn = {fill: 'green', width: "24px", height:"24px"}
+const iconStyleOff = {fill: 'black', width: "24px", height:"24px"}
 
 export default function LiveParticipantList({onClose, visible}) {
     const mMessage = useMessage();
@@ -70,7 +77,8 @@ export default function LiveParticipantList({onClose, visible}) {
         key="left"
       >
         {
-          console.log(mSession.streams)
+          //console.log(mSession.connections)
+          //console.log(mSession.streams)
           //console.log(mMessage.participants)
         }
         { mMessage.participants.length !== 0 ?
@@ -79,45 +87,58 @@ export default function LiveParticipantList({onClose, visible}) {
             dataSource={mMessage.participants}
             size="large"
             renderItem={item => {
-            const isCohost = mMessage.cohosts? mMessage.cohosts.includes(item.name):false;
-            const _stream = mSession.streams.length && mSession.streams.find(_e => _e.name === item.name);
-            // three buttons
-            const btnList = [{
-              enabled: _stream && _stream.hasAudio,
-              title: ["Mute Audio", "Muted Audio"],
-              onClick: (e) => { e.preventDefault(); handleForceMuteStream(_stream) },
-              icon: <IconMicOff className={'btn-svg'} style={iconStyle} />
-            },
-            {
-              enabled: _stream && (_stream.hasAudio || _stream.hasVideo),
-              title: ["Mute Audio & Video", "Muted Audio & Video"],
-              onClick: (e) => { e.preventDefault(); handleForceUnpublish(_stream) },
-              icon: <IconVoiceOverOff className={'btn-svg'} style={iconStyle} />
-            },
-            {
-              enabled: _stream && _stream.connection,
-              title: ["Disconnect", "Disconnected"],
-              onClick: (e) => { 
-                  e.preventDefault(); 
-                  handleForceDisconnect(_stream.connection).then(res => {
-                    let participants = mMessage.participants.filter(p =>  p.name !== item.name)
-                    mMessage.setParticipants(participants)
-                  }).catch()},
-              icon: <IconLinkOff className={'btn-svg'} style={iconStyle} />
-            }]
+              const _stream = mSession.streams.length && mSession.streams.find(_e => _e.name === item.name);
+              const _connection = mSession.connections.length && mSession.connections.find(_e => {
+                let data = JSON.parse(_e.data);
+                return (data.name === item.name)
+              });
+              // three buttons
+              const btnList = [{
+                enabled: _stream && _stream.hasAudio,
+                title: ["Mute Audio", "Muted"],
+                onClick: (e) => { e.preventDefault(); handleForceMuteStream(_stream) },
+                icon: [
+                  <IconMicOn className={'btn-svg'} style={iconStyleOn} />,
+                  <IconMicOff className={'btn-svg'} style={iconStyleOff} />
+                ]
+              },
+              {
+                enabled: _stream && (_stream.hasAudio || _stream.hasVideo),
+                title: ["Mute Audio & Video", "Blocked"],
+                onClick: (e) => { e.preventDefault(); handleForceUnpublish(_stream) },
+                icon: [
+                  <IconCameraMicOn className={'btn-svg'} style={iconStyleOn} />,
+                  <IconCameraMicOff className={'btn-svg'} style={iconStyleOff} />
+                ]
+              },
+              {
+                enabled: _connection && _connection.id,
+                title: ["Disconnect", "Disconnected"],
+                onClick: (e) => { 
+                    e.preventDefault(); 
+                    handleForceDisconnect(_connection).then(res => {
+                      let participants = mMessage.participants.filter(p =>  p.name !== item.name)
+                      mMessage.setParticipants(participants)
+                    }).catch()},
+                icon: [
+                  <IconLinkOn className={'btn-svg'} style={iconStyleOn} />,
+                  <IconLinkOff className={'btn-svg'} style={iconStyleOff} />
+                ]
+              }]
             return (
             <>
             {item.role !== "moderator" ?
             <List.Item>
-                <Row gutter={16}>
-                <Col className="gutter-row" span={24}>
+                <Row justify="center" align="top">
+                <Col span={22}>
                 <List.Item.Meta
-                  avatar={<Avatar src={`https://ui-avatars.com/api/?name=${item.name}`} round={true} size={44} style={{ marginRight: 16 }}/>}
-                  title={isCohost? "co-host" : item.role}
-                  description={item.name}
+                  avatar={<Avatar src={`https://ui-avatars.com/api/?name=${item.name}`} 
+                  round={true} size={44} style={{ marginRight: 16 }}/>}
+                  title={item.name}
+                  description={item.isCohost? 'Co-Host' : item.role}
                 />
                 </Col>
-                <Col className="gutter-row" span={24}>
+                <Col span={2}>
                 <Popconfirm
                     title={item.isCohost ? 
                         `Remove "${item.name}" co-host permission ?` : 
@@ -129,15 +150,22 @@ export default function LiveParticipantList({onClose, visible}) {
                     cancelText="No"
                     value={item.name}
                 >
-                <Tooltip title="Set as co-host" placement="bottom">
-                    <button 
-                        value={item.name} 
-                        className={'Vlt-btn Vlt-btn--app Vlt-btn--link'}
-                    ><IconWork className={'btn-svg'} style={iconStyle} />
-                    </button>
+                <Tooltip placement="bottom"
+                    title={item.isCohost? "Remove co-host permission":"Set as Co-Host"}
+                >
+                  <button
+                    value={item.name} 
+                    className={'Vlt-btn Vlt-btn--app Vlt-btn--link'}
+                  >{ item.isCohost?
+                      <IconBadge className={'btn-svg-mute'} style={iconStyleHost} />
+                      :
+                      <IconSettings className={'btn-svg'} style={iconStyle} />
+                  }</button>
                 </Tooltip>
-                </Popconfirm>
 
+                </Popconfirm>
+                </Col>
+                <Col span={24}>
                 {btnList.map((btn, key)=> {
                   return (
                     <Tooltip
@@ -148,12 +176,11 @@ export default function LiveParticipantList({onClose, visible}) {
                         onClick={e => btn.onClick(e)}
                         disabled={!btn.enabled}
                         className={'Vlt-btn Vlt-btn--app Vlt-btn--link'}
-                    > {btn.icon}
+                    > {btn.enabled? btn.icon[0]:btn.icon[1]}
                     </button>
                     </Tooltip>
                   )
                 })}
-
                 </Col>
                 </Row>
             </List.Item> : null

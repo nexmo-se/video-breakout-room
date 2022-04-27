@@ -30,6 +30,9 @@ span.Vlt-btn > button[disabled] {
 }
 
 .btn-svg:hover{
+  fill:white !important;
+  width: 26px;
+  height: 26px;
   border: none;
   background-color: green;
 }
