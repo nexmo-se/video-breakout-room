@@ -1,6 +1,4 @@
 // @flow
-require("dotenv").config();
-
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
 
@@ -62,5 +60,5 @@ const RoomListener = require("@app/listeners/room");
     res.sendFile(path.join(__dirname, "../build/index.html"));
   });
 
-  app.listen(process.env.PORT, () => console.log(`Express is listening to ${process.env.PORT}`));
+  app.listen(process.env.PORT_SERVER, () => console.log(`Express is listening to ${process.env.PORT_SERVER}`));
 })();
