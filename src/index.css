@@ -13,13 +13,15 @@ code {
 }
 
 span.Vlt-btn > button[disabled] {
-    background: none;
-    margin-left: 0px;
-    width: 40px;
-    height: 40px;
+  border: none;
+  background: none;
+  margin-left: 0px;
+  width: 40px;
+  height: 40px;
 }
 
 .btn-svg{
+  border: none;
   width: 24px;
   height: 24px;
   border-radius: .5rem;
@@ -28,5 +30,6 @@ span.Vlt-btn > button[disabled] {
 }
 
 .btn-svg:hover{
+  border: none;
   background-color: green;
 }

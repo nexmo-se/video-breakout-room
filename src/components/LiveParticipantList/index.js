@@ -79,7 +79,7 @@ export default function LiveParticipantList({onClose, visible}) {
             dataSource={mMessage.participants}
             size="large"
             renderItem={item => {
-            const isCohost = mMessage.cohosts.includes(item.name);
+            const isCohost = mMessage.cohosts? mMessage.cohosts.includes(item.name):false;
             const _stream = mSession.streams.length && mSession.streams.find(_e => _e.name === item.name);
             // three buttons
             const btnList = [{
