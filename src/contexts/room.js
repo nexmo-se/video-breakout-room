@@ -4,7 +4,6 @@ import useMessage from "hooks/message";
 import useSession from "hooks/session";
 import RoomAPI from "api/room";
 import CredentialAPI from "api/credential";
-import MessageAPI from "api/message";
 import config from "config";
 
 

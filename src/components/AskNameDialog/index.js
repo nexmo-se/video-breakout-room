@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import User from 'entities/user';
 import TextInput from 'components/TextInput';
+import RoomAPI from 'api/room';
 
 export default function AskNameDialog(props) {
   const { role, pin, onSubmit } = props;
@@ -16,13 +17,21 @@ export default function AskNameDialog(props) {
     }
   }
 
+  async function validateUserName(name) {
+    const { participants } = await RoomAPI.getParticipants(room);
+    if (participants && participants.find((participant) => participant.name === name)) {
+      return alert("Name already in use, please use another name");
+    }
+    setDisabled(true);
+    const user = new User(name, role);
+    onSubmit(user, room);
+  }
+
   function handleSubmit(e) {
       e.preventDefault();
       if(!name || !room) alert("Please fill in all fields");
       else if(onSubmit && inputPin === pin) {
-        setDisabled(true);
-        const user = new User(name, role);
-        onSubmit(user, room);
+        validateUserName(name);
       }else if(inputPin !== pin) alert("Wrong PIN");
   }
 

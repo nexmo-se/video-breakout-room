@@ -10,7 +10,6 @@ import {
     Block as IconCameraMicOff 
 } from '@mui/icons-material';
 import Avatar from 'react-avatar';
-import Button from 'components/Button';
 import useMessage from 'hooks/message';
 import RoomAPI from 'api/room';
 import useRoom from 'hooks/room';
@@ -76,11 +75,6 @@ export default function LiveParticipantList({onClose, visible}) {
         visible={visible}
         key="left"
       >
-        {
-          //console.log(mSession.connections)
-          //console.log(mSession.streams)
-          //console.log(mMessage.participants)
-        }
         { mMessage.participants.length !== 0 ?
         <List
             itemLayout="horizontal"

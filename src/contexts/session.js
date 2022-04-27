@@ -1,5 +1,5 @@
 // @flow
-import { useState, createContext, useEffect } from "react";
+import { useState, createContext } from "react";
 import { v4 as uuid } from "uuid";
 import OT from "@opentok/client";
 import config from "config";

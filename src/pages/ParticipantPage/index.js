@@ -13,7 +13,6 @@ import useNotification from "hooks/notification"
 
 import LiveBadge from "components/LiveBadge";
 import VonageLogo from "components/VonageLogo"
-import WhiteLayer from "components/WhiteLayer";
 import ChatList from "components/ChatList";
 import ChatInput from "components/ChatInput";
 import FullPageLoading from "components/FullPageLoading";

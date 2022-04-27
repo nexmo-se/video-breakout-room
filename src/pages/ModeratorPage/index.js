@@ -13,7 +13,6 @@ import useMessage from "hooks/message";
 import FullPageLoading from "components/FullPageLoading";
 import LayoutContainer from "components/LayoutContainer";
 import VonageLogo from "components/VonageLogo"
-import WhiteLayer from "components/WhiteLayer";
 import LiveBadge from "components/LiveBadge";
 import VideoControl from "components/VideoControl";
 import ChatList from "components/ChatList";
@@ -21,7 +20,6 @@ import ChatInput from "components/ChatInput";
 import BreakoutRoomButton from "components/BreakoutRoomButton";
 import ManagePeopleButton from "components/ManagePeopleButton";
 import BreakoutRoomControl from "components/BreakoutRoomControl";
-import Button from "components/Button";
 import MessageBar from "components/MessageBar";
 import ShareScreen from "components/ShareScreen";
 import CountDownTimer from "components/CountdownTimer";
