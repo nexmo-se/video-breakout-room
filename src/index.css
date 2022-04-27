@@ -11,3 +11,28 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+span.Vlt-btn > button[disabled] {
+  border: none;
+  background: none;
+  margin-left: 0px;
+  width: 40px;
+  height: 40px;
+}
+
+.btn-svg{
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: .5rem;
+  box-shadow: .25rem ;
+  fill: black
+}
+
+.btn-svg:hover{
+  fill:white !important;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background-color: green;
+}

@@ -437,6 +437,7 @@ class RoomListener{
       res.json({
         error: err.message
       });
+      // res.status(500).end(err.message);
     }
   }
 

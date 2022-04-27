@@ -5,7 +5,6 @@ export default class RoomAPI{
 
   static async getRoomInfo(roomId, data={}){
     const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/info`;
-
     const jsonResult = await (await fetch(apiURL, {
       method: "GET", headers: { "Content-Type": "application/JSON" },
     })).json();
@@ -25,7 +24,6 @@ export default class RoomAPI{
 
   static async generateSession(mainRoom, data){
     const apiURL = `${process.env.REACT_APP_API_URL}/room/${mainRoom}/createSession`;
-
     const jsonResult = await (await fetch(apiURL, {
       method: "POST", headers: { "Content-Type": "application/JSON" },
       body: JSON.stringify(data)
@@ -40,7 +38,6 @@ export default class RoomAPI{
 
   static async removeAllBreakoutRooms(roomId){
     const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/breakoutrooms`;
-
     const jsonResult = await (await fetch(apiURL, {
       method: "DELETE", headers: { "Content-Type": "application/JSON" },
     })).json();
@@ -59,7 +56,6 @@ export default class RoomAPI{
 
   static async renameRoom(roomId, newRoomName){
     const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/renameRoom`;
-
     const jsonResult = await (await fetch(apiURL, {
       method: "POST", headers: { "Content-Type": "application/JSON" },
       body: JSON.stringify({ data: {name: newRoomName} })
@@ -70,7 +66,6 @@ export default class RoomAPI{
 
   static async updateRoom(roomId, maxParticipants){
     const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/update`;
-
     const jsonResult = await (await fetch(apiURL, {
       method: "POST", headers: { "Content-Type": "application/JSON" },
       body: JSON.stringify({ data: {maxParticipants} })

@@ -1,6 +1,4 @@
 // @flow
-require("dotenv").config();
-
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
 
@@ -20,6 +18,13 @@ const RoomListener = require("@app/listeners/room");
   app.use(cors());
 
   app.use(express.static(path.join(__dirname, "../build")));
+
+  // app.use((req, res, next) => {
+  //   console.log("\n>>>", `${req.method} ${req.url}`)
+  //   if ("POST" == req.method) console.log(">>>>>>", JSON.stringify(req.body))
+  //   next()
+  // });
+
   app.get("/room/:roomId/info", RoomListener.info);
 
   app.post("/room/:roomId/createSession", RoomListener.createSession);
@@ -53,5 +58,5 @@ const RoomListener = require("@app/listeners/room");
     res.sendFile(path.join(__dirname, "../build/index.html"));
   });
 
-  app.listen(process.env.PORT, () => console.log(`Express is listening to ${process.env.PORT}`));
+  app.listen(process.env.PORT_SERVER, () => console.log(`Express is listening to ${process.env.PORT_SERVER}`));
 })();
