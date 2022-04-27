@@ -34,7 +34,7 @@ function ControlButton({ size=50, fontSize=24, loading, active, onClick, tooltip
     >
       {loading? <Loader size={fontSize} color="white" />: (
           <Tooltip title={tooltip}>
-            <div style={{ zIndex: 99999 }}>
+            <div style={{ zIndex: 99999, display: "flex" }}>
               {children}
             </div>
           </Tooltip>

@@ -12,6 +12,7 @@ class LayoutManager{
     const element = document.getElementById(this.container);
     if(element) this.manager = LM(element, { 
       fixedRatio: true, 
+      scaleLastRow: false,
       bigFirst: false,
       bigFixedRatio: true,
       bigAlignItems: "left"

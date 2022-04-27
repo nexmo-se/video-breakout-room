@@ -50,7 +50,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
         insertMode: "append",
         name: user.name,
         style: { 
-          buttonDisplayMode: displayName? "on": "off",
+          buttonDisplayMode: "off",
           nameDisplayMode: displayName? "on": "off"
         }
       };

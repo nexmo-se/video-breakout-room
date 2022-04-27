@@ -37,9 +37,7 @@ export default function AskNameDialog(props) {
           <TextInput label="Name*" text={name} onChange={setName} placeholder="Please enter your name"/>
           <TextInput label="Password*" type="password" text={inputPin} onChange={setInputPin} placeholder="PIN" autocomplete="on"/>
         </div>
-        <div className="Vlt-card__footer Vlt-card__footer--noborder">
-          <button type="submit" disabled={disabled} className="Vlt-btn Vlt-btn--primary Vlt-btn--app" onClick={handleSubmit}>Join</button>
-        </div>
+        <button style={{ marginTop: 16 }} type="submit" disabled={disabled} className="Vlt-btn Vlt-btn--primary Vlt-btn--app" onClick={handleSubmit}>Join</button>
       </div>
     </form>
   )

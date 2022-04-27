@@ -126,18 +126,6 @@ class RoomListener{
       const [ selectedRoom ] = await RoomAPI.getDetailById(room);
       const generatedUser = await UserAPI.generateToken(selectedRoom, user, data);
 
-      // If user join a main room
-      if (!selectedRoom.mainRoomId) {
-        let broadcast = false;
-        if (!participantsByMainRoom[selectedRoom.id]) { participantsByMainRoom[selectedRoom.id] = [data]; broadcast = true;}
-        else if (!participantsByMainRoom[selectedRoom.id].find((p) => p.name === data.name))  { participantsByMainRoom[selectedRoom.id].push(data); broadcast = true;}
-       
-        if (broadcast) {
-          let relatedSessions = await RoomAPI.getRelatedSessions(selectedRoom);
-          await RoomAPI.broadcastMsg(relatedSessions, 'update-participant', participantsByMainRoom[selectedRoom.id]);
-        }
-      }
-
       res.json({ 
         token: generatedUser.token,
         apiKey: process.env.API_KEY, ...selectedRoom
@@ -278,7 +266,7 @@ class RoomListener{
         if (targetedParticipant.isCohost) targetedParticipant.isCohost = false;
         else targetedParticipant.isCohost = true;
       }
-      if (type === "participant-leaved") {
+      if (type === "participant-leaved" && participantsByMainRoom[roomId]) {
         participantsByMainRoom[roomId] = participantsByMainRoom[roomId].filter((p) => p.name !== participant);
 
         // if no moderator
@@ -295,6 +283,10 @@ class RoomListener{
           }) 
         }
         tempRes.push(await RoomAPI.broadcastMsg(relatedSessions, 'breakout-room', {"message": "participantMoved", "breakoutRooms": breakoutRoomsByMainRoom[roomId]}));
+      }
+      if (type === "participant-joined" && !selectedRoom.mainRoomId) {
+          if (!participantsByMainRoom[selectedRoom.id]) { participantsByMainRoom[selectedRoom.id] = [participant];}
+          else if (!participantsByMainRoom[selectedRoom.id].find((p) => p.name === participant.name))  { participantsByMainRoom[selectedRoom.id].push(participant);}
       }
 
       tempRes.push(await RoomAPI.broadcastMsg(relatedSessions, "update-participant", participantsByMainRoom[roomId]));
@@ -383,7 +375,7 @@ class RoomListener{
   static async broadcast(req, res, next) {
     try {
       const { roomId } = req.params;
-      const { data, type } = req.body;
+      const { data, type, toRoomId } = req.body;
 
       if ( undefined === roomId ) throw new Error("Empty params");
 
@@ -395,9 +387,17 @@ class RoomListener{
         name: selectedRoom.name ?? selectedRoom.id
       };
 
-      let relatedSessions = await RoomAPI.getRelatedSessions(selectedRoom);
-      let tempRes = await RoomAPI.broadcastMsg(relatedSessions, type ?? 'raise-hand', data);
-      
+      let tempRes;
+      if (toRoomId) {
+        let toRoom = new Room(toRoomId);
+        let [ selectedToRoom ] = await RoomAPI.getDetailById(toRoom);  
+        tempRes = await RoomAPI.broadcastMsg([selectedToRoom.sessionId], type ?? 'message', data);
+      }
+      else {
+        let relatedSessions = await RoomAPI.getRelatedSessions(selectedRoom);
+        tempRes = await RoomAPI.broadcastMsg(relatedSessions, type ?? 'raise-hand', data);
+      }
+   
       res.json({
         tempRes
       });

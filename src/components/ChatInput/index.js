@@ -26,9 +26,7 @@ function ChatInput({ byPass, toBreakoutRoom, resetSelectedRoom }){
     if (toBreakoutRoom) {
       let toBreakoutRoomInfo = mMessage.breakoutRooms.find((room) => room.name === toBreakoutRoom)
 
-      toBreakoutRoom === 'all' ? 
-      MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'message', message) :
-      MessageAPI.crossRoomMsg(mRoom.currentRoom.id, toBreakoutRoomInfo.id, 'message', message)
+      MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'message', message, toBreakoutRoom === 'all' ? null : toBreakoutRoomInfo.id)
     }
     else {
       MessageAPI.sendMessage(mSession.session, message);

@@ -70,6 +70,7 @@ export default function RoomContextProvider({ children }){
     mSession.updateUser(user);
     mMessage.setBreakoutRooms(roomInfo.breakoutRooms ?? []);
     await connect(user, roomInfo.mainRoom.id);
+    await RoomAPI.updateParticipant(roomInfo.mainRoom.id, {type: 'participant-joined', participant: user});
     const { participants } = await RoomAPI.getParticipants(roomName);
     mMessage.setParticipants(participants);
   }

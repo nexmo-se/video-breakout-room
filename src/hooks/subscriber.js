@@ -1,7 +1,9 @@
 // @flow
-import { useState, useEffect } from "react";
+import { useState, useEffect, createElement } from "react";
 import LayoutManager from "utils/layout-manager";
 import useSession from "hooks/session";
+import VolumeOff from '@material-ui/icons/VolumeOff';
+
 
 function useSubscriber({ moderator, screen, camera, custom }){
   const [ subscribed, setSubscribed ] = useState([]);
@@ -13,14 +15,32 @@ function useSubscriber({ moderator, screen, camera, custom }){
 
   useEffect(() => {
     const { changedStream } = mSession;
-    if(changedStream){
-      const targetSubscriber = subscribers.find((subscriber) => subscriber.stream.id === changedStream.stream.id)
+    if(changedStream && (changedStream.changedProperty === "hasAudio")){
+      const targetSubscriber = subscribers.find((subscriber) => subscriber.stream.id === changedStream.stream.id)      
       
-      if (targetSubscriber && (changedStream.changedProperty === "hasAudio")) {
-        targetSubscriber.subscribeToAudio(changedStream.newValue);
+      if (!targetSubscriber) return;
+      const targetDom = document.getElementById(changedStream.oldValue ? targetSubscriber.id : `${targetSubscriber.id}-mute`);
+      
+      if (!targetDom) return;
+      targetSubscriber.subscribeToAudio(changedStream.newValue);
+      if (changedStream.newValue) {
+        targetDom.remove();
       }
-      if (targetSubscriber && (changedStream.changedProperty === "hasVideo")) {
-        targetSubscriber.subscribeToVideo(changedStream.newValue)
+      else{
+        const childNodeStr = `<div
+        id=${targetSubscriber.id}-mute
+        style="
+        position: absolute; 
+        bottom: 8px; 
+        left: 8px;
+        background: url(${process.env.PUBLIC_URL}/assets/mute.png);
+        background-position: center;
+        background-size: contain;
+        height: 22px;
+        width: 22px;
+        background-repeat: no-repeat;">
+        </div>`;
+        targetDom.insertAdjacentHTML('beforeend', childNodeStr);
       }
     }
   }, [ mSession.changedStream ])
@@ -62,8 +82,8 @@ function useSubscriber({ moderator, screen, camera, custom }){
       const containerId = getContainerId(data, videoType);
       const extraData = (data.role === "moderator")? { width: "100%", height: "100%" }: {}
       const finalOptions = Object.assign({}, extraData, { insertMode: "append", style: { 
-        buttonDisplayMode: "on",
-        nameDisplayMode: "on"
+        buttonDisplayMode: "off",
+        nameDisplayMode: "on",
       }});
       const subscriber = await new Promise((resolve, reject) => {
         const subscriber = mSession.session.subscribe(stream, containerId, finalOptions, (err) => {

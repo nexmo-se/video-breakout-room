@@ -61,6 +61,7 @@ export default function PromptCreateRooms(props) {
         >
           <InputNumber min={1} onChange={handleRoomChange}/>
         </Form.Item> Breakout rooms. </div>
+        <div styles={{overflowY: "scroll"}}>
         {[...Array(numberOfRooms)].map((x, i) =>
               <Input.Group compact key={`room ${i+1}`}>
               <Form.Item
@@ -81,7 +82,7 @@ export default function PromptCreateRooms(props) {
               <InputNumber min={1}/>
             </Form.Item>
             </Input.Group>
-        )}
+        )}</div>
         <Form.Item name="modifier" className="collection-create-form_last-form-item">
           <Radio.Group>
             <Radio style={{display: 'block'}} value="automatic">Assign automatically</Radio>

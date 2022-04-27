@@ -13,38 +13,18 @@ export default class MessageAPI{
     })
   };
 
-  static async broadcastMsg(roomId, type, data) {
-    if (undefined === roomId) return null;
+  static async broadcastMsg(mainRoomId, type, data, toRoomId = null) {
+    if (undefined === mainRoomId) return null;
 
     if (!type) { type = 'raise-hand'};
-    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/broadcast`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${mainRoomId}/broadcast`;
 
+    
     return fetch(apiURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       keepalive: true,
-      body: JSON.stringify({ type, data})
-    })
-    .then(res => res.json())
-    .then(res => {
-      return Promise.resolve(res);
-    })
-    .catch(error => {
-        console.error(`HTTP error!!`, this.url, error);
-        return Promise.resolve(null);
-    });
-  }
-
-  static async crossRoomMsg(roomId, toRoomId, type, data) {
-    if (undefined === roomId || undefined === toRoomId) return null;
-
-    if (!type) { type = 'message'};
-    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/crossRoomMsg`;
-
-    return fetch(apiURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type, toRoomId, data})
+      body: JSON.stringify({ type, data, toRoomId})
     })
     .then(res => res.json())
     .then(res => {

@@ -42,8 +42,6 @@ const RoomListener = require("@app/listeners/room");
 
   app.post("/room/:roomId/broadcast", RoomListener.broadcast);
 
-  app.post("/room/:roomId/crossRoomMsg", RoomListener.crossRoomMsg);
-
   app.post("/room/:roomId/updateParticipant", RoomListener.updateParticipant);
 
   app.post("/room/:roomId/joinBreakoutRoom", RoomListener.joinBreakoutRoom);

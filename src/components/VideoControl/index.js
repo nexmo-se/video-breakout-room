@@ -44,7 +44,31 @@ function VideoControl({ publisher, children }){
   }, [ mSession.changedStream ]);
 
   useEffect(() => {
-    if(publisher) publisher.publishAudio(hasAudio);
+    if(publisher) {
+      publisher.publishAudio(hasAudio);
+      const targetDom = document.getElementById(hasAudio ? `${publisher.id}-mute` : publisher.id);
+
+      if (!targetDom) return;
+      if (hasAudio) {
+        targetDom.remove();
+      }
+      else{
+        const childNodeStr = `<div
+        id=${publisher.id}-mute
+        style="
+        position: absolute; 
+        bottom: 8px; 
+        left: 8px;
+        background: url(${process.env.PUBLIC_URL}/assets/mute.png);
+        background-position: center;
+        background-size: contain;
+        height: 22px;
+        width: 22px;
+        background-repeat: no-repeat;">
+        </div>`;
+        targetDom.insertAdjacentHTML('beforeend', childNodeStr);
+      }
+    }
   }, [ hasAudio, publisher ])
 
   useEffect(() => {

@@ -49,12 +49,12 @@ export default makeStyles(() => ({
     zIndex: 0
   },
   moderator: { 
-    flex: 1, 
+    flex: 2, 
     borderBottom: "1px solid #e7ebee", 
     position: "relative" 
   },
   chatContainer: { 
-    flex: 3, 
+    flex: 4, 
     display: "flex", 
     flexDirection: "column", 
     padding: 16, 
