@@ -19,6 +19,7 @@ const RoomListener = require("@app/listeners/room");
 
   app.use(express.static(path.join(__dirname, "../build")));
 
+  const PORT = process.env.PORT_SERVER || 8080;
   // app.use((req, res, next) => {
   //   console.log("\n>>>", `${req.method} ${req.url}`)
   //   if ("POST" == req.method) console.log(">>>>>>", JSON.stringify(req.body))
@@ -58,5 +59,5 @@ const RoomListener = require("@app/listeners/room");
     res.sendFile(path.join(__dirname, "../build/index.html"));
   });
 
-  app.listen(process.env.PORT_SERVER, () => console.log(`Express is listening to ${process.env.PORT_SERVER}`));
+  app.listen(PORT, () => console.log(`Express is listening to ${PORT}`));
 })();
