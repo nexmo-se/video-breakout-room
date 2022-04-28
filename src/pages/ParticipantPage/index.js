@@ -172,7 +172,7 @@ export default function ParticipantPage(){
     <>
       <div className={mStyles.container}>
         {mSession.session.currentState !== "connected" ? <FullPageLoading/> : null}
-      <div className={clsx(mStyles.leftContainer, mStyles.black)}>
+      <div className={clsx(mRoom.inBreakoutRoom ? mStyles.containerInRoom : '', mStyles.leftContainer, mStyles.black)}>
             {
             mRoom.inBreakoutRoom ?
               (
@@ -183,7 +183,9 @@ export default function ParticipantPage(){
               </div>
               ) : null
             }
+          <div className={mStyles.cameraContainer}>
           <LayoutContainer id="cameraContainer" size="big" />
+          </div>
           <div className={mStyles.logoContainer}>
             <LiveBadge/>
           </div>

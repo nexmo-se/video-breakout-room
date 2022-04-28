@@ -129,7 +129,7 @@ export default function ModeratorPage() {
       <>
       <div className={mStyles.container}>
         {mSession.session.currentState !== "connected" ? <FullPageLoading/> : null}
-        <div className={clsx(mStyles.leftContainer, mStyles.black)}>
+        <div className={clsx(mRoom.inBreakoutRoom ? mStyles.containerInRoom : '', mStyles.leftContainer, mStyles.black)}>
         { mRoom.inBreakoutRoom ?
               (
               <div className={mStyles.header}>
@@ -138,7 +138,9 @@ export default function ModeratorPage() {
               </div>
               ) : null
           }
-          <LayoutContainer id="cameraContainer" size="big" />
+          <div className={mStyles.cameraContainer}>
+            <LayoutContainer id="cameraContainer" size="big" />
+          </div>
           <div className={mStyles.logoContainer}>
             <LiveBadge/>
           </div>

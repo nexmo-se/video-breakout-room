@@ -16,6 +16,14 @@ export default makeStyles(() => ({
     display: "flex",
     position: "relative" 
   },
+  containerInRoom: {
+    padding: "32px 0px 0px"
+  },
+  cameraContainer: {
+    position: "relative",
+    width: "100%",
+    height: "100%"
+  },
   header: {
     position: "absolute",
     top: 0,
