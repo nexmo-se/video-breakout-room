@@ -19,7 +19,8 @@ const RoomListener = require("@app/listeners/room");
 
   app.use(express.static(path.join(__dirname, "../build")));
 
-  const PORT = process.env.PORT_SERVER || 8080;
+  const PORT = process.env.PORT || 3002;
+  
   // app.use((req, res, next) => {
   //   console.log("\n>>>", `${req.method} ${req.url}`)
   //   if ("POST" == req.method) console.log(">>>>>>", JSON.stringify(req.body))
