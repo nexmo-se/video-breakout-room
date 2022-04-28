@@ -37,11 +37,6 @@
         "description": "Always stay connect to main session",
         "value": "no",
         "required": true
-      },
-      "REACT_APP_API_URL": {
-        "description": "API Url",
-        "value": "",
-        "required": true
       }
     }
   }
