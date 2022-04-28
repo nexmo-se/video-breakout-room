@@ -1,4 +1,8 @@
 // @flow
+const url = new URL(window.location.href);
+const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+
+
 export default class MessageAPI{
 
   static async sendMessage(session, message){
@@ -18,7 +22,7 @@ export default class MessageAPI{
 
     if (!type) { type = 'raise-hand'};
 
-    const apiURL = `${process.env.REACT_APP_API_URL}/room/${mainRoomId}/broadcast`;
+    const apiURL = `${serverPath}/room/${mainRoomId}/broadcast`;
 
     return fetch(apiURL, {
       method: "POST",
