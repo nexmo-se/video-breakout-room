@@ -36,7 +36,6 @@ export default function MoveRoomContent(props) {
             participant: selectedParticipant
         }
         
-        // RoomAPI.manageRoomParticipants(mRoom.currentRoom.id, 'breakout-room', {"message": "participantMoved", "breakoutRooms": newRooms});
         RoomAPI.moveParticipant(mRoom.mainRoom.id, "participantMoved", data);
 
         setSelectedParticipant(null);

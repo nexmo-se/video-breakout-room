@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Form, InputNumber, Radio, Input } from 'antd';
 import useRoom from 'hooks/room';
 import useMessage from 'hooks/message';
-import MessageAPI from 'api/message';
 
 export default function PromptCreateRooms(props) {
   const [form] = Form.useForm();

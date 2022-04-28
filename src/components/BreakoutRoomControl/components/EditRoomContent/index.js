@@ -2,15 +2,12 @@
 import { Input, InputNumber, Form } from 'antd';
 import Button from 'components/Button';
 import RoomAPI from 'api/room';
-import MessageAPI from 'api/message';
 import useMessage from 'hooks/message';
-import useRoom from 'hooks/room';
 
 export default function EditRoomContent(props) {
    const { roomName, maxParticipant, selectedRoom, setIsLoading, setSelectedRoom } = props
    const [form] = Form.useForm();
    const mMessage = useMessage();
-   const mRoom = useRoom();
 
    function handleEditRoom() {
     const formRoomName = form.getFieldValue(selectedRoom);

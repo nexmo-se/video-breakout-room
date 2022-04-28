@@ -11,7 +11,6 @@ import MessageRoomContent from '../MessageRoomContent';
 import useMessage from 'hooks/message';
 import useRoom from 'hooks/room';
 import useSession from "hooks/session";
-import MessageAPI from "api/message";
 
 export default function ActionButtons(props) {
     const {roomName, setIsLoading, handleChangeRoom, styles} = props;

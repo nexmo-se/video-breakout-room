@@ -68,7 +68,11 @@ export default function MessageProvider({ children }){
     mSession.session.on("signal:breakout-room", ({ data }) => {
       const jsonData = JSON.parse(data);
       setBreakoutRooms(jsonData.breakoutRooms);
-      setBreakoutRoomSignal(jsonData);
+      setBreakoutRoomSignal((prevSignal) => {
+        if (!prevSignal || (data !== JSON.stringify(prevSignal))) {
+          return jsonData
+        }
+      });
     });
 
     mSession.session.on("signal:join-breakout-room", ({ data }) => {

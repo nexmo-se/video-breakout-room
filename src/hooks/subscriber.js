@@ -1,9 +1,7 @@
 // @flow
-import { useState, useEffect, createElement } from "react";
+import { useState, useEffect } from "react";
 import LayoutManager from "utils/layout-manager";
 import useSession from "hooks/session";
-import VolumeOff from '@material-ui/icons/VolumeOff';
-
 
 function useSubscriber({ moderator, screen, camera, custom }){
   const [ subscribed, setSubscribed ] = useState([]);
@@ -27,23 +25,27 @@ function useSubscriber({ moderator, screen, camera, custom }){
         targetDom.remove();
       }
       else{
-        const childNodeStr = `<div
-        id=${targetSubscriber.id}-mute
-        style="
-        position: absolute; 
-        bottom: 8px; 
-        left: 8px;
-        background: url(${process.env.PUBLIC_URL}/assets/mute.png);
-        background-position: center;
-        background-size: contain;
-        height: 22px;
-        width: 22px;
-        background-repeat: no-repeat;">
-        </div>`;
-        targetDom.insertAdjacentHTML('beforeend', childNodeStr);
+        insertMuteIcon(targetSubscriber,targetDom);
       }
     }
   }, [ mSession.changedStream ])
+
+  function insertMuteIcon(targetSubscriber,targetDom) {
+    const childNodeStr = `<div
+    id=${targetSubscriber.id}-mute
+    style="
+    position: absolute; 
+    bottom: 8px; 
+    left: 8px;
+    background: url(${process.env.PUBLIC_URL}/assets/mute.png);
+    background-position: center;
+    background-size: contain;
+    height: 22px;
+    width: 22px;
+    background-repeat: no-repeat;">
+    </div>`;
+    targetDom.insertAdjacentHTML('beforeend', childNodeStr);
+  }
 
   function getContainerId(user, videoType){
     if(user.role === "moderator" && videoType === "camera") return moderator;
@@ -87,7 +89,13 @@ function useSubscriber({ moderator, screen, camera, custom }){
       }});
       const subscriber = await new Promise((resolve, reject) => {
         const subscriber = mSession.session.subscribe(stream, containerId, finalOptions, (err) => {
-          if(!err) resolve(subscriber);
+          if(!err) {
+            if (!stream.hasAudio) {
+              const targetDom = document.getElementById(subscriber.id);
+              insertMuteIcon(subscriber,targetDom)
+            }
+            resolve(subscriber);
+          }
         })
       });
       setSubscribers((prevSubscribers) => [ ...prevSubscribers, subscriber ]);

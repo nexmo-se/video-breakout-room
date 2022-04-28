@@ -53,7 +53,6 @@ export default function ParticipantPage(){
     if (!mMessage.breakoutRoomSignal) return;
 
     setChooseRoomPrompt(false);
-
     let roomNameFound;
     let roomSessionIdFound;
     let roomAssigned = mMessage.breakoutRoomSignal.breakoutRooms.find((room) => room["memberAssigned"].includes(mSession.user.name));
@@ -76,8 +75,8 @@ export default function ParticipantPage(){
     if (mMessage.breakoutRoomSignal.message === 'roomEdited' && !roomNameFound && roomSessionIdFound) {
        mNotification.openNotification("Room renamed by Host/Co-host", "New Room Name: " + roomSessionIdFound.name, ()=>{mRoom.handleInBreakoutRoomChange(roomSessionIdFound.name)});
     }
-    if (mMessage.breakoutRoomSignal.message === 'participantMoved' && ((roomNameFound && !roomNameFound["member"].includes(mSession.user.name)) || ((!roomNameFound && roomAssigned)))) {
-        mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned.name === mRoom.mainRoom.name ? '' : roomAssigned.name))
+    if (mMessage.breakoutRoomSignal.message === 'participantMoved' && ((roomNameFound && !roomNameFound["member"].includes(mSession.user.name)) || ((!roomNameFound && roomAssigned)))) { 
+      mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned ? roomAssigned.name: mRoom.mainRoom.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name: ''))
     }
     if (mMessage.breakoutRoomSignal.message === "forceReturn" && mRoom.inBreakoutRoom ) {
         mNotification.openNotification("Moderator left", "You will be redirected to main session in 5 seconds.",  () => handleChangeRoom())
@@ -210,6 +209,7 @@ export default function ParticipantPage(){
             <VideoControl 
               publisher={mPublisher.publisher} 
               forceUnpublished={ mPublisher.forceUnpublished } 
+              publisherStream = {mPublisher.stream}
             >
             <MessageBar />
             { isCohost ?

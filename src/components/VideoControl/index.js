@@ -9,7 +9,7 @@ import VideoButton from 'components/VideoButton';
 import useStyles from './styles';
 import useSession from 'hooks/session';
 
-function VideoControl({ publisher, forceUnpublished, children }){
+function VideoControl({ publisher, publisherStream, forceUnpublished, children }){
   const [ hasAudio, setHasAudio ] = useState(true);
   const [ hasVideo, setHasVideo ] = useState(true);
   const mSession = useSession();
@@ -81,6 +81,13 @@ function VideoControl({ publisher, forceUnpublished, children }){
       setHasVideo(false);
     }
   }, [forceUnpublished])
+
+  useEffect(() => {
+    if (!publisherStream) return;
+    if (publisherStream.hasAudio && !hasAudio) {
+      setHasAudio(true);
+    }
+  }, [publisherStream])
 
   if(!publisher) return null;
 

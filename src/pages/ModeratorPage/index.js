@@ -64,7 +64,7 @@ export default function ModeratorPage() {
          mNotification.openNotification("Room renamed by Host/Co-host", "New Room Name: " + roomSessionIdFound.name, ()=>{mRoom.handleInBreakoutRoomChange(roomSessionIdFound.name)});
       }
       if (mMessage.breakoutRoomSignal.message === 'participantMoved' && ((roomNameFound && !roomNameFound["member"].includes(mSession.user.name)) || (!roomNameFound && roomAssigned))) {
-          mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned.name === mRoom.mainRoom.name ? '' : roomAssigned.name))
+          mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned ? roomAssigned.name: mRoom.mainRoom.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name: ''))
       }
     }, [ mMessage.breakoutRoomSignal ])
 
@@ -159,6 +159,7 @@ export default function ModeratorPage() {
             <VideoControl 
               publisher={mPublisher.publisher} 
               forceUnpublished={ mPublisher.forceUnpublished } 
+              publisherStream = {mPublisher.stream}
             >
             <MessageBar />
             <BreakoutRoomButton
