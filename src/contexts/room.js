@@ -119,7 +119,7 @@ export default function RoomContextProvider({ children }){
 
   async function connect(user, roomId){
     if (!user) return;
-    const userJson = user.toJSON();
+    const userJson = user;
     const credentialInfo = {
       role: userJson.role === "moderator" ? "moderator" : "publisher",
       data: userJson

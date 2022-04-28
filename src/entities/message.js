@@ -35,7 +35,7 @@ export default class Message{
   toJSON() {
     const jsonData = {
       id: this.id,
-      sender: this.sender.toJSON(),
+      sender: this.sender,
       text: this.text,
       isApproved: this.isApproved,
       fromRoomName: this.fromRoomName,

@@ -31,6 +31,7 @@ export default function BreakoutRoomButton({...props }){
       active={isBreakout}
       onClick={onBreakoutRoomClicked}
       tooltip="Breakout Room"
+      style={{ marginLeft: 8 }}
     >
     <GridView fontSize="inherit"/>
     </ControlButton>

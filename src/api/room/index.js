@@ -22,6 +22,16 @@ export default class RoomAPI{
     return jsonResult;
   }
 
+  static async getBreakoutRooms(roomId){
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/getBreakoutRooms`;
+
+    const jsonResult = await (await fetch(apiURL, {
+      method: "GET", headers: { "Content-Type": "application/JSON" },
+    })).json();
+
+    return jsonResult;
+  }
+
   static async generateSession(mainRoom, data){
     const apiURL = `${process.env.REACT_APP_API_URL}/room/${mainRoom}/createSession`;
     const jsonResult = await (await fetch(apiURL, {

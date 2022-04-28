@@ -285,6 +285,7 @@ class RoomListener{
         tempRes.push(await RoomAPI.broadcastMsg(relatedSessions, 'breakout-room', {"message": "participantMoved", "breakoutRooms": breakoutRoomsByMainRoom[roomId]}));
       }
       if (type === "participant-joined" && !selectedRoom.mainRoomId) {
+          if (!breakoutRoomsByMainRoom[roomId]) breakoutRoomsByMainRoom[roomId] = [];
           if (!participantsByMainRoom[selectedRoom.id]) { participantsByMainRoom[selectedRoom.id] = [participant];}
           else if (!participantsByMainRoom[selectedRoom.id].find((p) => p.name === participant.name))  { participantsByMainRoom[selectedRoom.id].push(participant);}
       }
