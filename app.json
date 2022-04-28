@@ -37,6 +37,18 @@
         "description": "Always stay connect to main session",
         "value": "no",
         "required": true
+      },
+      "REACT_APP_API_URL": {
+        "description": "Server Url.",
+        "generator": "secret"
+      },
+      "WEB_CONCURRENCY": "5"
+    },
+    "environments": {
+      "test": {
+        "env": {
+          "REACT_APP_API_URL": ""
+        }
       }
     }
   }

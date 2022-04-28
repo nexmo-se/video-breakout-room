@@ -4,9 +4,8 @@ import Room from "entities/room";
 export default class RoomAPI{
 
   static async getRoomInfo(roomId, data={}){
-    const serverPath = process.env.REACT_APP_API_URL || '';
 
-    const apiURL = `${serverPath}/room/${roomId}/info`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/info`;
     const jsonResult = await (await fetch(apiURL, {
       method: "GET", headers: { "Content-Type": "application/JSON" },
     })).json();
@@ -15,9 +14,8 @@ export default class RoomAPI{
   }
 
   static async getParticipants(roomId){
-    const serverPath = process.env.REACT_APP_API_URL || '';
 
-    const apiURL = `${serverPath}/room/${roomId}/participants`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/participants`;
 
     const jsonResult = await (await fetch(apiURL, {
       method: "GET", headers: { "Content-Type": "application/JSON" },
@@ -27,9 +25,8 @@ export default class RoomAPI{
   }
 
   static async getBreakoutRooms(roomId){
-    const serverPath = process.env.REACT_APP_API_URL || '';
 
-    const apiURL = `${serverPath}/room/${roomId}/getBreakoutRooms`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/getBreakoutRooms`;
 
     const jsonResult = await (await fetch(apiURL, {
       method: "GET", headers: { "Content-Type": "application/JSON" },
@@ -39,9 +36,8 @@ export default class RoomAPI{
   }
 
   static async generateSession(mainRoom, data){
-    const serverPath = process.env.REACT_APP_API_URL || '';
 
-    const apiURL = `${serverPath}/room/${mainRoom}/createSession`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${mainRoom}/createSession`;
     const jsonResult = await (await fetch(apiURL, {
       method: "POST", headers: { "Content-Type": "application/JSON" },
       body: JSON.stringify(data)
@@ -55,9 +51,8 @@ export default class RoomAPI{
   }
 
   static async removeAllBreakoutRooms(roomId){
-    const serverPath = process.env.REACT_APP_API_URL || '';
 
-    const apiURL = `${serverPath}/room/${roomId}/breakoutrooms`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/breakoutrooms`;
     const jsonResult = await (await fetch(apiURL, {
       method: "DELETE", headers: { "Content-Type": "application/JSON" },
     })).json();
@@ -66,9 +61,8 @@ export default class RoomAPI{
   }
 
   static async removeBreakoutRoom(roomId){
-    const serverPath = process.env.REACT_APP_API_URL || '';
 
-    const apiURL = `${serverPath}/room/${roomId}`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}`;
 
     const jsonResult = await (await fetch(apiURL, {
       method: "DELETE", headers: { "Content-Type": "application/JSON" },
@@ -77,9 +71,8 @@ export default class RoomAPI{
   }
 
   static async renameRoom(roomId, newRoomName){
-    const serverPath = process.env.REACT_APP_API_URL || '';
 
-    const apiURL = `${serverPath}/room/${roomId}/renameRoom`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/renameRoom`;
     const jsonResult = await (await fetch(apiURL, {
       method: "POST", headers: { "Content-Type": "application/JSON" },
       body: JSON.stringify({ data: {name: newRoomName} })
@@ -89,9 +82,8 @@ export default class RoomAPI{
   }
 
   static async updateRoom(roomId, maxParticipants){
-    const serverPath = process.env.REACT_APP_API_URL || '';
 
-    const apiURL = `${serverPath}/room/${roomId}/update`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/update`;
     const jsonResult = await (await fetch(apiURL, {
       method: "POST", headers: { "Content-Type": "application/JSON" },
       body: JSON.stringify({ data: {maxParticipants} })
@@ -103,9 +95,7 @@ export default class RoomAPI{
   static async updateParticipant(roomId, data= {}) {
     if (undefined === roomId) return null;
 
-    const serverPath = process.env.REACT_APP_API_URL || '';
-
-    const apiURL = `${serverPath}/room/${roomId}/updateParticipant`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/updateParticipant`;
 
     return fetch(apiURL, {
       method: "POST",
@@ -126,9 +116,7 @@ export default class RoomAPI{
   static async joinBreakoutRoom(roomId, type, data= {}) {
     if (undefined === roomId) return null;
 
-    const serverPath = process.env.REACT_APP_API_URL || '';
-
-    const apiURL = `${serverPath}/room/${roomId}/joinBreakoutRoom`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/joinBreakoutRoom`;
     data.type = type;
     const jsonResult = await (await fetch(apiURL, {
       method: "POST",
@@ -142,9 +130,7 @@ export default class RoomAPI{
   static async moveParticipant(roomId, type, data= {}) {
     if (undefined === roomId) return null;
 
-    const serverPath = process.env.REACT_APP_API_URL || '';
-
-    const apiURL = `${serverPath}/room/${roomId}/moveParticipant`;
+    const apiURL = `${process.env.REACT_APP_API_URL}/room/${roomId}/moveParticipant`;
     data.type = type;
     const jsonResult = await (await fetch(apiURL, {
       method: "POST",
