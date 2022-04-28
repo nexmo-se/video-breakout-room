@@ -39,14 +39,9 @@
         "required": true
       },
       "REACT_APP_API_URL": {
-        "description": "API Url."
-      }
-    },
-    "environments": {
-      "test": {
-        "env": {
-          "REACT_APP_API_URL": ""
-        }
+        "description": "API Url",
+        "value": "",
+        "required": true
       }
     }
   }
