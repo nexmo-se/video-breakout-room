@@ -39,10 +39,8 @@
         "required": true
       },
       "REACT_APP_API_URL": {
-        "description": "Server Url.",
-        "generator": "secret"
-      },
-      "WEB_CONCURRENCY": "5"
+        "description": "API Url."
+      }
     },
     "environments": {
       "test": {
