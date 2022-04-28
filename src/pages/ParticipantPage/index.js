@@ -121,6 +121,14 @@ export default function ParticipantPage(){
     if (mMessage.breakoutRooms.length !== 0 ) setIsBreakout(true);
   }, [mMessage.breakoutRooms])
 
+  useEffect(() => {
+    if (mSession.forceDisconnected) {
+      mNotification.openNotification("", "Oops, Someone has disconnected you from the room.", () => { mRoom.handleExitPage() })
+    }
+    if (mPublisher.forceUnpublished) {
+      mNotification.openNotification("", "Oops, Someone has stopped you publishing a stream.", () => {})
+    }
+  }, [ mSession.forceDisconnected, mPublisher.forceUnpublished])
 
   useEffect(() => {
     window.addEventListener('unload', () => mRoom.handleExitPage() )
@@ -199,6 +207,7 @@ export default function ParticipantPage(){
             <h4 className="Vlt-center">My Controls</h4>
             <VideoControl 
               publisher={mPublisher.publisher} 
+              forceUnpublished={ mPublisher.forceUnpublished } 
             >
             <MessageBar />
             { isCohost ?

@@ -12,6 +12,7 @@ function SessionProvider({ children }){
   const [ streams, setStreams ] = useState([]);
   const [ changedStream, setChangedStream ] = useState();
   const [ connections, setConnections ] = useState([]);
+  const [ forceDisconnected, setForceDisconnected ] = useState(false);
 
   function handleStreamPropertyChanged({ stream, changedProperty, newValue, oldValue }){
     setChangedStream({ stream, changedProperty, newValue, oldValue, token: uuid() });
@@ -23,6 +24,12 @@ function SessionProvider({ children }){
 
   function handleConnectionDestroyed(e){
     setConnections((prevConnections) => [ ...prevConnections].filter((connection) => connection.id !== e.connection.id));
+  }
+
+  function handleSessionDisconnected(e){
+    if (e.reason == "forceDisconnected") {
+      setForceDisconnected(true);
+    }
   }
 
   function handleStreamCreated(e){
@@ -54,7 +61,8 @@ function SessionProvider({ children }){
         newSession.on("streamPropertyChanged", handleStreamPropertyChanged);
         newSession.on("streamCreated", (e) => handleStreamCreated(e));
         newSession.on("streamDestroyed", (e) => handleStreamDestroyed(e));
-  
+        // one trigger: connection moderation: session.forceDisconnect(connection) 
+        newSession.on("sessionDisconnected", (e) => handleSessionDisconnected(e));
         newSession.on("connectionCreated", (e) => handleConnectionCreated(e));
         newSession.on("connectionDestroyed", (e) => handleConnectionDestroyed(e));
       }
@@ -64,7 +72,8 @@ function SessionProvider({ children }){
         newSession.on("streamPropertyChanged", handleStreamPropertyChanged);
         newSession.on("streamCreated", (e) => handleStreamCreated(e));
         newSession.on("streamDestroyed", (e) => handleStreamDestroyed(e));
-  
+        // one trigger: connection moderation: session.forceDisconnect(connection) 
+        newSession.on("sessionDisconnected", (e) => handleSessionDisconnected(e));
         newSession.on("connectionCreated", (e) => handleConnectionCreated(e));
         newSession.on("connectionDestroyed", (e) => handleConnectionDestroyed(e));
         
@@ -91,6 +100,7 @@ function SessionProvider({ children }){
       connections,
       connect,
       updateUser,
+      forceDisconnected
     }}>
       {children}
     </SessionContext.Provider>

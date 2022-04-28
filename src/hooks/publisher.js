@@ -9,6 +9,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
   const [ publisher, setPublisher ] = useState();
 
   const [ stream, setStream ] = useState();
+  const [ forceUnpublished, setForceUnpublished ] = useState(false);
   const [ layoutManager, setLayoutManager ] = useState(new LayoutManager(containerId));
   const mSession = useSession();
 
@@ -23,15 +24,8 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
   function handleStreamDestroyed(e){
     if (e.stream.name !== "sharescreen") e.preventDefault();
     if (e.reason === 'forceUnpublished') {
-      console.log('You are forceUnpublished', e);
-      // update mSession.changedStream 
-      // -- this should be able to update audio+button ?
-      mSession.changedStream = {
-        stream: e.stream, 
-        changedProperty: 'destroyed', 
-        newValue: false, 
-        oldValue: true
-      }
+      console.log('You are forceUnpublished');
+      setForceUnpublished(true)
     }
   }
 
@@ -108,6 +102,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
     publish, 
     publisher, 
     stream,
+    forceUnpublished,
     layoutManager
   }
 }

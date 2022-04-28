@@ -98,7 +98,7 @@ export default function LiveParticipantList({onClose, visible}) {
               },
               {
                 enabled: _stream && (_stream.hasAudio || _stream.hasVideo),
-                title: ["Mute Audio & Video", "Blocked"],
+                title: ["Stop Stream", "Stream Stopped"],
                 onClick: (e) => { e.preventDefault(); handleForceUnpublish(_stream) },
                 icon: [
                   <IconCameraMicOn className={'btn-svg'} style={iconStyleOn} />,
