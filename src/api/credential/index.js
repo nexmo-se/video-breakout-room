@@ -4,8 +4,7 @@ import config from "config";
 
 export default class CredentialAPI{
   static async generateCredential({roomId = config.roomName, role="publisher", data={}}){
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
     const apiURL = `${serverPath}/room/${roomId}/generateToken`;
     const jsonResult = await (await fetch(apiURL, {
       method: "POST", headers: { "Content-Type": "application/JSON" },

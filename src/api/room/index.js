@@ -4,8 +4,7 @@ import Room from "entities/room";
 export default class RoomAPI{
 
   static async getRoomInfo(roomId, data={}){
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
 
     const apiURL = `${serverPath}/room/${roomId}/info`;
     const jsonResult = await (await fetch(apiURL, {
@@ -16,8 +15,7 @@ export default class RoomAPI{
   }
 
   static async getParticipants(roomId){
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
 
     const apiURL = `${serverPath}/room/${roomId}/participants`;
 
@@ -29,8 +27,7 @@ export default class RoomAPI{
   }
 
   static async getBreakoutRooms(roomId){
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
 
     const apiURL = `${serverPath}/room/${roomId}/getBreakoutRooms`;
 
@@ -42,8 +39,7 @@ export default class RoomAPI{
   }
 
   static async generateSession(mainRoom, data){
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
 
     const apiURL = `${serverPath}/room/${mainRoom}/createSession`;
     const jsonResult = await (await fetch(apiURL, {
@@ -59,8 +55,7 @@ export default class RoomAPI{
   }
 
   static async removeAllBreakoutRooms(roomId){
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
 
     const apiURL = `${serverPath}/room/${roomId}/breakoutrooms`;
     const jsonResult = await (await fetch(apiURL, {
@@ -71,8 +66,7 @@ export default class RoomAPI{
   }
 
   static async removeBreakoutRoom(roomId){
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
 
     const apiURL = `${serverPath}/room/${roomId}`;
 
@@ -83,8 +77,7 @@ export default class RoomAPI{
   }
 
   static async renameRoom(roomId, newRoomName){
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
 
     const apiURL = `${serverPath}/room/${roomId}/renameRoom`;
     const jsonResult = await (await fetch(apiURL, {
@@ -96,8 +89,7 @@ export default class RoomAPI{
   }
 
   static async updateRoom(roomId, maxParticipants){
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
 
     const apiURL = `${serverPath}/room/${roomId}/update`;
     const jsonResult = await (await fetch(apiURL, {
@@ -111,8 +103,7 @@ export default class RoomAPI{
   static async updateParticipant(roomId, data= {}) {
     if (undefined === roomId) return null;
 
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
 
     const apiURL = `${serverPath}/room/${roomId}/updateParticipant`;
 
@@ -135,8 +126,7 @@ export default class RoomAPI{
   static async joinBreakoutRoom(roomId, type, data= {}) {
     if (undefined === roomId) return null;
 
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
 
     const apiURL = `${serverPath}/room/${roomId}/joinBreakoutRoom`;
     data.type = type;
@@ -152,8 +142,7 @@ export default class RoomAPI{
   static async moveParticipant(roomId, type, data= {}) {
     if (undefined === roomId) return null;
 
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
 
     const apiURL = `${serverPath}/room/${roomId}/moveParticipant`;
     data.type = type;

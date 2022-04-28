@@ -17,8 +17,7 @@ export default class MessageAPI{
     if (undefined === mainRoomId) return null;
 
     if (!type) { type = 'raise-hand'};
-    const url = new URL(window.location.href);
-    const serverPath = process.env.REACT_APP_API_URL || `${url.protocol}//${url.hostname}:${url.port}`;
+    const serverPath = process.env.REACT_APP_API_URL || '';
 
     const apiURL = `${serverPath}/room/${mainRoomId}/broadcast`;
 
