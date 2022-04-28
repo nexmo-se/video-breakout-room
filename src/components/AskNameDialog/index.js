@@ -20,9 +20,9 @@ export default function AskNameDialog(props) {
   async function validateUserName(name) {
     const { participants } = await RoomAPI.getParticipants(room);
     if (participants && participants.find((participant) => participant.name === name)) {
+      setDisabled(false);
       return alert("Name already in use, please use another name");
     }
-    setDisabled(true);
     const user = new User(name, role);
     onSubmit(user, room);
   }
@@ -31,6 +31,7 @@ export default function AskNameDialog(props) {
       e.preventDefault();
       if(!name || !room) alert("Please fill in all fields");
       else if(onSubmit && inputPin === pin) {
+        setDisabled(true);
         validateUserName(name);
       }else if(inputPin !== pin) alert("Wrong PIN");
   }
