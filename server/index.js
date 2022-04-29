@@ -19,7 +19,7 @@ const RoomListener = require("@app/listeners/room");
 
   app.use(express.static(path.join(__dirname, "../build")));
 
-  const PORT = process.env.PORT || 3002;
+  const PORT = process.env.PORT_SERVER || 3002;
   
   // app.use((req, res, next) => {
   //   console.log("\n>>>", `${req.method} ${req.url}`)
