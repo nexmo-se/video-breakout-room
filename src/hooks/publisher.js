@@ -9,7 +9,6 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
   const [ publisher, setPublisher ] = useState();
 
   const [ stream, setStream ] = useState();
-  const [ forceUnpublished, setForceUnpublished ] = useState(false);
   const [ layoutManager, setLayoutManager ] = useState(new LayoutManager(containerId));
   const mSession = useSession();
 
@@ -25,7 +24,8 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
     if (e.stream.name !== "sharescreen") e.preventDefault();
     if (e.reason === 'forceUnpublished') {
       console.log('You are forceUnpublished');
-      setForceUnpublished(true)
+      setStream({...e.stream})
+      setPublisher({...e.stream.publisher})
     }
   }
 
@@ -102,7 +102,6 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
     publish, 
     publisher, 
     stream,
-    forceUnpublished,
     layoutManager
   }
 }

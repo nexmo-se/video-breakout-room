@@ -28,6 +28,9 @@ function SessionProvider({ children }){
 
   function handleSessionDisconnected(e){
     if (e.reason == "forceDisconnected") {
+      console.log('You are forceDisconnected.')
+      setSession({...e.target})
+      setConnections([])
       setForceDisconnected(true);
     }
   }

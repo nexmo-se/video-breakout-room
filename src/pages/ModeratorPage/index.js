@@ -95,13 +95,16 @@ export default function ModeratorPage() {
     }, [mMessage.timer])
 
     useEffect(() => {
-      if (mSession.forceDisconnected) {
-        mNotification.openNotification("", "Oops, Someone has disconnected you from the room.", () => { mRoom.handleExitPage() })
-      }
-      if (mPublisher.forceUnpublished) {
+      if (mPublisher.stream && mPublisher.stream.destroyed) {
         mNotification.openNotification("", "Oops, Someone has stopped you publishing a stream.", () => {})
       }
-    }, [ mSession.forceDisconnected, mPublisher.forceUnpublished])
+    }, [ mPublisher.stream ])
+  
+    useEffect(() => {
+      if (mSession.forceDisconnected) {
+        mNotification.openNotification("", "Oops, Someone has disconnected you from the room.", () => {})
+      }
+    }, [ mSession.forceDisconnected ])  
 
     useEffect(() => {
       window.addEventListener('unload', () => mRoom.handleExitPage() )
@@ -158,7 +161,6 @@ export default function ModeratorPage() {
             <h4 className="Vlt-center">My Controls</h4>
             <VideoControl 
               publisher={mPublisher.publisher} 
-              forceUnpublished={ mPublisher.forceUnpublished } 
               publisherStream = {mPublisher.stream}
             >
             <MessageBar />
