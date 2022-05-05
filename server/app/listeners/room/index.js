@@ -56,8 +56,10 @@ class RoomListener{
   static generateBreakoutRoomsList(generatedRoom) {
     let breakoutRooms = [];
     const mainRoomId = generatedRoom.id;
+    let member = [];
+    if (participantsByMainRoom[mainRoomId]) member = participantsByMainRoom[mainRoomId].map(p => p.name);
     if (generatedRoom.breakoutRooms && (!breakoutRoomsByMainRoom[mainRoomId] || breakoutRoomsByMainRoom[mainRoomId].length === 0)) {
-      breakoutRooms.push(new Room(generatedRoom.id, generatedRoom.name, generatedRoom.sessionId, null))
+      breakoutRooms.push(new Room(generatedRoom.id, generatedRoom.name, generatedRoom.sessionId, null, null, member))
       generatedRoom.breakoutRooms.forEach((room) => {
       breakoutRooms.push(new Room(room.id, room.name, room.sessionId, room.mainRoomId, room.maxParticipants))
       });
@@ -90,13 +92,26 @@ class RoomListener{
       await RoomListener.generateBreakoutRoomsList(generatedRoom);
 
       if (type.includes("automatic")) {
-        const participants = [...participantsByMainRoom[generatedRoom.id].filter((p) => (p.role !== "moderator" && !p.isCohost)).map((p) => p.name)];
+        const participants = [];
+        const moderatorAndCoHost = [];
+
+        [...participantsByMainRoom[generatedRoom.id]].forEach((p) => {
+          if (p.role === "moderator" || p.isCohost) {
+            moderatorAndCoHost.push(p.name)
+          }
+          else {
+            participants.push(p.name);
+          }
+        });
+
         if (participants.length !== 0) {
           participants.sort(()=> { return 0.5 - Math.random()});
           breakoutRoomsByMainRoom[generatedRoom.id].forEach((room) => {
               if (room.name === roomId) return;
               room["memberAssigned"] = participants.splice(0, room["maxParticipants"]);
-          })
+          });
+          const mainRoom = breakoutRoomsByMainRoom[generatedRoom.id].find((room) => room.id === roomId);
+          mainRoom["member"] = participants.concat(moderatorAndCoHost)
         }
       }
 
@@ -266,70 +281,10 @@ class RoomListener{
         if (targetedParticipant.isCohost) targetedParticipant.isCohost = false;
         else targetedParticipant.isCohost = true;
       }
-      if (type === "participant-leaved" && participantsByMainRoom[roomId]) {
-        participantsByMainRoom[roomId] = participantsByMainRoom[roomId].filter((p) => p.name !== participant);
-
-        // if no moderator
-        if (!participantsByMainRoom[roomId].find((user) => user.role === "moderator")) {
-          participantsByMainRoom[roomId].forEach((p) => p.isCohost = false);
-          breakoutRoomsByMainRoom[roomId].forEach((room) => {
-            if (room.id !== roomId) { room.member = []; room.memberAssigned = []} 
-          })
-        }
-        else {
-          breakoutRoomsByMainRoom[roomId].forEach((p) => {
-            p["member"] = p["member"].filter((p) => p !== participant)
-            p["memberAssigned"] = p["memberAssigned"].filter((p) => p !==participant)
-          }) 
-        }
-        tempRes.push(await RoomAPI.broadcastMsg(relatedSessions, 'breakout-room', {"message": "participantMoved", "breakoutRooms": breakoutRoomsByMainRoom[roomId]}));
-      }
-      if (type === "participant-joined" && !selectedRoom.mainRoomId) {
-          if (!breakoutRoomsByMainRoom[roomId]) breakoutRoomsByMainRoom[roomId] = [];
-          if (!participantsByMainRoom[selectedRoom.id]) { participantsByMainRoom[selectedRoom.id] = [participant];}
-          else if (!participantsByMainRoom[selectedRoom.id].find((p) => p.name === participant.name))  { participantsByMainRoom[selectedRoom.id].push(participant);}
-      }
-
+  
       tempRes.push(await RoomAPI.broadcastMsg(relatedSessions, "update-participant", participantsByMainRoom[roomId]));
 
-
       res.json({tempRes});
-    } catch(err) {
-      console.error(err.stack);
-      res.json({
-        error: err.message
-      });
-    }
-  }
-
-  static async joinBreakoutRoom(req, res) {
-    try {
-      const { roomId } = req.params;
-      const { type, fromRoom, toRoom, participant } = req.body;
-
-      if ( undefined === roomId ) throw new Error("Empty params");
-
-      if (fromRoom)  {
-        const prevRoom = breakoutRoomsByMainRoom[roomId].find((room) => room.name === fromRoom)
-        if (prevRoom) prevRoom["member"] = prevRoom["member"].filter((a) => a !== participant);
-      }
-      if (toRoom) {
-        const nextRoom = breakoutRoomsByMainRoom[roomId].find((room) => room.name === toRoom)
-        if (nextRoom && !nextRoom["member"].includes(participant)) nextRoom["member"].push(participant);
-        if (nextRoom && nextRoom["memberAssigned"].includes(participant)) nextRoom["memberAssigned"] = nextRoom["memberAssigned"].filter((a) => a !== participant);
-      }
-
-      let room = new Room(roomId);
-      let [ selectedRoom ] = await RoomAPI.getDetailById(room);
-
-      let relatedSessions = await RoomAPI.getRelatedSessions(selectedRoom);
-
-      let tempRes = await RoomAPI.broadcastMsg(relatedSessions, type, breakoutRoomsByMainRoom[roomId]);
-
-      res.json({
-        breakoutRooms: breakoutRoomsByMainRoom[roomId],
-        participants: participantsByMainRoom[roomId]
-      });
     } catch(err) {
       console.error(err.stack);
       res.json({
@@ -410,35 +365,52 @@ class RoomListener{
     }
   }
 
-  static async crossRoomMsg(req, res, next) {
+  static async sessionMonitoring(req, res) {
     try {
-      const { roomId } = req.params;
-      const { data, type, toRoomId } = req.body;
+      const { event, sessionId, connection } = req.body;
 
-      if ( undefined === roomId ) throw new Error("Empty params");
+      if (event !== "streamCreated" && event !==  "streamDestroyed") {
+        return res.sendStatus(200);
+      }
 
-      let room = new Room(roomId);
-      let [ selectedRoom ] = await RoomAPI.getDetailById(room);
+      // get Room by sessionId
+      const [ room ] = await RoomAPI.getRoomBySessionId(sessionId);
+      const mainRoomId = room.mainRoomId ?? room.id;
+      const participant = JSON.parse(connection.data);
 
-      let toRoom = new Room(toRoomId);
-      let [ selectedToRoom ] = await RoomAPI.getDetailById(toRoom);
+      let relatedSessions = await RoomAPI.getRelatedSessions(room);
 
-      data.fromRoom = {
-        id: selectedRoom.id,
-        name: selectedRoom.name ?? selectedRoom.id
-      };
+      if (event === "streamCreated") {
+        if (!participantsByMainRoom[mainRoomId]) { participantsByMainRoom[mainRoomId] = [participant];}
+        else if (!participantsByMainRoom[mainRoomId].find((p) => p.name === participant.name))  { participantsByMainRoom[mainRoomId].push(participant);}
+        if (!breakoutRoomsByMainRoom[mainRoomId]) breakoutRoomsByMainRoom[mainRoomId] = [];
+        else {
+          const targetRoom = breakoutRoomsByMainRoom[mainRoomId].find((t_room) => t_room.id === room.id);
+          if (targetRoom && !targetRoom["member"].includes(participant.name)) targetRoom["member"].push(participant.name);
+        }
+      }
+      if (event === "streamDestroyed" && participantsByMainRoom[mainRoomId]) {
+        breakoutRoomsByMainRoom[mainRoomId].forEach((p) => {
+          p["member"] = p["member"].filter((p) => p !==participant.name)
+          p["memberAssigned"] = p["memberAssigned"].filter((p) => p !==participant.name)
+        })
+        participantsByMainRoom[mainRoomId] = participantsByMainRoom[mainRoomId].filter((p) => p.name !== participant.name);
+      }
 
-      let tempRes = await RoomAPI.sendCrossRoomMsg(selectedToRoom.sessionId, type ?? 'message', data);
+      if (participantsByMainRoom[mainRoomId]) {
+        await RoomAPI.broadcastMsg(relatedSessions, "update-participant", participantsByMainRoom[mainRoomId]);
+      }
+      
+     if (breakoutRoomsByMainRoom[mainRoomId]) {
+        RoomAPI.broadcastMsg(relatedSessions, 'breakout-room', {"message": "updateBreakoutRoom", "breakoutRooms": breakoutRoomsByMainRoom[mainRoomId]});
+     }
 
-      res.json({
-        tempRes
-      });
+     res.sendStatus(200);
     } catch(err) {
       console.error(err.stack);
       res.json({
         error: err.message
       });
-      // res.status(500).end(err.message);
     }
   }
 

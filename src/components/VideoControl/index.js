@@ -1,5 +1,5 @@
 // @flow
-import { useState , useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import HangupButton from 'components/HangupButton';
@@ -7,12 +7,11 @@ import MuteButton from 'components/MuteButton';
 import VideoButton from 'components/VideoButton';
 
 import useStyles from './styles';
-import useSession from 'hooks/session';
+import useRoom from 'hooks/room';
 
-function VideoControl({ publisher, publisherStream, children }){
-  const [ hasAudio, setHasAudio ] = useState(true);
-  const [ hasVideo, setHasVideo ] = useState(true);
-  const mSession = useSession();
+function VideoControl({ mPublisher, children }){
+  const { hasAudio, hasVideo, setHasAudio, setHasVideo, publisher} = mPublisher;
+  const mRoom = useRoom();
   const mStyles = useStyles();
   const navigate = useNavigate();
 
@@ -25,23 +24,9 @@ function VideoControl({ publisher, publisherStream, children }){
   }
 
   function handleHangupClick(){
+    mRoom.handleExitPage();
     navigate("/thank-you");
   }
-
-  useEffect(() => {
-    const { changedStream } = mSession;
-    if(changedStream){
-      const { connection:otherConnection } = changedStream.stream;
-      const { connection:myConnection } = mSession.session;
-      if(otherConnection.id === myConnection.id && publisher?.stream.id === changedStream.stream.id){
-        switch(changedStream.changedProperty){
-          case "hasAudio": return setHasAudio(changedStream.newValue);
-          case "hasVideo": return setHasVideo(changedStream.newValue);
-          default: return;
-        }
-      }
-    }
-  }, [ mSession.changedStream ]);
 
   useEffect(() => {
     if(publisher) {
@@ -74,20 +59,6 @@ function VideoControl({ publisher, publisherStream, children }){
   useEffect(() => {
     if(publisher) publisher.publishVideo(hasVideo);
   }, [ hasVideo, publisher ]);
-
-  useEffect(() => {
-    if (!publisherStream) return;
-    if (publisherStream.hasAudio && !hasAudio) {
-      setHasAudio(true);
-    }
-  }, [publisherStream])
-  
-  useEffect(() => {
-    if (publisher && publisher.stream && publisher.stream.destroyed) {
-      setHasAudio(false);
-      setHasVideo(false);
-    }
-  }, [publisher])
 
   if(!publisher) return null;
 

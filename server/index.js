@@ -51,9 +51,9 @@ const RoomListener = require("@app/listeners/room");
 
   app.post("/room/:roomId/updateParticipant", RoomListener.updateParticipant);
 
-  app.post("/room/:roomId/joinBreakoutRoom", RoomListener.joinBreakoutRoom);
-
   app.post("/room/:roomId/moveParticipant", RoomListener.moveParticipant);
+
+  app.post(process.env.SESSION_MONITORING_PATH, RoomListener.sessionMonitoring)
 
 
   app.get("*", (req, res) => {

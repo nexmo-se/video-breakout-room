@@ -116,20 +116,6 @@ export default class RoomAPI{
     });
   }
 
-  static async joinBreakoutRoom(roomId, type, data= {}) {
-    if (undefined === roomId) return null;
-
-    const apiURL = `${serverPath}/room/${roomId}/joinBreakoutRoom`;
-    data.type = type;
-    const jsonResult = await (await fetch(apiURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    })).json();
-
-    return jsonResult;
-  }
-
   static async moveParticipant(roomId, type, data= {}) {
     if (undefined === roomId) return null;
 

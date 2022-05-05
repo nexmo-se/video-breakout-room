@@ -18,6 +18,7 @@
     "@vonagevolta/volta2": "^0.0.56",
     "antd": "^4.19.2",
     "cors": "^2.8.5",
+    "delay": "^5.0.0",
     "dotenv": "^16.0.0",
     "framer-motion": "^6.2.8",
     "module-alias": "^2.2.2",

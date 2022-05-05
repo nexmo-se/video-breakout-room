@@ -106,14 +106,6 @@ export default function ModeratorPage() {
       }
     }, [ mSession.forceDisconnected ])  
 
-    useEffect(() => {
-      window.addEventListener('unload', () => mRoom.handleExitPage() )
-      return () => {
-        window.removeEventListener('unload', () => mRoom.handleExitPage())
-        mRoom.handleExitPage();
-      }
-    }, [])
-
     function handleChangeRoom(roomName = '') {
       mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, roomName);
     }
@@ -160,8 +152,7 @@ export default function ModeratorPage() {
           <div className={mStyles.videoControl}>
             <h4 className="Vlt-center">My Controls</h4>
             <VideoControl 
-              publisher={mPublisher.publisher} 
-              publisherStream = {mPublisher.stream}
+              mPublisher={mPublisher} 
             >
             <MessageBar />
             <BreakoutRoomButton

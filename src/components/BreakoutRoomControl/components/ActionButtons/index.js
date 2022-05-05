@@ -69,17 +69,10 @@ export default function ActionButtons(props) {
     }
 
     useEffect(() => {
-        if (mRoom.inBreakoutRoom) {
-            const room = mMessage.breakoutRooms.find((room) => room.name === mRoom.inBreakoutRoom.name)
-            if (room && room.member.includes(mSession.user.name)) {
-                setIsLoading(false);
-            }
-        }
-        else {
-            const room = mMessage.breakoutRooms.find((room) => room.name === mRoom.mainRoom.name)
-            if (room && room.member.includes(mSession.user.name)) {
-                setIsLoading(false);
-            }
+        const currentRoomName = mRoom.inBreakoutRoom ? mRoom.inBreakoutRoom.name : mRoom.mainRoom.name;
+        const room = mMessage.breakoutRooms.find((room) => room.name === currentRoomName);
+        if (room && room.member.includes(mSession.user.name)) {
+            setIsLoading(false);
         }
     }, [mRoom.inBreakoutRoom, mMessage.breakoutRooms])
 

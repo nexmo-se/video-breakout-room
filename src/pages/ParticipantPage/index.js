@@ -131,14 +131,6 @@ export default function ParticipantPage(){
     }
   }, [ mSession.forceDisconnected ])
 
-  useEffect(() => {
-    window.addEventListener('unload', () => mRoom.handleExitPage() )
-    return () => {
-      window.removeEventListener('unload', () => mRoom.handleExitPage())
-      mRoom.handleExitPage();
-    }
-  }, [])
-
   function handleRoleChange(state) {
     setIsCohost(state);
     mRoom.refreshInfo();
@@ -209,8 +201,7 @@ export default function ParticipantPage(){
           <div className={mStyles.videoControl}>
             <h4 className="Vlt-center">My Controls</h4>
             <VideoControl 
-              publisherStream = {mPublisher.stream}
-              publisher={mPublisher.publisher}
+              mPublisher={mPublisher} 
             >
             <MessageBar />
             { isCohost ?

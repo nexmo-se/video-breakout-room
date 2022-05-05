@@ -3,14 +3,34 @@ import { useState, useEffect } from "react";
 import LayoutManager from "utils/layout-manager";
 import useSession from "hooks/session";
 import OT from "@opentok/client";
+import delay from "delay";
 
 
 function usePublisher(containerId, autoLayout=true, displayName=true){
   const [ publisher, setPublisher ] = useState();
+  const [ publisherOptions, setPublisherOptions ] = useState();
+  const [ hasAudio, setHasAudio] = useState(false);
+  const [ hasVideo, setHasVideo] = useState(false);
 
   const [ stream, setStream ] = useState();
   const [ layoutManager, setLayoutManager ] = useState(new LayoutManager(containerId));
   const mSession = useSession();
+
+
+  useEffect(() => {
+    const { changedStream } = mSession;
+    if(changedStream){
+      const { connection:otherConnection } = changedStream.stream;
+      const { connection:myConnection } = mSession.session;
+      if(otherConnection.id === myConnection.id && publisher?.stream.id === changedStream.stream.id){
+        switch(changedStream.changedProperty){
+          case "hasAudio": return setHasAudio(changedStream.newValue);
+          case "hasVideo": return setHasVideo(changedStream.newValue);
+          default: return;
+        }
+      }
+    }
+  }, [ mSession.changedStream ]);
 
   function handleDestroyed(){
     setPublisher(null);
@@ -31,45 +51,88 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
 
   function handleAccessDenied(){
     if (publisher) {
-      publisher.off("destroyed", handleDestroyed);
-      publisher.off("streamCreated", handleStreamCreated);
-      publisher.off("streamDestroyed", handleStreamDestroyed);
-      publisher.off("accessDenied", handleAccessDenied)
-      publisher.destroy();
-      setPublisher(null);
+      resetPublisher();
     }
+  }
+
+  function resetPublisher() {
+    publisher.off("destroyed", handleDestroyed);
+    publisher.off("streamCreated", handleStreamCreated);
+    publisher.off("streamDestroyed", handleStreamDestroyed);
+    publisher.off("accessDenied", handleAccessDenied)
+    publisher.destroy();
+    setPublisher(null);
   }
 
   async function unpublish(){
     if(publisher) mSession.session.unpublish(publisher);
     layoutManager.layout();
   }
+  
+  async function publishAttempt(publisher, attempt = 1) {
+    console.log(`Attempting to publish in ${attempt} try`)
+    if (attempt > 1)  { publisher = OT.initPublisher(containerId, publisherOptions); }
+
+    const { retry, error } = await new Promise(
+      (resolve, reject) => {
+        mSession.session.publish(
+          publisher,
+          (err) => {
+            if (err && attempt < 3) {
+              resolve({ retry: true, error: err });
+            } if (err && attempt >= 3) {
+              resolve({ retry: false, error: err });
+            } else resolve({ retry: false, error: undefined });
+          }
+        )
+      }
+    )
+    if (retry) {
+      // Wait for 2 seconds before attempting to publish again
+      await delay(2000 * attempt);
+      await publishAttempt(
+        publisher,
+        attempt + 1
+      );
+    } else if (error) {
+      alert(`
+      We tried to access your camera/mic 3 times but failed. 
+      Please make sure you allow us to access your camera/mic and no other application is using it.
+      You may refresh the page to retry`)
+
+      setPublisher(null);
+    } else {
+      setPublisher(publisher);
+    }
+  }
 
   async function publish(
     user, 
-    extraData,
+    extraData
   ){
     try{
       if(!mSession.session) throw new Error("You are not connected to session");
-      const options = { 
-        insertMode: "append",
-        name: user.name,
-        style: { 
-          buttonDisplayMode: "off",
-          nameDisplayMode: displayName? "on": "off"
-        }
-      };
-      const finalOptions = Object.assign({}, options, extraData);
-
-      if (!publisher) {
-        const initPublisher = OT.initPublisher(containerId, finalOptions);
-
-        mSession.session.publish(initPublisher);
-        setPublisher(initPublisher);
+      if (!publisher || publisherOptions.publishVideo !== hasVideo || publisherOptions.publishAudio !== hasAudio ) {
+        if (publisher) resetPublisher();
+        const options = { 
+          insertMode: "append",
+          name: user.name,
+          publishAudio: hasVideo,
+          publishVideo: hasAudio,
+          style: { 
+            buttonDisplayMode: "off",
+            nameDisplayMode: displayName? "on": "off"
+          }
+        };
+        const finalOptions = Object.assign({}, options, extraData);
+        setPublisherOptions(finalOptions);
+        const newPublisher = OT.initPublisher(containerId, finalOptions);
+        publishAttempt(newPublisher);     
       }
       else {
-        mSession.session.publish(publisher);
-      }
+        publishAttempt(publisher);
+      }   
+ 
     }catch(err){
       console.log(err.stack);
     }
@@ -95,11 +158,15 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
     }catch(err){
       console.log(err.stack);
     }
-  }, [ publisher, stream, layoutManager, autoLayout, containerId ])
+  }, [ publisher, stream, layoutManager, autoLayout, containerId, hasAudio, hasVideo ])
 
   return { 
     unpublish, 
-    publish, 
+    publish,
+    hasAudio, 
+    hasVideo,
+    setHasAudio,
+    setHasVideo,
     publisher, 
     stream,
     layoutManager
