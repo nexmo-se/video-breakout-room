@@ -29,7 +29,8 @@ function ShareScreen(){
 
   useEffect(() => {
     if (!screenPublisher) setSharing(false);
-  }, [screenPublisher])
+    else {setSharing(true);}
+  }, [screenPublisher, sharing])
 
   useEffect(() => {
      if (screenPublisher) {

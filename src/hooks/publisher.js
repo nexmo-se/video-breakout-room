@@ -69,7 +69,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
     layoutManager.layout();
   }
   
-  async function publishAttempt(publisher, attempt = 1) {
+  async function publishAttempt(publisher, attempt = 1, noRetry = false) {
     console.log(`Attempting to publish in ${attempt} try`)
     if (attempt > 1)  { publisher = OT.initPublisher(containerId, publisherOptions); }
 
@@ -78,6 +78,9 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
         mSession.session.publish(
           publisher,
           (err) => {
+            if (err && noRetry) {
+              resolve({ retry: undefined, error: err });
+            }
             if (err && attempt < 3) {
               resolve({ retry: true, error: err });
             } if (err && attempt >= 3) {
@@ -87,6 +90,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
         )
       }
     )
+
     if (retry) {
       // Wait for 2 seconds before attempting to publish again
       await delay(2000 * attempt);
@@ -95,11 +99,11 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
         attempt + 1
       );
     } else if (error) {
+      if (noRetry) return;
       alert(`
       We tried to access your camera/mic 3 times but failed. 
       Please make sure you allow us to access your camera/mic and no other application is using it.
       You may refresh the page to retry`)
-
       setPublisher(null);
     } else {
       setPublisher(publisher);
@@ -113,12 +117,14 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
     try{
       if(!mSession.session) throw new Error("You are not connected to session");
       if (!publisher || publisherOptions.publishVideo !== hasVideo || publisherOptions.publishAudio !== hasAudio ) {
+        
         if (publisher) resetPublisher();
+        const isScreenShare = extraData && extraData.videoSource === 'screen' ? true : false;
         const options = { 
           insertMode: "append",
           name: user.name,
-          publishAudio: hasVideo,
-          publishVideo: hasAudio,
+          publishAudio: isScreenShare ? true : hasVideo,
+          publishVideo: isScreenShare ? true : hasAudio,
           style: { 
             buttonDisplayMode: "off",
             nameDisplayMode: displayName? "on": "off"
@@ -127,7 +133,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
         const finalOptions = Object.assign({}, options, extraData);
         setPublisherOptions(finalOptions);
         const newPublisher = OT.initPublisher(containerId, finalOptions);
-        publishAttempt(newPublisher);     
+        publishAttempt(newPublisher, 1, isScreenShare);     
       }
       else {
         publishAttempt(publisher);
@@ -158,7 +164,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
     }catch(err){
       console.log(err.stack);
     }
-  }, [ publisher, stream, layoutManager, autoLayout, containerId, hasAudio, hasVideo ])
+  }, [ publisher, stream, layoutManager, autoLayout, containerId])
 
   return { 
     unpublish, 
