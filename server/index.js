@@ -19,7 +19,7 @@ const RoomListener = require("@app/listeners/room");
 
   app.use(express.static(path.join(__dirname, "../build")));
 
-  const PORT = process.env.PORT_SERVER || 3002;
+  const PORT = process.env.PORT || 3002;
   
   // app.use((req, res, next) => {
   //   console.log("\n>>>", `${req.method} ${req.url}`)
@@ -53,8 +53,7 @@ const RoomListener = require("@app/listeners/room");
 
   app.post("/room/:roomId/moveParticipant", RoomListener.moveParticipant);
 
-  app.post(process.env.SESSION_MONITORING_PATH, RoomListener.sessionMonitoring)
-
+  app.post("/room/:roomId/joinBreakoutRoom", RoomListener.joinBreakoutRoom);
 
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../build/index.html"));

@@ -69,6 +69,9 @@ export default function RoomContextProvider({ children }){
     mSession.updateUser(user);
     mMessage.setBreakoutRooms(roomInfo.breakoutRooms ?? []);
     await connect(user, roomInfo.mainRoom.id);
+    await RoomAPI.updateParticipant(roomInfo.mainRoom.id, {type: 'participant-joined', participant: user});
+    const { participants } = await RoomAPI.getParticipants(roomName);
+    mMessage.setParticipants(participants);
   }
 
   async function refreshInfo() {
@@ -108,6 +111,9 @@ export default function RoomContextProvider({ children }){
     }
 
     setInBreakoutRoom(targetRoom && targetRoom.name !== mainRoom.name ? targetRoom : null);
+    const {participants, breakoutRooms} = await RoomAPI.joinBreakoutRoom(mainRoom.id, "join-breakout-room", data);
+    mMessage.setParticipants(participants);
+    mMessage.setBreakoutRooms(breakoutRooms);
 
   }
 
@@ -139,6 +145,7 @@ export default function RoomContextProvider({ children }){
   }
 
   async function handleExitPage() {
+    await RoomAPI.updateParticipant(mainRoomRef.current.id, {type: 'participant-leaved', participant: mSessionRef.current.user.name});
     if (mSessionRef.current.session) {
       mSessionRef.current.session.disconnect();
     }

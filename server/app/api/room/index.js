@@ -136,14 +136,6 @@ class RoomAPI{
     })
   }
 
-  static async getRoomBySessionId(sessionId) {
-    return await DatabaseAPI.query(async (client) => {
-      const queryResponse = await client.query("SELECT * FROM rooms WHERE session_id = $1", [ sessionId ]);
-      if (queryResponse.rowCount === 0) return null;
-      else return Promise.resolve(RoomAPI.parseQueryResponse(queryResponse));
-    })
-  }
-
   static async generateSessionBreakoutRoom(breakoutRooms, mainRoom) {
     try {
       for (var i = 0; i < breakoutRooms.length; i++) {

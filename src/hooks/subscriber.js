@@ -115,7 +115,7 @@ function useSubscriber({ moderator, screen, camera, custom }){
     }catch(err){
       console.log(err.stack);
     }
-  }, [ subscribers, cameraLayout, screenLayout ]);
+  }, [ subscribers, cameraLayout, screenLayout, mSession.changedStream ]);
 
   return { subscribe, unsubscribe, subscribers }
 }

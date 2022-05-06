@@ -131,6 +131,14 @@ export default function ParticipantPage(){
     }
   }, [ mSession.forceDisconnected ])
 
+  useEffect(() => {
+    window.addEventListener('pagehide', () => mRoom.handleExitPage() )
+    return () => {
+      window.removeEventListener('pagehide', () => mRoom.handleExitPage())
+      mRoom.handleExitPage();
+    }
+  }, [])
+
   function handleRoleChange(state) {
     setIsCohost(state);
     mRoom.refreshInfo();

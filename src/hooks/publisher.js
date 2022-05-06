@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import LayoutManager from "utils/layout-manager";
 import useSession from "hooks/session";
+import useRoom from "hooks/room";
 import OT from "@opentok/client";
 import delay from "delay";
 
@@ -9,12 +10,13 @@ import delay from "delay";
 function usePublisher(containerId, autoLayout=true, displayName=true){
   const [ publisher, setPublisher ] = useState();
   const [ publisherOptions, setPublisherOptions ] = useState();
-  const [ hasAudio, setHasAudio] = useState(false);
-  const [ hasVideo, setHasVideo] = useState(false);
+  const [ hasAudio, setHasAudio] = useState(true);
+  const [ hasVideo, setHasVideo] = useState(true);
 
   const [ stream, setStream ] = useState();
   const [ layoutManager, setLayoutManager ] = useState(new LayoutManager(containerId));
   const mSession = useSession();
+  const mRoom = useRoom();
 
 
   useEffect(() => {
@@ -104,6 +106,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
       We tried to access your camera/mic 3 times but failed. 
       Please make sure you allow us to access your camera/mic and no other application is using it.
       You may refresh the page to retry`)
+      mRoom.handleExitPage();
       setPublisher(null);
     } else {
       setPublisher(publisher);
@@ -164,7 +167,7 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
     }catch(err){
       console.log(err.stack);
     }
-  }, [ publisher, stream, layoutManager, autoLayout, containerId])
+  }, [ publisher, stream, layoutManager, autoLayout, containerId, mSession.changedStream])
 
   return { 
     unpublish, 

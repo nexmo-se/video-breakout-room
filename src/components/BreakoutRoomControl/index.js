@@ -37,18 +37,29 @@ export default function BreakoutRoomControl(props) {
             setRoomGroup({});
             return setIsBreakout(false);
         }
+        setIsLoading(true);
         let newRoomGroup = {};
+        let participantJoined = [];
+        let participantNotJoin = [];
 
         mMessage.breakoutRooms.forEach((room) => {
             const roomMember = room.member.concat(room.memberAssigned.map((member) => member + ' (joining)'));
             newRoomGroup[room.name] = roomMember;
+            participantJoined = participantJoined.concat(room.member, room.memberAssigned);
         })
+        mMessage.participants.forEach((user) => {
+            if (participantJoined.includes(user.name)) return;
+            participantNotJoin.push(user.name);
+        })
+
+        newRoomGroup[mRoom.mainRoom.name] = newRoomGroup[mRoom.mainRoom.name].concat(participantNotJoin);
 
         if (newRoomGroup[mRoom.mainRoom.name].length === mMessage.participants.length && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
             handleCloseAllRoom();
             MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'count-down-timer', {});
         }
         setRoomGroup(newRoomGroup);
+        setIsLoading(false);
 
     }, [mMessage.breakoutRooms, mMessage.participants, setIsBreakout])
 
