@@ -43,7 +43,6 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
   }
 
   function handleStreamDestroyed(e){
-    console.log("stream destroe");
     if (e.stream.name !== "sharescreen") e.preventDefault();
     if (e.reason === 'forceUnpublished') {
       console.log('You are forceUnpublished');

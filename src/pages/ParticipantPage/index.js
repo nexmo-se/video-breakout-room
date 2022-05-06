@@ -132,11 +132,11 @@ export default function ParticipantPage(){
   }, [ mSession.forceDisconnected ])
 
   useEffect(() => {
-    document.onvisibilitychange = function() {
-      if (document.visibilityState === 'hidden') {
-        mRoom.handleExitPage();
-      }
-    };
+    window.addEventListener('pagehide', () => mRoom.handleExitPage())
+    return () => {
+      window.removeEventListener('pagehide', () => mRoom.handleExitPage())
+      mRoom.handleExitPage();
+    }
   }, [])
 
   function handleRoleChange(state) {
