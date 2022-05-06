@@ -107,12 +107,12 @@ export default function ModeratorPage() {
     }, [ mSession.forceDisconnected ])  
 
     useEffect(() => {
-      window.addEventListener('pagehide', () => mRoom.handleExitPage() )
+      window.addEventListener('pagehide', () => mRoom.handleExitPage(), {capture: true} )
       return () => {
-        window.removeEventListener('pagehide', () => mRoom.handleExitPage())
+        window.removeEventListener('pagehide', () => mRoom.handleExitPage(), {capture: true})
         mRoom.handleExitPage();
       }
-    }, [])
+    }, [capture])
 
     function handleChangeRoom(roomName = '') {
       mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, roomName);

@@ -1,5 +1,7 @@
 // @flow
 import { useState, useEffect, useRef, createContext } from "react";
+import { useNavigate } from "react-router-dom";
+
 import useMessage from "hooks/message";
 import useSession from "hooks/session";
 import RoomAPI from "api/room";
@@ -16,6 +18,7 @@ export default function RoomContextProvider({ children }){
 
   const mSession = useSession();
   const mMessage = useMessage();
+  const navigate = useNavigate();
 
   const mainRoomRef = useRef();
   mainRoomRef.current = mainRoom;
@@ -149,6 +152,7 @@ export default function RoomContextProvider({ children }){
     if (mSessionRef.current.session) {
       mSessionRef.current.session.disconnect();
     }
+    navigate("/thank-you");
   }
 
   return (
