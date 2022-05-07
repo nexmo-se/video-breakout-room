@@ -40,12 +40,16 @@ export default function BreakoutRoomControl(props) {
         setIsLoading(true);
         let newRoomGroup = {};
 
+        let isBreakoutRoomsEmpty = true;
         mMessage.breakoutRooms.forEach((room) => {
             const roomMember = room.member.concat(room.memberAssigned.map((member) => member + ' (joining)'));
             newRoomGroup[room.name] = roomMember;
+            if (room.id !== mRoom.mainRoom.id && roomMember.length !== 0) {
+                isBreakoutRoomsEmpty = false;
+            }
         })
 
-        if (newRoomGroup[mRoom.mainRoom.name].length === mMessage.participants.length && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
+        if (isBreakoutRoomsEmpty && mMessage.timer && (mMessage.timer.endTime <= new Date().getTime())) {            
             handleCloseAllRoom();
             MessageAPI.broadcastMsg(mRoom.currentRoom.id, 'count-down-timer', {});
         }

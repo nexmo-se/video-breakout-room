@@ -1,5 +1,5 @@
 // @flow
-import { useState, useEffect, createContext } from "react";
+import { useState, useEffect, createContext, useRef } from "react";
 import useSession from "hooks/session";
 import User from "entities/user";
 import Message from "entities/message";
@@ -16,6 +16,9 @@ export default function MessageProvider({ children }){
   const [ roomSessionListeners, setSessionListeners ] = useState();
   const mSession = useSession();
 
+  const userRef = useRef();
+  userRef.current = mSession.user;
+
   function removeRaisedHand(user){
     setRaisedHands((prevRaisedHands) => prevRaisedHands.filter((prevRaisedHand) => {
       return prevRaisedHand.id !== user.id
@@ -23,11 +26,13 @@ export default function MessageProvider({ children }){
   }
 
   async function refreshInfo(mainRoomId) {
+    if (userRef.current.role === "moderator" || userRef.current.isCohost) {
     const { participants } = await RoomAPI.getParticipants(mainRoomId);
     const { breakoutRooms } = await RoomAPI.getBreakoutRooms(mainRoomId);
     
     setParticipants(participants);
     setBreakoutRooms(breakoutRooms ?? []);
+    }
   }
 
   useEffect(() => {

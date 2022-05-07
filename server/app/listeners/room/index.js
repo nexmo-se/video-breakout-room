@@ -2,6 +2,7 @@ const RoomAPI = require("@app/api/room");
 const UserAPI = require("@app/api/user");
 const User = require("@app/entities/user");
 const Room = require("@app/entities/room");
+const { ConstructionOutlined } = require("@mui/icons-material");
 
 let breakoutRoomsByMainRoom = {};
 let participantsByMainRoom = {};
@@ -299,13 +300,18 @@ class RoomListener{
       let relatedSessions = await RoomAPI.getRelatedSessions(selectedRoom);
 
       let tempRes = []
-      if (type === 'update-participant') {
-        const targetedParticipant = Object.values(participantsByMainRoom[roomId]).find((p) => p.find((q) => q.name === participant));
-        if (targetedParticipant.isCohost) targetedParticipant.isCohost = false;
-        else targetedParticipant.isCohost = true;
+      if (type === 'update-participant') {        
+         Object.entries(participantsByMainRoom[roomId]).map(([key, value]) => {
+          let targetParticipant = value.find((p)=> p.name === participant);
+          if (targetParticipant) {
+            targetParticipant.isCohost = !targetParticipant.isCohost;
+          }
+          return [key, value]
+        }) 
       }
 
       const participants = RoomListener.generateParticipantList(selectedRoom.mainRoomId ?? selectedRoom.id)
+      
       tempRes.push(await RoomAPI.broadcastMsg(relatedSessions, "update-participant", participants));
 
       res.json({tempRes});
@@ -426,7 +432,7 @@ class RoomListener{
           p["memberAssigned"] = p["memberAssigned"].filter((p) => p !==participant.name)
         })
         }
-        if (participantsByMainRoom[mainRoomId]) {
+        if (participantsByMainRoom[mainRoomId] && participantsByMainRoom[mainRoomId][room.id]) {
           participantsByMainRoom[mainRoomId][room.id] = participantsByMainRoom[mainRoomId][room.id].filter((p) => p.name !== participant.name);
         
         }
