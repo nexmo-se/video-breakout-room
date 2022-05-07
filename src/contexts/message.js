@@ -1,8 +1,9 @@
 // @flow
-import { useState, useEffect, createContext, useRef } from "react";
+import { useState, useEffect, createContext } from "react";
 import useSession from "hooks/session";
 import User from "entities/user";
 import Message from "entities/message";
+import RoomAPI from "api/room";
 
 export const MessageContext = createContext({});
 export default function MessageProvider({ children }){
@@ -15,16 +16,18 @@ export default function MessageProvider({ children }){
   const [ roomSessionListeners, setSessionListeners ] = useState();
   const mSession = useSession();
 
-  const sessionRef = useRef(null);
-  sessionRef.current = mSession.session;
-
-  const breakoutRoomsRef= useRef(null);
-  breakoutRoomsRef.current = breakoutRooms;
-
   function removeRaisedHand(user){
     setRaisedHands((prevRaisedHands) => prevRaisedHands.filter((prevRaisedHand) => {
       return prevRaisedHand.id !== user.id
     }))
+  }
+
+  async function refreshInfo(mainRoomId) {
+    const { participants } = await RoomAPI.getParticipants(mainRoomId);
+    const { breakoutRooms } = await RoomAPI.getBreakoutRooms(mainRoomId);
+    
+    setParticipants(participants);
+    setBreakoutRooms(breakoutRooms ?? []);
   }
 
   useEffect(() => {
@@ -43,6 +46,7 @@ export default function MessageProvider({ children }){
       roomSessionListeners.off("signal:join-breakout-room");
       roomSessionListeners.off("signal:count-down-timer");
       roomSessionListeners.off("signal:update-participant");
+      roomSessionListeners.off("signal:data-refreshed");
     }
 
     mSession.session.on("signal:raise-hand", ({ data }) => {
@@ -91,6 +95,11 @@ export default function MessageProvider({ children }){
       setParticipants(jsonData);
     });
 
+    mSession.session.on("signal:data-refreshed", ({ data }) => {
+      const jsonData = JSON.parse(data);
+      refreshInfo(jsonData);
+    });
+
     setSessionListeners(mSession.session)
   }, [ mSession.session ])
 
@@ -104,7 +113,8 @@ export default function MessageProvider({ children }){
       participants,
       removeRaisedHand,
       setBreakoutRooms,
-      setParticipants
+      setParticipants,
+      refreshInfo
     }}>
       {children}
     </MessageContext.Provider>

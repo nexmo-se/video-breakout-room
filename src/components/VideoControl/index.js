@@ -24,6 +24,7 @@ function VideoControl({ mPublisher, children }){
   }
 
   function handleHangupClick(){
+    mRoom.handleExitPage();
     navigate("/thank-you");
   }
 
