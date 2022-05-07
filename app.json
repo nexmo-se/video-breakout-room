@@ -37,6 +37,11 @@
         "description": "Always stay connect to main session",
         "value": "no",
         "required": true
+      },
+      "SESSION_MONITORING_PATH": {
+        "description": "Session monitoring relative path",
+        "value": "/session-monitoring",
+        "required": true
       }
     }
   }

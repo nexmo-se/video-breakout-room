@@ -53,7 +53,7 @@ const RoomListener = require("@app/listeners/room");
 
   app.post("/room/:roomId/moveParticipant", RoomListener.moveParticipant);
 
-  app.post("/room/:roomId/joinBreakoutRoom", RoomListener.joinBreakoutRoom);
+  app.post(process.env.SESSION_MONITORING_PATH, RoomListener.sessionMonitoring)
 
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../build/index.html"));
