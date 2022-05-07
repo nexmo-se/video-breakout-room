@@ -105,7 +105,7 @@ function useSubscriber({ moderator, screen, camera, custom }){
   useEffect(() => {
     try{
       subscribers.forEach((subscriber) => {
-        const { videoType } = subscriber.stream;
+        const videoType = subscriber.stream ? subscriber.stream.videoType : null;
         const element = document.getElementById(subscriber.id);
         if(videoType === "screen" && element) element.classList.add("OT_big");
       })

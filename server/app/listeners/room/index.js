@@ -6,6 +6,7 @@ const { ConstructionOutlined } = require("@mui/icons-material");
 
 let breakoutRoomsByMainRoom = {};
 let participantsByMainRoom = {};
+let sessionMonitoring = {};
 
 class RoomListener{
   static async info(req, res){
@@ -407,7 +408,18 @@ class RoomListener{
       const [ room ] = await RoomAPI.getRoomBySessionId(sessionId);
 
       if (!room) return res.sendStatus(200);
+
       const mainRoomId = room.mainRoomId ?? room.id;
+
+      if (sessionMonitoring[mainRoomId] && sessionMonitoring[mainRoomId].includes(JSON.stringify(req.body))) {
+        return res.sendStatus(200);
+      }
+      else if (sessionMonitoring[mainRoomId]){
+        sessionMonitoring[mainRoomId].push(JSON.stringify(req.body));
+      }
+      else {
+        sessionMonitoring[mainRoomId] = [JSON.stringify(req.body)]
+      }
 
       const participant = JSON.parse(connection.data);
 
