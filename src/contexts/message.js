@@ -26,13 +26,11 @@ export default function MessageProvider({ children }){
   }
 
   async function refreshInfo(mainRoomId) {
-    if (userRef.current.role === "moderator" || userRef.current.isCohost) {
     const { participants } = await RoomAPI.getParticipants(mainRoomId);
     const { breakoutRooms } = await RoomAPI.getBreakoutRooms(mainRoomId);
     
     setParticipants(participants);
     setBreakoutRooms(breakoutRooms ?? []);
-    }
   }
 
   useEffect(() => {

@@ -29,7 +29,7 @@ export default function CountDownTimer({handleChangeRoom}) {
     }, [mMessage.timer, mRoom.inBreakoutRoom]);
 
     useEffect(() => {
-        if (mSession.user.role === "participant" && !mRoom.inBreakoutRoom && triggeredTimer) {
+        if (mSession.user.role === "participant" && !mSession.user.isCohost && !mRoom.inBreakoutRoom && triggeredTimer) {
             return resetTimer();
         }
         if (countDown !== null && countDown <= mMessage.timer.countDownTimer && !showCountDownTimer) {
