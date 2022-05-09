@@ -265,6 +265,7 @@ class RoomListener{
       await RoomAPI.broadcastMsg(relatedSessions, 'update-participant', participants );
 
       const updatedRoom = await RoomAPI.delBreakoutRooms(room);
+      sessionMonitoring[selectedRoom.id] = [];
 
       res.json({
         ...updatedRoom

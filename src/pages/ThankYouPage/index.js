@@ -15,12 +15,6 @@ function ThankYouPage () {
         <div className="Vlt-card__content">
           <CallEnd className={mStyles.icon}></CallEnd>
           <h1>Call Ended</h1>
-          <p> 
-            <Button 
-              onClick={() => {navigate("/")}}
-              text="Start Over"
-              />
-          </p> 
         </div>
       </div>
     </div>
