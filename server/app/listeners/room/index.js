@@ -441,13 +441,14 @@ class RoomListener{
       if (event === "streamDestroyed") {
         if (breakoutRoomsByMainRoom[mainRoomId]) {
         breakoutRoomsByMainRoom[mainRoomId].forEach((p) => {
-          p["member"] = p["member"].filter((p) => p !==participant.name)
+          if (p.id === room.id) {
+            p["member"] = p["member"].filter((p) => p !==participant.name)
+          }
           p["memberAssigned"] = p["memberAssigned"].filter((p) => p !==participant.name)
         })
         }
         if (participantsByMainRoom[mainRoomId] && participantsByMainRoom[mainRoomId][room.id]) {
           participantsByMainRoom[mainRoomId][room.id] = participantsByMainRoom[mainRoomId][room.id].filter((p) => p.name !== participant.name);
-        
         }
       }
       
