@@ -8,7 +8,6 @@ export const SessionContext = createContext({});
 function SessionProvider({ children }){
   const [ user, setUser ] = useState();
   const [ session, setSession ] = useState();
-  const [ userSessions, setUserSessions ] = useState([]);
   const [ streams, setStreams ] = useState([]);
   const [ changedStream, setChangedStream ] = useState();
   const [ connections, setConnections ] = useState([]);
@@ -57,37 +56,23 @@ function SessionProvider({ children }){
         session.off("connectionCreated");
         session.off("connectionDestroyed");
       }
-      let newSession =  userSessions.find((tSession) => tSession.id === credential.sessionId);
       setStreams([]); // Clear old streams
+      let newSession = OT.initSession(credential.apiKey, credential.sessionId); 
 
-      if (newSession) {
-        newSession.on("streamPropertyChanged", handleStreamPropertyChanged);
-        newSession.on("streamCreated", (e) => handleStreamCreated(e));
-        newSession.on("streamDestroyed", (e) => handleStreamDestroyed(e));
-        // one trigger: connection moderation: session.forceDisconnect(connection) 
-        newSession.on("sessionDisconnected", (e) => handleSessionDisconnected(e));
-        newSession.on("connectionCreated", (e) => handleConnectionCreated(e));
-        newSession.on("connectionDestroyed", (e) => handleConnectionDestroyed(e));
-      }
-     else {
-        newSession = OT.initSession(credential.apiKey, credential.sessionId); 
-
-        newSession.on("streamPropertyChanged", handleStreamPropertyChanged);
-        newSession.on("streamCreated", (e) => handleStreamCreated(e));
-        newSession.on("streamDestroyed", (e) => handleStreamDestroyed(e));
-        // one trigger: connection moderation: session.forceDisconnect(connection) 
-        newSession.on("sessionDisconnected", (e) => handleSessionDisconnected(e));
-        newSession.on("connectionCreated", (e) => handleConnectionCreated(e));
-        newSession.on("connectionDestroyed", (e) => handleConnectionDestroyed(e));
-        
-        await new Promise((resolve, reject) => {
-          newSession.connect(credential.token, (err) => {
-            if(err) reject(err);
-            else resolve();
-          })
-        });
-        if (config.keepAllConnection) setUserSessions([...userSessions, newSession]);
-      }
+      newSession.on("streamPropertyChanged", handleStreamPropertyChanged);
+      newSession.on("streamCreated", (e) => handleStreamCreated(e));
+      newSession.on("streamDestroyed", (e) => handleStreamDestroyed(e));
+      // one trigger: connection moderation: session.forceDisconnect(connection) 
+      newSession.on("sessionDisconnected", (e) => handleSessionDisconnected(e));
+      newSession.on("connectionCreated", (e) => handleConnectionCreated(e));
+      newSession.on("connectionDestroyed", (e) => handleConnectionDestroyed(e));
+      
+      await new Promise((resolve, reject) => {
+        newSession.connect(credential.token, (err) => {
+          if(err) reject(err);
+          else resolve();
+        })
+      });
       setSession(newSession);
     }catch(err){
       console.log(err);

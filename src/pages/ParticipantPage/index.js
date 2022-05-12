@@ -48,8 +48,6 @@ export default function ParticipantPage(){
     screen: "cameraContainer" 
   });
 
-  const subscriberRef = useRef(null);
-
   useEffect(() => {
     if (!mMessage.breakoutRoomSignal) return;
 
@@ -93,10 +91,6 @@ export default function ParticipantPage(){
   }, [mMessage.timer])
 
   useEffect(() => {
-    if (mSubscriber.subscribers) subscriberRef.current = mSubscriber;
-  }, [mSubscriber.subscribers, mSubscriber] )
-
-  useEffect(() => {
     if(mSession.session && mSession.session.currentState === "connected") {
       mPublisher.publish(mSession.user);
     }
@@ -104,7 +98,6 @@ export default function ParticipantPage(){
 
   useEffect(() => {
     if(mSession.session && mSession.session.currentState === "connected") {
-      console.log("subscibre");
       mSubscriber.subscribe(mSession.streams);
     }
   }, [ mSession.streams, mSession.session ]);
@@ -151,7 +144,7 @@ export default function ParticipantPage(){
   }
 
   async function handleChangeRoom(roomName = '') {
-    await mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, roomName);
+    await mRoom.handleChangeRoom(mPublisher.publisher, roomName);
     setActiveRoom(roomName? roomName : null);
     setCurrentRoomAssigned(null);
   }
@@ -176,7 +169,7 @@ export default function ParticipantPage(){
               (
               <div className={mStyles.header}>
                 <strong style={{paddingRight: "16px"}}>{mRoom.inBreakoutRoom.name}</strong>
-                {!config.keepAllConnection ? <span style={{fontStyle:"italic"}}>(Disconnected from main session)</span> : null}
+                <span style={{fontStyle:"italic"}}>(Disconnected from main session)</span>
                 {!mSession.user.isCohost ? <Button hierarchy="link" text="Return to main room" onClick={() => handleChangeRoom()} style={{position: "absolute", top: 0, right: "16px", minHeight: "32px", margin: 0}}></Button> : null}
               </div>
               ) : null

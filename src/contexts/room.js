@@ -74,18 +74,12 @@ export default function RoomContextProvider({ children }){
     await connect(user, roomInfo.mainRoom.id);
   }
 
-  async function handleChangeRoom(publisher, subscriber, roomName) {
+  async function handleChangeRoom(publisher, roomName) {
     const newRooms = [...mMessage.breakoutRooms];
     let targetRoom = newRooms.find((room) => room.name === roomName);
 
-    if (config.keepAllConnection) {
-      await mSession.session.unpublish(publisher);
-      subscriber.unsubscribe();
-    }
-    else {
-      await mSession.session.unpublish(publisher);
-      await mSession.session.disconnect();
-    }
+    await mSession.session.unpublish(publisher);
+    await mSession.session.disconnect();
 
     const connectionSuccess = await connect(mSession.user, targetRoom ? targetRoom.id : '');
 

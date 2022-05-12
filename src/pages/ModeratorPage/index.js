@@ -29,6 +29,7 @@ import useStyles from "./styles"
 export default function ModeratorPage() {
     const [isBreakout, setIsBreakout] = useState(false);
     const [isManagePeople, setIsManagePeople] = useState(false);
+    const [currentRoomAssigned, setCurrentRoomAssigned] = useState();
 
     const mSession = useSession();
     const mStyles = useStyles();
@@ -41,8 +42,6 @@ export default function ModeratorPage() {
       camera: "cameraContainer", 
       screen: "cameraContainer" 
     });
-
-    const subscriberRef = useRef(null);
 
     useEffect(() => {
       if (!mMessage.breakoutRoomSignal) return;
@@ -63,8 +62,9 @@ export default function ModeratorPage() {
       if (mMessage.breakoutRoomSignal.message === 'roomEdited' && !roomNameFound && roomSessionIdFound) {
          mNotification.openNotification("Room renamed by Host/Co-host", "New Room Name: " + roomSessionIdFound.name, ()=>{mRoom.handleInBreakoutRoomChange(roomSessionIdFound.name)});
       }
-      if (mMessage.breakoutRoomSignal.message === 'participantMoved' && ((roomNameFound && !roomNameFound["member"].includes(mSession.user.name)) || (!roomNameFound && roomAssigned))) {
-          mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned ? roomAssigned.name: mRoom.mainRoom.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name: ''))
+      if (mMessage.breakoutRoomSignal.message === 'participantMoved' && roomAssigned && (!currentRoomAssigned || currentRoomAssigned.id !== roomAssigned.id)) { 
+        setCurrentRoomAssigned(roomAssigned);
+        mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned.name))
       }
     }, [ mMessage.breakoutRoomSignal ])
 
@@ -79,10 +79,6 @@ export default function ModeratorPage() {
         mSubscriber.subscribe(mSession.streams);
       }
     }, [ mSession.streams, mSession.session, mSubscriber  ]);
-
-    useEffect(() => {
-      if (mSubscriber.subscribers) subscriberRef.current = mSubscriber;
-    }, [mSubscriber.subscribers, mSubscriber] )
 
     useEffect(() => {
       if (mMessage.breakoutRooms.length !== 0 ) setIsBreakout(true);
@@ -106,8 +102,9 @@ export default function ModeratorPage() {
       }
     }, [ mSession.forceDisconnected ])  
 
-    function handleChangeRoom(roomName = '') {
-      mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, roomName);
+    async function handleChangeRoom(roomName = '') {
+      await mRoom.handleChangeRoom(mPublisher.publisher, roomName);
+      setCurrentRoomAssigned(null);
     }
 
     if(!mSession.user && !mSession.session) {
@@ -129,7 +126,7 @@ export default function ModeratorPage() {
               (
               <div className={mStyles.header}>
                 <strong style={{paddingRight: "16px"}}>{mRoom.inBreakoutRoom.name}</strong>
-                {!config.keepAllConnection ? <span style={{fontStyle:"italic"}}>(Disconnected from main session)</span> : null}
+                <span style={{fontStyle:"italic"}}>(Disconnected from main session)</span>
               </div>
               ) : null
           }
