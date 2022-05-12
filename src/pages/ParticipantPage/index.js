@@ -34,6 +34,7 @@ export default function ParticipantPage(){
   const [ activeRoom, setActiveRoom ] = useState();
   const [isBreakout, setIsBreakout] = useState(false);
   const [isCohost, setIsCohost] = useState(false);
+  const [currentRoomAssigned, setCurrentRoomAssigned] = useState();
 
   const mSession = useSession();
   const mRoom = useRoom();
@@ -75,8 +76,9 @@ export default function ParticipantPage(){
     if (mMessage.breakoutRoomSignal.message === 'roomEdited' && !roomNameFound && roomSessionIdFound) {
        mNotification.openNotification("Room renamed by Host/Co-host", "New Room Name: " + roomSessionIdFound.name, ()=>{mRoom.handleInBreakoutRoomChange(roomSessionIdFound.name)});
     }
-    if (mMessage.breakoutRoomSignal.message === 'participantMoved' && ((roomNameFound && !roomNameFound["member"].includes(mSession.user.name)) || ((!roomNameFound && roomAssigned)))) { 
-      mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned ? roomAssigned.name: mRoom.mainRoom.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned ? roomAssigned.name: ''))
+    if (mMessage.breakoutRoomSignal.message === 'participantMoved' && roomAssigned && (!currentRoomAssigned || currentRoomAssigned.id !== roomAssigned.id)) { 
+      setCurrentRoomAssigned(roomAssigned);
+      mNotification.openNotification("Room assigned by Host/Co-host", `You will be redirected to Room: ${roomAssigned.name} in 5 seconds.`, () => handleChangeRoom(roomAssigned.name))
     }
     if (mMessage.breakoutRoomSignal.message === "forceReturn" && mRoom.inBreakoutRoom ) {
         mNotification.openNotification("Moderator left", "You will be redirected to main session in 5 seconds.",  () => handleChangeRoom())
@@ -102,9 +104,10 @@ export default function ParticipantPage(){
 
   useEffect(() => {
     if(mSession.session && mSession.session.currentState === "connected") {
+      console.log("subscibre");
       mSubscriber.subscribe(mSession.streams);
     }
-  }, [ mSession.streams, mSession.session, mSubscriber ]);
+  }, [ mSession.streams, mSession.session ]);
 
   useEffect(() => {
       if (!isCohost && mSession.user && mSession.user.isCohost) {
@@ -147,9 +150,10 @@ export default function ParticipantPage(){
     setActiveRoom(null);
   }
 
-  function handleChangeRoom(roomName = '') {
-    mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, roomName);
+  async function handleChangeRoom(roomName = '') {
+    await mRoom.handleChangeRoom(mPublisher.publisher, subscriberRef.current, roomName);
     setActiveRoom(roomName? roomName : null);
+    setCurrentRoomAssigned(null);
   }
 
   if(!mSession.user && !mSession.session){

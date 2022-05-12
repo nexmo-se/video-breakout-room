@@ -28,6 +28,7 @@ export default function MoveRoomContent(props) {
             return;
         }
 
+        setIsLoading(true);
         let data = {
             fromRoom: prevRoomIndex !== -1 ? newRooms[prevRoomIndex].name : null, 
             toRoom: targetRoomIndex !== -1 ? newRooms[targetRoomIndex].name : null, 

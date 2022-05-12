@@ -35,7 +35,8 @@ You need to setup some environment variables
   - `DATABASE_URL` -- this variable works only for manual deployment. Heroku deployment will automatically fill the value.
   - `REACT_APP_MODERATOR_PIN` -- pin number for moderator to join in
   - `REACT_APP_PARTICIPANT_PIN` -- pin number for participant to join in
-  - `REACT_APP_KEEP_ALL_CONNECTIONS` -- set value to "yes" if you intend to stay connect to main session from breakout room sessions.
+  - `REACT_APP_API_URL` -- this variable works only for development if you want to run backend and frontend on different server. Set the value to your backend api url.
+  - `SESSION_MONITORING_PATH` -- your session monitoring path.
 
 ## Architecture
 This Breakout Room application contains `backend` and `frontend`. However, the `backend` needs a database to store session information. You need to install `postgres` for the database. Any other than `postgres` will not work.
@@ -44,6 +45,10 @@ This Breakout Room application contains `backend` and `frontend`. However, the `
   - Frontend -- we use `ReactJS`
   - Database -- we use `postgres`
 
+## Register Session Monitoring Callbacks
+Set up session monitoring url in your opentok account after deployment.
+  - Go to your Opentok project
+  - Set the callback URL in the Session Monitoring section with url: {Your-app-public-url}/{SESSION_MONITORING_PATH} Example: https://breakout-rooms.herokuapp.com/session-monitoring
 
 ## Deploy to Heroku
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/nexmo-se/video-breakout-room)
