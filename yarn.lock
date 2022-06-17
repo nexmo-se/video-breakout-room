@@ -2485,16 +2485,6 @@
     "@typescript-eslint/types" "5.28.0"
     eslint-visitor-keys "^3.3.0"
 
-"@vonagevolta/volta2@^0.0.56":
-  version "0.0.56"
-  resolved "https://registry.yarnpkg.com/@vonagevolta/volta2/-/volta2-0.0.56.tgz#a9929581bf0aaeb8f2e9d766df2483635ccf64c8"
-  integrity sha512-hNWjiCD+AupTOnH/LEUTBB/V/AHxe3jq2ZY8NC9W0u3aEacRGqk86pwpOOARF2cY9LsA7C0SFME8nbqZWXLX3Q==
-  dependencies:
-    marked "^0.7.0"
-    marked-sanitizer-github "^1.0.0"
-    prismjs "^1.15.0"
-    tooltip.js "^1.2.0"
-
 "@webassemblyjs/ast@1.11.1":
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.11.1.tgz#2bfd767eae1a6996f432ff7e8d7fc75679c0b6a7"
@@ -4200,13 +4190,6 @@ domexception@^2.0.1:
   dependencies:
     webidl-conversions "^5.0.0"
 
-domhandler@^3.0.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/domhandler/-/domhandler-3.3.0.tgz#6db7ea46e4617eb15cf875df68b2b8524ce0037a"
-  integrity sha512-J1C5rIANUbuYK+FuFL98650rihynUOEzRLxW+90bKZRWB6A1X1Tf82GxR1qAWLyfNPRvjqfip3Q5tdYlmAa9lA==
-  dependencies:
-    domelementtype "^2.0.1"
-
 domhandler@^4.0.0, domhandler@^4.2.0, domhandler@^4.3.1:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/domhandler/-/domhandler-4.3.1.tgz#8d792033416f59d68bc03a5aa7b018c1ca89279c"
@@ -4222,7 +4205,7 @@ domutils@^1.7.0:
     dom-serializer "0"
     domelementtype "1"
 
-domutils@^2.0.0, domutils@^2.5.2, domutils@^2.8.0:
+domutils@^2.5.2, domutils@^2.8.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/domutils/-/domutils-2.8.0.tgz#4437def5db6e2d1f5d6ee859bd95ca7d02048135"
   integrity sha512-w96Cjofp72M5IIhpjgobBimYEfoPjx1Vx0BSX9P30WBdZW2WIKU0T1Bd0kz2eNZ9ikjKgHbEyKx8BB6H1L3h3A==
@@ -4440,7 +4423,7 @@ escodegen@^2.0.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-config-react-app@^7.0.0:
+eslint-config-react-app@^7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/eslint-config-react-app/-/eslint-config-react-app-7.0.1.tgz#73ba3929978001c5c86274c017ea57eb5fa644b4"
   integrity sha512-K6rNzvkIeHaTd8m/QEh1Zko0KI7BACWkkneSs6s9cKZC/J27X3eZR6Upt1jkmZ/4FK+XUOPPxMEN7+lbUXfSlA==
@@ -5347,11 +5330,6 @@ html-minifier-terser@^6.0.2:
     relateurl "^0.2.7"
     terser "^5.10.0"
 
-html-void-elements@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/html-void-elements/-/html-void-elements-1.0.5.tgz#ce9159494e86d95e45795b166c2021c2cfca4483"
-  integrity sha512-uE/TxKuyNIcx44cIWnjr/rfIATDH7ZaOMmstu0CwhFG1Dunhlp4OC6/NMbhiwoq5BpW0ubi303qnEk/PZj614w==
-
 html-webpack-plugin@^5.5.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/html-webpack-plugin/-/html-webpack-plugin-5.5.0.tgz#c3911936f57681c1f9f4d8b68c158cd9dfe52f50"
@@ -5362,16 +5340,6 @@ html-webpack-plugin@^5.5.0:
     lodash "^4.17.21"
     pretty-error "^4.0.0"
     tapable "^2.0.0"
-
-htmlparser2@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/htmlparser2/-/htmlparser2-4.1.0.tgz#9a4ef161f2e4625ebf7dfbe6c0a2f52d18a59e78"
-  integrity sha512-4zDq1a1zhE4gQso/c5LP1OtrhYTncXNSpvJYtWJBtXAETPlMfi3IFNjGuQbYLuVY4ZR0QMqRVvo4Pdy9KLyP8Q==
-  dependencies:
-    domelementtype "^2.0.1"
-    domhandler "^3.0.0"
-    domutils "^2.0.0"
-    entities "^2.0.0"
 
 htmlparser2@^6.1.0:
   version "6.1.0"
@@ -6778,20 +6746,6 @@ makeerror@1.0.12:
   dependencies:
     tmpl "1.0.5"
 
-marked-sanitizer-github@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/marked-sanitizer-github/-/marked-sanitizer-github-1.0.1.tgz#99edee7b92e3a42b8f436609eba24cb41c0ef7e1"
-  integrity sha512-ZCuCwhBc6JwoZkksCD+r1kDo5exAnIMumFKXAr8xkaCcglUrcqb78ijO1vYZIKi+S8TEBUYacaz8Ot+zRIQeNw==
-  dependencies:
-    he "^1.2.0"
-    html-void-elements "^1.0.5"
-    htmlparser2 "^4.1.0"
-
-marked@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-0.7.0.tgz#b64201f051d271b1edc10a04d1ae9b74bb8e5c0e"
-  integrity sha512-c+yYdCZJQrsRjTPhUx7VKkApw9bwDkNbHUKo1ovgcfDjb2kc8rLuRbIFyXL5WOEUwzSSKo3IXpph2K6DqB/KZg==
-
 md5@^2.0.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/md5/-/md5-2.3.0.tgz#c3da9a6aae3a30b46b7b0c349b87b110dc3bda4f"
@@ -7478,11 +7432,6 @@ popper.js@1.16.1-lts:
   resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1-lts.tgz#cf6847b807da3799d80ee3d6d2f90df8a3f50b05"
   integrity sha512-Kjw8nKRl1m+VrSFCoVGPph93W/qrSO7ZkqPpTf7F4bk/sqcfWK019dWBUpE/fBOsOQY1dks/Bmcbfn1heM/IsA==
 
-popper.js@^1.0.2:
-  version "1.16.1"
-  resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1.tgz#2a223cb3dc7b6213d740e40372be40de43e65b1b"
-  integrity sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==
-
 postcss-attribute-case-insensitive@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/postcss-attribute-case-insensitive/-/postcss-attribute-case-insensitive-5.0.1.tgz#86d323c77ab8896ed90500071c2c8329fba64fda"
@@ -8095,11 +8044,6 @@ pretty-format@^28.1.1:
     ansi-styles "^5.0.0"
     react-is "^18.0.0"
 
-prismjs@^1.15.0:
-  version "1.28.0"
-  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.28.0.tgz#0d8f561fa0f7cf6ebca901747828b149147044b6"
-  integrity sha512-8aaXdYvl1F7iC7Xm1spqSaY/OJBpYW3v+KJ+F17iYxvdc8sfjW194COK5wVhMZX45tGteiBQgdvD/nhxcRwylw==
-
 process-nextick-args@~2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.1.tgz#7820d9b16120cc55ca9ae7792680ae7dba6d7fe2"
@@ -8590,7 +8534,7 @@ react-avatar@^4.0.0:
     is-retina "^1.0.3"
     md5 "^2.0.0"
 
-react-dev-utils@^12.0.0:
+react-dev-utils@^12.0.1:
   version "12.0.1"
   resolved "https://registry.yarnpkg.com/react-dev-utils/-/react-dev-utils-12.0.1.tgz#ba92edb4a1f379bd46ccd6bcd4e7bc398df33e73"
   integrity sha512-84Ivxmr17KjUupyqzFode6xKhjwuEJDROWKJy/BthkL7Wn6NJ8h4WE6k/exAv6ImS+0oZLRRW5j/aINMHyeGeQ==
@@ -8669,10 +8613,10 @@ react-router@6.3.0:
   dependencies:
     history "^5.2.0"
 
-react-scripts@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/react-scripts/-/react-scripts-5.0.0.tgz#6547a6d7f8b64364ef95273767466cc577cb4b60"
-  integrity sha512-3i0L2CyIlROz7mxETEdfif6Sfhh9Lfpzi10CtcGs1emDQStmZfWjJbAIMtRD0opVUjQuFWqHZyRZ9PPzKCFxWg==
+react-scripts@5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/react-scripts/-/react-scripts-5.0.1.tgz#6285dbd65a8ba6e49ca8d651ce30645a6d980003"
+  integrity sha512-8VAmEm/ZAwQzJ+GOMLbBsTdDKOpuZh7RPs0UymvBR2vRk4iZWCskjbFnxqjrzoIvlNNRZ3QJFx6/qDSi6zSnaQ==
   dependencies:
     "@babel/core" "^7.16.0"
     "@pmmmwh/react-refresh-webpack-plugin" "^0.5.3"
@@ -8690,7 +8634,7 @@ react-scripts@5.0.0:
     dotenv "^10.0.0"
     dotenv-expand "^5.1.0"
     eslint "^8.3.0"
-    eslint-config-react-app "^7.0.0"
+    eslint-config-react-app "^7.0.1"
     eslint-webpack-plugin "^3.1.1"
     file-loader "^6.2.0"
     fs-extra "^10.0.0"
@@ -8707,7 +8651,7 @@ react-scripts@5.0.0:
     postcss-preset-env "^7.0.1"
     prompts "^2.4.2"
     react-app-polyfill "^3.0.0"
-    react-dev-utils "^12.0.0"
+    react-dev-utils "^12.0.1"
     react-refresh "^0.11.0"
     resolve "^1.20.0"
     resolve-url-loader "^4.0.0"
@@ -9784,13 +9728,6 @@ toidentifier@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/toidentifier/-/toidentifier-1.0.1.tgz#3be34321a88a820ed1bd80dfaa33e479fbb8dd35"
   integrity sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==
-
-tooltip.js@^1.2.0:
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/tooltip.js/-/tooltip.js-1.3.3.tgz#2ad0d77bb6776a76e117eac0afcd3c7d3a237121"
-  integrity sha512-XWWuy/dBdF/F/YpRE955yqBZ4VdLfiTAUdOqoU+wJm6phJlMpEzl/iYHZ+qJswbeT9VG822bNfsETF9wzmoy5A==
-  dependencies:
-    popper.js "^1.0.2"
 
 tough-cookie@^4.0.0:
   version "4.0.0"
