@@ -16,7 +16,8 @@ export default function PromptCreateRooms(props) {
     useEffect(() => {
       // exclude co-hosts and moderator
       const numberOfParticipants = mMessage.participants.filter((p) => !p.isCohost)
-      setNumberOfParticipants(numberOfParticipants.length - 1); // exclude moderator
+      let participantsExcludeModerator = Math.max(0, numberOfParticipants.length - 1); 
+      setNumberOfParticipants(participantsExcludeModerator);
     }, [mMessage.participants])
 
     function handleRoomChange(value) {
