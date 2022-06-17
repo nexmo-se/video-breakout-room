@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'antd/dist/antd.css';
+import "@vonagevolta/volta2/dist/css/volta.min.css";
 
 ReactDOM.render(
   // <React.StrictMode> 

@@ -14,6 +14,7 @@
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
+    "@vonagevolta/volta2": "^0.0.56",
     "antd": "^4.19.2",
     "cors": "^2.8.5",
     "delay": "^5.0.0",
@@ -62,6 +63,7 @@
     ]
   },
   "resolutions": { 
-    "nth-check": "^2.0.1" 
+    "nth-check": "^2.0.1",
+    "marked": "^4.0.10"
   }
 }
