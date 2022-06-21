@@ -95,12 +95,6 @@ export default function ModeratorPage() {
         mNotification.openNotification("", "Oops, Someone has stopped you publishing a stream.", () => {})
       }
     }, [ mPublisher.stream ])
-  
-    useEffect(() => {
-      if (mSession.forceDisconnected) {
-        mNotification.openNotification("", "Oops, Someone has disconnected you from the room.", () => {})
-      }
-    }, [ mSession.forceDisconnected ])  
 
     async function handleChangeRoom(roomName = '') {
       await mRoom.handleChangeRoom(mPublisher.publisher, roomName);

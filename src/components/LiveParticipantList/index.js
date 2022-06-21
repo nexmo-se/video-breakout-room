@@ -81,7 +81,7 @@ export default function LiveParticipantList({onClose, visible}) {
             dataSource={mMessage.participants}
             size="large"
             renderItem={item => {
-              const _stream = mSession.streams.length && mSession.streams.find(_e => _e.name === item.name);
+              const _stream = mSession.streams && mSession.streams.length && mSession.streams.find(_e => _e.name === item.name);
               const _connection = mSession.connections.length && mSession.connections.find(_e => {
                 let data = JSON.parse(_e.data);
                 return (data.name === item.name)

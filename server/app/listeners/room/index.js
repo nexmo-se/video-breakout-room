@@ -399,9 +399,12 @@ class RoomListener{
 
   static async sessionMonitoring(req, res) {
     try {
-      const { event, sessionId, connection, stream } = req.body;
+      const { event, sessionId, connection, stream, reason } = req.body;
 
-      if ((event !== "streamCreated" && event !==  "streamDestroyed") || stream.videoType === "screen") {
+      if ((event !== "streamCreated" 
+            && event !==  "streamDestroyed" 
+            && event !==  "connectionDestroyed" 
+          ) || (stream && stream.videoType === "screen")) {
         return res.sendStatus(200);
       }
 
@@ -438,7 +441,8 @@ class RoomListener{
           if (targetRoom && !targetRoom["member"].includes(participant.name)) targetRoom["member"].push(participant.name);
         }
       }
-      if (event === "streamDestroyed") {
+      if (event === "streamDestroyed" && reason != "forceUnpublished"
+          || event === "connectionDestroyed" ) {
         if (breakoutRoomsByMainRoom[mainRoomId]) {
         breakoutRoomsByMainRoom[mainRoomId].forEach((p) => {
           if (p.id === room.id) {

@@ -121,13 +121,6 @@ export default function ParticipantPage(){
     }
   }, [ mPublisher.stream ])
 
-  useEffect(() => {
-    if (mSession.forceDisconnected) {
-      mNotification.openNotification("", "Oops, Someone has disconnected you from the room.", () => {})
-    }
-  }, [ mSession.forceDisconnected ])
-
-
   function handleRoleChange(state) {
     setIsCohost(state);
     mMessage.refreshInfo(mRoom.mainRoom.id);

@@ -14,7 +14,9 @@ function useSubscriber({ moderator, screen, camera, custom }){
   useEffect(() => {
     const { changedStream } = mSession;
     if(changedStream && (changedStream.changedProperty === "hasAudio")){
-      const targetSubscriber = subscribers.find((subscriber) => subscriber.stream.id === changedStream.stream.id)      
+      const targetSubscriber = subscribers.find((subscriber) => 
+        subscriber.stream && changedStream.stream && subscriber.stream.id === changedStream.stream.id
+      )
       
       if (!targetSubscriber) return;
       const targetDom = document.getElementById(changedStream.oldValue ? targetSubscriber.id : `${targetSubscriber.id}-mute`);

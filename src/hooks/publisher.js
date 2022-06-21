@@ -46,8 +46,10 @@ function usePublisher(containerId, autoLayout=true, displayName=true){
     if (e.stream.name !== "sharescreen") e.preventDefault();
     if (e.reason === 'forceUnpublished') {
       console.log('You are forceUnpublished');
-      setStream({...e.stream})
+      setStream(null);
+      publisher.destroy();
       setPublisher({...e.stream.publisher})
+      layoutManager.layout();
     }
   }
 
